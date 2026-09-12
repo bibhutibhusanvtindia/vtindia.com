@@ -11,26 +11,39 @@ export function IntroLoader() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // 1. Immediately trigger the welcome greeting simultaneously with logo animation
+    // 1. Attempt immediate speech trigger
     triggerWelcomeGreeting(true);
 
-    const greetTimer = setTimeout(() => {
-      triggerWelcomeGreeting(true);
-    }, 150);
+    // 2. Continuous retry loop to start speech the millisecond browser unfreezes
+    const retryInterval = setInterval(() => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        if (!window.speechSynthesis.speaking) {
+          triggerWelcomeGreeting(true);
+        } else {
+          clearInterval(retryInterval);
+        }
+      }
+    }, 200);
 
-    // 2. Gesture listener: any mouse move, pointer down, key or touch immediately resumes and speaks
-    const handleUnlockAndGreet = () => {
+    // 3. Capturing listeners on window & document: any tap, mouse press, key or scroll unlocks speech instantly
+    const handleInstantUnlock = () => {
       triggerWelcomeGreeting(true);
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      }
     };
 
-    window.addEventListener("pointermove", handleUnlockAndGreet, { once: true });
-    window.addEventListener("mousemove", handleUnlockAndGreet, { once: true });
-    window.addEventListener("pointerdown", handleUnlockAndGreet, { once: true });
-    window.addEventListener("touchstart", handleUnlockAndGreet, { once: true });
-    window.addEventListener("click", handleUnlockAndGreet, { once: true });
-    window.addEventListener("keydown", handleUnlockAndGreet, { once: true });
+    window.addEventListener("pointerdown", handleInstantUnlock, { capture: true });
+    window.addEventListener("mousedown", handleInstantUnlock, { capture: true });
+    window.addEventListener("touchstart", handleInstantUnlock, { capture: true });
+    window.addEventListener("keydown", handleInstantUnlock, { capture: true });
+    window.addEventListener("click", handleInstantUnlock, { capture: true });
+    window.addEventListener("wheel", handleInstantUnlock, { capture: true });
+    window.addEventListener("focus", handleInstantUnlock, { capture: true });
 
-    // Smooth progress counter calibrated to ~2.8s to synchronize with spoken welcome greeting
+    // Smooth progress counter calibrated to ~3.2s
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -38,19 +51,20 @@ export function IntroLoader() {
           setTimeout(() => setLoading(false), 500);
           return 100;
         }
-        return prev + Math.floor(Math.random() * 4 + 3);
+        return prev + Math.floor(Math.random() * 4 + 2);
       });
-    }, 90);
+    }, 85);
 
     return () => {
-      clearTimeout(greetTimer);
+      clearInterval(retryInterval);
       clearInterval(interval);
-      window.removeEventListener("pointermove", handleUnlockAndGreet);
-      window.removeEventListener("mousemove", handleUnlockAndGreet);
-      window.removeEventListener("pointerdown", handleUnlockAndGreet);
-      window.removeEventListener("touchstart", handleUnlockAndGreet);
-      window.removeEventListener("click", handleUnlockAndGreet);
-      window.removeEventListener("keydown", handleUnlockAndGreet);
+      window.removeEventListener("pointerdown", handleInstantUnlock, { capture: true });
+      window.removeEventListener("mousedown", handleInstantUnlock, { capture: true });
+      window.removeEventListener("touchstart", handleInstantUnlock, { capture: true });
+      window.removeEventListener("keydown", handleInstantUnlock, { capture: true });
+      window.removeEventListener("click", handleInstantUnlock, { capture: true });
+      window.removeEventListener("wheel", handleInstantUnlock, { capture: true });
+      window.removeEventListener("focus", handleInstantUnlock, { capture: true });
     };
   }, []);
 
