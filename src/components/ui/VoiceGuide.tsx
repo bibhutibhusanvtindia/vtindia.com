@@ -79,16 +79,10 @@ export function VoiceGuide() {
     setSoundOn(isSoundEnabled());
     const unsubSound = subscribeSound((on) => {
       setSoundOn(on);
-      if (on && viewMode === "pill") {
-        setViewMode("tour");
-      }
     });
 
     const unsubSpeech = subscribeSpeech((state) => {
       setSpeechState(state);
-      if (state.isPlaying && viewMode === "pill") {
-        setViewMode("tour");
-      }
     });
 
     // Check SpeechRecognition support in browser

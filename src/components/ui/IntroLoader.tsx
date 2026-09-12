@@ -4,12 +4,18 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Zap } from "lucide-react";
+import { triggerWelcomeGreeting } from "@/lib/sound";
 
 export function IntroLoader() {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    // Instantly trigger the warm welcome greeting during the logo assembly
+    const greetTimer = setTimeout(() => {
+      triggerWelcomeGreeting();
+    }, 300);
+
     // Smooth progress counter from 0 to 100%
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -22,7 +28,10 @@ export function IntroLoader() {
       });
     }, 90);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(greetTimer);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
