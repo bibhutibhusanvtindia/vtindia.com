@@ -18,27 +18,37 @@ export function IntroLoader() {
       setIsSpeaking(state.isPlaying);
     });
 
-    const startGreeting = () => {
-      if (hasTriggeredRef.current) return;
-      hasTriggeredRef.current = true;
+    const triggerSpeechNow = () => {
       triggerWelcomeGreeting(true, () => {
         // When speech finishes, gracefully dismiss loader after brief pause
         setTimeout(() => setLoading(false), 400);
       });
     };
 
-    // 1. Immediately attempt auto-greeting
-    startGreeting();
+    // 1. Trigger immediately on mount
+    triggerSpeechNow();
 
-    // 2. Gesture listener: any interaction awakens the speech synthesis & plays simultaneous greeting
-    const handleGesture = () => {
-      startGreeting();
+    // 2. Scheduled wakeups to catch voice engine initialization
+    const t1 = setTimeout(triggerSpeechNow, 120);
+    const t2 = setTimeout(triggerSpeechNow, 350);
+
+    // 3. User interaction listener: immediately awakens speech synthesis if blocked by browser policy
+    const handleUserInteraction = () => {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        if (!window.speechSynthesis.speaking) {
+          triggerSpeechNow();
+        } else if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      }
     };
 
-    window.addEventListener("pointerdown", handleGesture, { once: true });
-    window.addEventListener("touchstart", handleGesture, { once: true });
-    window.addEventListener("click", handleGesture, { once: true });
-    window.addEventListener("keydown", handleGesture, { once: true });
+    window.addEventListener("pointerdown", handleUserInteraction);
+    window.addEventListener("pointermove", handleUserInteraction, { passive: true });
+    window.addEventListener("mousedown", handleUserInteraction);
+    window.addEventListener("touchstart", handleUserInteraction, { passive: true });
+    window.addEventListener("click", handleUserInteraction);
+    window.addEventListener("keydown", handleUserInteraction);
 
     // Smooth progress counter calibrated to ~2.8s
     const interval = setInterval(() => {
@@ -57,11 +67,15 @@ export function IntroLoader() {
 
     return () => {
       unsubSpeech();
+      clearTimeout(t1);
+      clearTimeout(t2);
       clearInterval(interval);
-      window.removeEventListener("pointerdown", handleGesture);
-      window.removeEventListener("touchstart", handleGesture);
-      window.removeEventListener("click", handleGesture);
-      window.removeEventListener("keydown", handleGesture);
+      window.removeEventListener("pointerdown", handleUserInteraction);
+      window.removeEventListener("pointermove", handleUserInteraction);
+      window.removeEventListener("mousedown", handleUserInteraction);
+      window.removeEventListener("touchstart", handleUserInteraction);
+      window.removeEventListener("click", handleUserInteraction);
+      window.removeEventListener("keydown", handleUserInteraction);
     };
   }, []);
 
