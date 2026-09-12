@@ -109,7 +109,7 @@ export function Footer() {
       </Container>
 
       <div className="relative border-t border-border">
-        <Container className="flex flex-col items-center justify-between gap-3 py-6 text-xs text-muted sm:flex-row">
+        <Container className="flex flex-col items-center justify-between gap-4 py-8 pb-14 text-xs text-muted sm:flex-row sm:pb-8">
           <p>
             © {site.copyrightYear} {site.legalName}. All rights reserved.
           </p>

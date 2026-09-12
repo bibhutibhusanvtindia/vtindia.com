@@ -11,13 +11,15 @@ import {
   SkipBack,
   Sparkles,
   ChevronDown,
-  ChevronUp,
   MessageSquare,
   Headphones,
   Send,
   ArrowRight,
   Bot,
   HelpCircle,
+  Mic,
+  MicOff,
+  RotateCcw,
 } from "lucide-react";
 import {
   isSoundEnabled,
@@ -40,6 +42,14 @@ import {
   BotAnswer,
 } from "@/lib/virtoyBot";
 
+const WELCOME_GREETING: BotAnswer = {
+  text: "Welcome to Virtoy Technologies! Founded by IIT alumni and senior engineers, we build enterprise software, ERP systems, and high-fidelity AR/VR simulations. How can I assist you today?",
+  speechText:
+    "Welcome to Virtoy Technologies. Founded by IIT alumni, we build enterprise software, custom ERPs, and high-fidelity AR and VR simulations across India and the UAE. How can I assist you today?",
+  actionUrl: "/products",
+  actionLabel: "Explore 16 Products",
+};
+
 export function VoiceGuide() {
   const [soundOn, setSoundOn] = useState(false);
   const [speechState, setSpeechState] = useState<{
@@ -57,8 +67,13 @@ export function VoiceGuide() {
   // Display mode: 'pill' (compact), 'tour' (audio player), 'chat' (ask customer question)
   const [viewMode, setViewMode] = useState<"pill" | "tour" | "chat">("pill");
   const [customerQuery, setCustomerQuery] = useState("");
-  const [botResponse, setBotResponse] = useState<BotAnswer | null>(null);
+  const [botResponse, setBotResponse] = useState<BotAnswer>(WELCOME_GREETING);
+  const [isListening, setIsListening] = useState(false);
+  const [micSupported, setMicSupported] = useState(false);
+  const [hasGreeted, setHasGreeted] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     setSoundOn(isSoundEnabled());
@@ -75,6 +90,49 @@ export function VoiceGuide() {
         setViewMode("tour");
       }
     });
+
+    // Check SpeechRecognition support in browser
+    if (typeof window !== "undefined") {
+      const SpeechRecognitionClass =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognitionClass) {
+        setMicSupported(true);
+        const recognition = new SpeechRecognitionClass();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-US";
+
+        recognition.onstart = () => {
+          setIsListening(true);
+        };
+
+        recognition.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          if (transcript) {
+            setCustomerQuery(transcript);
+            handleDirectQuery(transcript);
+          }
+        };
+
+        recognition.onerror = () => {
+          setIsListening(false);
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      }
+    }
+
+    // First interaction welcome greeting hook
+    const handleFirstInteraction = () => {
+      if (!hasGreeted) {
+        setHasGreeted(true);
+      }
+    };
+    window.addEventListener("click", handleFirstInteraction, { once: true });
 
     // Global click listener for spoken elements
     const handleVoiceTrigger = (e: MouseEvent) => {
@@ -94,18 +152,40 @@ export function VoiceGuide() {
       unsubSound();
       unsubSpeech();
       window.removeEventListener("click", handleVoiceTrigger);
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
     };
-  }, [viewMode]);
+  }, [viewMode, hasGreeted]);
+
+  const toggleMic = () => {
+    if (!recognitionRef.current) return;
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      playChimeClick();
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (err) {
+        // Recognition already running or blocked
+      }
+    }
+  };
+
+  const handleDirectQuery = (queryText: string) => {
+    if (!queryText.trim()) return;
+    playChimeClick();
+    const res = answerCustomerQuery(queryText);
+    setBotResponse(res);
+    speakText(res.speechText, `Virtoy AI: ${queryText.slice(0, 24)}...`);
+    setCustomerQuery("");
+  };
 
   const handleSendQuery = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!customerQuery.trim()) return;
-
-    playChimeClick();
-    const res = answerCustomerQuery(customerQuery);
-    setBotResponse(res);
-    speakText(res.speechText, `Virtoy AI: ${customerQuery.slice(0, 24)}...`);
-    setCustomerQuery("");
+    handleDirectQuery(customerQuery);
   };
 
   const handleSelectSuggested = (q: string) => {
@@ -115,41 +195,62 @@ export function VoiceGuide() {
     speakText(res.speechText, `Virtoy AI: ${q}`);
   };
 
-  // 1. Minimized Floating Pill View (Ultra-compact, zero screen obstruction)
+  const playWelcomeGreeting = () => {
+    playChimeStartup();
+    setBotResponse(WELCOME_GREETING);
+    speakText(WELCOME_GREETING.speechText, "Virtoy Welcome");
+  };
+
+  // 1. Minimized Floating Pill View (Ultra-compact, zero screen obstruction, bottom-left)
   if (viewMode === "pill") {
     return (
-      <div className="fixed bottom-6 right-24 z-40 animate-rise-in font-sans">
+      <div className="fixed bottom-6 left-6 z-40 animate-rise-in font-sans">
         <button
           onClick={() => {
-            playChimeStartup();
-            if (!soundOn) enableSoundAndPlay(0);
-            setViewMode("tour");
+            playWelcomeGreeting();
+            setViewMode("chat");
           }}
-          className="group flex items-center gap-2.5 rounded-full border border-primary/30 bg-surface/90 px-4 py-2.5 shadow-lg shadow-primary/15 backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-primary hover:bg-surface hover:shadow-xl hover:shadow-primary/25"
+          className="group flex items-center gap-2.5 rounded-full border border-primary/30 bg-surface/95 px-4 py-2.5 shadow-lg shadow-primary/15 backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-primary hover:bg-surface hover:shadow-xl hover:shadow-primary/25"
         >
           <span className="relative flex h-3 w-3">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
             <span className="relative inline-flex h-3 w-3 rounded-full bg-primary" />
           </span>
-          <Headphones className="h-4 w-4 text-primary" />
+          <Bot className="h-4 w-4 text-primary" />
           <span className="text-xs font-bold text-foreground">
-            {speechState.isPlaying ? "Listening to Voice..." : "Voice & AI Guide"}
+            {speechState.isPlaying ? "Speaking Aloud..." : "Voice & AI Assistant"}
           </span>
           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-            Interactive
+            Mic Ready 🎙️
           </span>
         </button>
       </div>
     );
   }
 
-  // 2. Expanded Interactive Card (Docked neatly beside WhatsApp button)
+  // 2. Expanded Interactive Card (Docked neatly on bottom-left)
   return (
-    <div className="fixed bottom-6 right-4 sm:right-24 z-50 w-[calc(100vw-2rem)] sm:w-[26rem] max-w-[28rem] animate-rise-in font-sans">
+    <div className="fixed bottom-6 left-4 sm:left-6 z-50 w-[calc(100vw-2rem)] sm:w-[26rem] max-w-[28rem] animate-rise-in font-sans">
       <div className="relative overflow-hidden rounded-3xl border border-primary/35 bg-surface/95 p-4 sm:p-5 shadow-2xl shadow-primary/25 backdrop-blur-2xl transition-all">
         {/* Header with Switcher Tabs & Controls */}
         <div className="flex items-center justify-between gap-2 border-b border-border/70 pb-3">
           <div className="flex items-center gap-1 rounded-full bg-surface-muted p-1">
+            <button
+              onClick={() => {
+                playChimeClick();
+                setViewMode("chat");
+                setTimeout(() => inputRef.current?.focus(), 150);
+              }}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
+                viewMode === "chat"
+                  ? "bg-primary text-white shadow-sm shadow-primary/30"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              <Bot className="h-3.5 w-3.5" />
+              Ask Virtoy AI
+            </button>
+
             <button
               onClick={() => {
                 playChimeClick();
@@ -163,22 +264,6 @@ export function VoiceGuide() {
             >
               <Headphones className="h-3.5 w-3.5" />
               Audio Tour
-            </button>
-
-            <button
-              onClick={() => {
-                playChimeClick();
-                setViewMode("chat");
-                setTimeout(() => inputRef.current?.focus(), 150);
-              }}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
-                viewMode === "chat"
-                  ? "bg-primary text-white shadow-sm shadow-primary/30"
-                  : "text-muted hover:text-foreground"
-              }`}
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-              Ask Virtoy AI
             </button>
           </div>
 
@@ -194,6 +279,9 @@ export function VoiceGuide() {
             <button
               onClick={() => {
                 stopVoiceNarration();
+                if (isListening && recognitionRef.current) {
+                  recognitionRef.current.stop();
+                }
                 setViewMode("pill");
               }}
               title="Mute & Close"
@@ -203,6 +291,120 @@ export function VoiceGuide() {
             </button>
           </div>
         </div>
+
+        {/* ================= VIEW: CUSTOMER QUESTION / AI & MIC INPUT ================= */}
+        {viewMode === "chat" && (
+          <div className="mt-3.5 space-y-3">
+            {/* Welcome / Bot Response Bubble */}
+            <div className="rounded-2xl border border-primary/30 bg-primary/[0.06] p-3.5 space-y-2.5 animate-rise-in">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-primary">
+                  <Bot className="h-3.5 w-3.5" />
+                  Virtoy AI Assistant
+                </div>
+                {speechState.isPlaying ? (
+                  <span className="text-[10px] font-semibold text-primary animate-pulse flex items-center gap-1">
+                    <Volume2 className="h-3 w-3" /> Speaking...
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => speakText(botResponse.speechText, "Virtoy AI")}
+                    title="Repeat Audio"
+                    className="text-[10px] font-semibold text-muted hover:text-primary flex items-center gap-1 transition"
+                  >
+                    <RotateCcw className="h-3 w-3" /> Replay
+                  </button>
+                )}
+              </div>
+              <p className="text-xs leading-relaxed text-foreground whitespace-pre-line font-medium">
+                {botResponse.text}
+              </p>
+              {botResponse.actionUrl && (
+                <div className="flex items-center justify-between pt-1">
+                  <Link
+                    href={botResponse.actionUrl}
+                    onClick={() => setViewMode("pill")}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-primary-strong transition shadow-sm"
+                  >
+                    {botResponse.actionLabel || "Learn More"}
+                    <ArrowRight className="h-3 w-3" />
+                  </Link>
+
+                  <span className="text-[10px] font-semibold text-muted">
+                    100% Verified Data
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Popular Suggested Questions */}
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted flex items-center gap-1">
+                <HelpCircle className="h-3 w-3 text-primary" />
+                Suggested Inquiries
+              </p>
+              <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto pr-1">
+                {SUGGESTED_QUESTIONS.slice(0, 4).map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => handleSelectSuggested(q)}
+                    className="rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[11px] font-medium text-muted hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition text-left"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Customer Input Field with Active Mic Button */}
+            <form onSubmit={handleSendQuery} className="relative mt-2">
+              <div className="relative flex items-center">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={customerQuery}
+                  onChange={(e) => setCustomerQuery(e.target.value)}
+                  placeholder={
+                    isListening
+                      ? "🎙️ Listening... speak your question now"
+                      : "Type or tap Mic to speak..."
+                  }
+                  className={`w-full rounded-2xl border bg-surface py-2.5 pl-3.5 pr-20 text-xs text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+                    isListening ? "border-primary ring-2 ring-primary/20 bg-primary/[0.03]" : "border-border"
+                  }`}
+                />
+
+                <div className="absolute right-1.5 flex items-center gap-1">
+                  {/* Mic Toggle Button */}
+                  {micSupported && (
+                    <button
+                      type="button"
+                      onClick={toggleMic}
+                      title={isListening ? "Stop listening" : "Speak with Voice (Mic On)"}
+                      className={`flex h-7 w-7 items-center justify-center rounded-xl transition ${
+                        isListening
+                          ? "bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30"
+                          : "bg-surface-muted text-muted hover:bg-primary/10 hover:text-primary"
+                      }`}
+                    >
+                      {isListening ? <Mic className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                    </button>
+                  )}
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={!customerQuery.trim()}
+                    title="Send query"
+                    className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary text-white shadow-sm disabled:opacity-40 hover:bg-primary-strong transition"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        )}
 
         {/* ================= VIEW: AUDIO TOUR ================= */}
         {viewMode === "tour" && (
@@ -317,93 +519,10 @@ export function VoiceGuide() {
                 onClick={() => setViewMode("chat")}
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
               >
-                <span>Ask a question</span>
+                <span>Ask AI</span>
                 <ArrowRight className="h-3 w-3" />
               </button>
             </div>
-          </div>
-        )}
-
-        {/* ================= VIEW: CUSTOMER QUESTION / AI INPUT ================= */}
-        {viewMode === "chat" && (
-          <div className="mt-3.5 space-y-3">
-            {/* Bot Response Bubble (if available) */}
-            {botResponse ? (
-              <div className="rounded-2xl border border-primary/30 bg-primary/[0.06] p-3.5 space-y-2.5 animate-rise-in">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                    <Bot className="h-3.5 w-3.5" />
-                    Virtoy Verified Answer
-                  </div>
-                  {speechState.isPlaying && (
-                    <span className="text-[10px] font-semibold text-primary animate-pulse">
-                      Speaking aloud...
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs leading-relaxed text-foreground whitespace-pre-line font-medium">
-                  {botResponse.text}
-                </p>
-                {botResponse.actionUrl && (
-                  <Link
-                    href={botResponse.actionUrl}
-                    onClick={() => setViewMode("pill")}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-primary-strong transition shadow-sm"
-                  >
-                    {botResponse.actionLabel || "Learn More"}
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-dashed border-border p-3 text-center">
-                <p className="text-xs font-semibold text-foreground">
-                  Ask anything about Virtoy Technologies
-                </p>
-                <p className="text-[11px] text-muted mt-0.5">
-                  Type your query below or pick a suggested topic to get instant spoken answers.
-                </p>
-              </div>
-            )}
-
-            {/* Suggested Questions Grid */}
-            <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted flex items-center gap-1">
-                <HelpCircle className="h-3 w-3 text-primary" />
-                Popular Questions
-              </p>
-              <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
-                {SUGGESTED_QUESTIONS.map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => handleSelectSuggested(q)}
-                    className="rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[11px] font-medium text-muted hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition text-left"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Customer Input Field */}
-            <form onSubmit={handleSendQuery} className="relative mt-2">
-              <input
-                ref={inputRef}
-                type="text"
-                value={customerQuery}
-                onChange={(e) => setCustomerQuery(e.target.value)}
-                placeholder="Ask about SafeAct, ERP, clients, offices..."
-                className="w-full rounded-2xl border border-border bg-surface py-2.5 pl-3.5 pr-11 text-xs text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-              <button
-                type="submit"
-                disabled={!customerQuery.trim()}
-                title="Send query"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-xl bg-primary text-white shadow-sm disabled:opacity-40 hover:bg-primary-strong transition"
-              >
-                <Send className="h-3.5 w-3.5" />
-              </button>
-            </form>
           </div>
         )}
       </div>
