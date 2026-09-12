@@ -302,16 +302,22 @@ function findBestEnglishVoice(synth: SpeechSynthesis): SpeechSynthesisVoice | nu
   }
 }
 
+let pendingVoiceTimer: NodeJS.Timeout | null = null;
+
 export function speakText(text: string, title = "Virtoy Voice Guide") {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   if (!soundEnabled) return;
 
   const synth = window.speechSynthesis;
 
-  // Clear existing resume heartbeat
+  // Clear any existing resume heartbeat and pending voice load timers
   if (resumeInterval) {
     clearInterval(resumeInterval);
     resumeInterval = null;
+  }
+  if (pendingVoiceTimer) {
+    clearTimeout(pendingVoiceTimer);
+    pendingVoiceTimer = null;
   }
 
   try {
@@ -327,6 +333,8 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
   notifySpeech();
 
   const doSpeak = () => {
+    if (!soundEnabled || !isSpeakingState) return;
+
     try {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "en-US";
@@ -363,6 +371,13 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
 
       // Chrome Speech bug prevention: resume periodically while utterance is active
       resumeInterval = setInterval(() => {
+        if (!soundEnabled || !isSpeakingState) {
+          if (resumeInterval) {
+            clearInterval(resumeInterval);
+            resumeInterval = null;
+          }
+          return;
+        }
         if (synth.speaking && synth.paused) {
           synth.resume();
         }
@@ -383,11 +398,15 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
       if (handled) return;
       handled = true;
       synth.onvoiceschanged = null;
+      if (pendingVoiceTimer) {
+        clearTimeout(pendingVoiceTimer);
+        pendingVoiceTimer = null;
+      }
       doSpeak();
     };
 
     synth.onvoiceschanged = onVoicesReady;
-    setTimeout(() => {
+    pendingVoiceTimer = setTimeout(() => {
       onVoicesReady();
     }, 60);
   }
@@ -396,8 +415,13 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
 export function stopVoiceNarration() {
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
     try {
+      window.speechSynthesis.onvoiceschanged = null;
       window.speechSynthesis.cancel();
     } catch {}
+  }
+  if (pendingVoiceTimer) {
+    clearTimeout(pendingVoiceTimer);
+    pendingVoiceTimer = null;
   }
   if (resumeInterval) {
     clearInterval(resumeInterval);

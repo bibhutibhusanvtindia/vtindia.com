@@ -24,7 +24,9 @@ export function SoundToggle() {
     };
   }, []);
 
-  const handleToggle = () => {
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     toggleSound();
   };
 
