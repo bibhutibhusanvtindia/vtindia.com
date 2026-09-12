@@ -135,7 +135,7 @@ export function playChimeStartup() {
     }
     const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
     notes.forEach((freq, idx) => {
-      const startTime = ctx.currentTime + idx * 0.08;
+      const startTime = ctx.currentTime + idx * 0.055;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -143,13 +143,13 @@ export function playChimeStartup() {
       osc.frequency.setValueAtTime(freq, startTime);
 
       gain.gain.setValueAtTime(0.25, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.45);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.35);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(startTime);
-      osc.stop(startTime + 0.45);
+      osc.stop(startTime + 0.35);
     });
   } catch {
     // AudioContext blocked before gesture
@@ -338,7 +338,7 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
     try {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "en-US";
-      utterance.rate = 1.0;
+      utterance.rate = 1.08;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 

@@ -26,17 +26,17 @@ export function IntroLoader() {
     window.addEventListener("click", handleGestureUnlock, { once: true });
     window.addEventListener("keydown", handleGestureUnlock, { once: true });
 
-    // Smooth progress counter from 0 to 100% over ~2.8 seconds matching speech duration
+    // Snappy progress counter from 0 to 100% over ~1.3 seconds
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setLoading(false), 350);
+          setTimeout(() => setLoading(false), 200);
           return 100;
         }
-        return prev + Math.floor(Math.random() * 4 + 2);
+        return prev + Math.floor(Math.random() * 6 + 3);
       });
-    }, 70);
+    }, 35);
 
     return () => {
       clearTimeout(greetTimer);
@@ -60,7 +60,7 @@ export function IntroLoader() {
           initial={{ opacity: 1 }}
           exit={{
             y: "-100%",
-            transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] },
+            transition: { duration: 0.45, ease: [0.76, 0, 0.24, 1] },
           }}
           onClick={handleEnterWithAudio}
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-[#fbf7f9] text-[#1a0a12] select-none cursor-pointer"
@@ -77,21 +77,21 @@ export function IntroLoader() {
               <motion.div
                 initial={{ scaleX: 0, opacity: 0 }}
                 animate={{ scaleX: 1, opacity: 0.4 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
                 className="absolute inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary to-transparent"
               />
               <motion.div
                 initial={{ scaleY: 0, opacity: 0 }}
                 animate={{ scaleY: 1, opacity: 0.4 }}
-                transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+                transition={{ duration: 0.35, delay: 0.05, ease: "easeOut" }}
                 className="absolute inset-y-0 w-[1.5px] bg-gradient-to-b from-transparent via-primary to-transparent"
               />
 
               {/* Left Logo Wing Assembly */}
               <motion.div
-                initial={{ x: -100, opacity: 0, rotate: -35 }}
+                initial={{ x: -80, opacity: 0, rotate: -25 }}
                 animate={{ x: 0, opacity: 1, rotate: 0 }}
-                transition={{ duration: 0.7, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+                transition={{ duration: 0.45, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
                 className="absolute -left-2 top-1/2 -translate-y-1/2 flex items-center"
               >
                 <div className="h-10 w-3 rounded-l-md border-l-2 border-y-2 border-primary bg-primary/20 shadow-[0_0_15px_rgba(240,24,108,0.8)]" />
@@ -100,9 +100,9 @@ export function IntroLoader() {
 
               {/* Right Logo Wing Assembly */}
               <motion.div
-                initial={{ x: 100, opacity: 0, rotate: 35 }}
+                initial={{ x: 80, opacity: 0, rotate: 25 }}
                 animate={{ x: 0, opacity: 1, rotate: 0 }}
-                transition={{ duration: 0.7, delay: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
+                transition={{ duration: 0.45, delay: 0.12, ease: [0.21, 0.47, 0.32, 0.98] }}
                 className="absolute -right-2 top-1/2 -translate-y-1/2 flex items-center"
               >
                 <div className="h-1 w-6 bg-accent-strong" />
@@ -111,9 +111,9 @@ export function IntroLoader() {
 
               {/* Center Assembled Brand Mark */}
               <motion.div
-                initial={{ scale: 0.4, opacity: 0 }}
-                animate={{ scale: [0.4, 1.08, 1], opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: [0.5, 1.05, 1], opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
                 className="relative z-10 flex items-center justify-center p-4"
               >
                 <div className="relative h-16 w-60 sm:h-20 sm:w-72">
@@ -130,17 +130,17 @@ export function IntroLoader() {
               {/* Energy Shockwave Pulse on Assembly */}
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: [0.8, 2.2], opacity: [0.8, 0] }}
-                transition={{ duration: 0.9, delay: 0.8, ease: "easeOut" }}
+                animate={{ scale: [0.8, 2], opacity: [0.8, 0] }}
+                transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" }}
                 className="absolute h-24 w-24 rounded-full border-2 border-primary shadow-[0_0_30px_rgba(240,24,108,1)]"
               />
             </div>
 
             {/* Kinetic Slogan */}
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.9 }}
+              transition={{ duration: 0.35, delay: 0.45 }}
               className="mt-6 flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-muted uppercase"
             >
               <span className="h-1 w-1 rounded-full bg-primary" />
@@ -164,9 +164,9 @@ export function IntroLoader() {
 
             {/* Tap to Enter with Audio Badge */}
             <motion.button
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
+              transition={{ delay: 0.6 }}
               onClick={handleEnterWithAudio}
               className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-white px-5 py-2 text-xs font-bold text-primary shadow-md shadow-primary/20 hover:scale-105 hover:bg-primary hover:text-white transition"
             >
