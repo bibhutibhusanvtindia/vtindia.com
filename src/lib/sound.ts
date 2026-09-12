@@ -1,22 +1,8 @@
 "use client";
 
-// High-fidelity Web Audio API synthesizer & Voice Assistant Engine
+// High-fidelity Web Audio API synthesizer for interactive audio feedback & chimes
 let audioCtx: AudioContext | null = null;
 let soundEnabled = true;
-
-// Prevent Chrome V8 garbage collection bug on SpeechSynthesisUtterance
-let activeUtterance: SpeechSynthesisUtterance | null = null;
-let speechResumeInterval: ReturnType<typeof setInterval> | null = null;
-
-// Preload voices immediately on client script load
-if (typeof window !== "undefined" && "speechSynthesis" in window) {
-  try {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.getVoices();
-    };
-  } catch {}
-}
 
 type SoundListener = (enabled: boolean) => void;
 type SpeechListener = (state: { isPlaying: boolean; text: string; title: string; topicIndex: number }) => void;
@@ -56,23 +42,30 @@ let isSpeakingState = false;
 let currentSpeechText = "";
 let currentSpeechTitle = "";
 let hasGreetedUser = false;
+let resumeInterval: NodeJS.Timeout | null = null;
+
+// Pre-warm voices on script load
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  try {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+  } catch {}
+}
 
 export function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
-  try {
-    if (!audioCtx) {
-      const AudioContextClass =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioContextClass) {
-        audioCtx = new AudioContextClass();
-      }
+  if (!audioCtx) {
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
     }
-    if (audioCtx && audioCtx.state === "suspended") {
-      audioCtx.resume().catch(() => {});
-    }
-  } catch {
-    // AudioContext blocked
+  }
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume().catch(() => {});
   }
   return audioCtx;
 }
@@ -138,6 +131,9 @@ export function playChimeStartup() {
   if (!ctx) return;
 
   try {
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
     const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
     notes.forEach((freq, idx) => {
       const startTime = ctx.currentTime + idx * 0.08;
@@ -147,14 +143,14 @@ export function playChimeStartup() {
       osc.type = "sine";
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.2, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.4);
+      gain.gain.setValueAtTime(0.25, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.45);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(startTime);
-      osc.stop(startTime + 0.4);
+      osc.stop(startTime + 0.45);
     });
   } catch {
     // AudioContext blocked before gesture
@@ -179,6 +175,9 @@ export function playHapticBeep(
   if (!ctx) return;
 
   try {
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -208,9 +207,10 @@ export function playChimeSuccess() {
 
 /**
  * Auto Greeting on website open:
- * Simultaneously speaks "Welcome to Virtoy Technologies Private Limited." while the logo animation plays.
+ * Speaks simultaneously with the logo animation:
+ * "Welcome to Virtoy Technologies Private Limited." (nothing else).
  */
-export function triggerWelcomeGreeting(force = true) {
+export function triggerWelcomeGreeting(force = false) {
   if (typeof window === "undefined") return;
   if (hasGreetedUser && !force) return;
   hasGreetedUser = true;
@@ -249,26 +249,33 @@ export function prevVoiceTopic() {
   startVoiceTour(prevIdx);
 }
 
-function getBestVoice(synth: SpeechSynthesis): SpeechSynthesisVoice | null {
+/**
+ * Select the best natural-sounding voice available in the browser
+ */
+function findBestEnglishVoice(synth: SpeechSynthesis): SpeechSynthesisVoice | null {
   try {
     const voices = synth.getVoices();
     if (!voices || voices.length === 0) return null;
 
-    return (
-      voices.find(
-        (v) =>
-          v.lang.startsWith("en") &&
-          (v.name.includes("Natural") ||
-            v.name.includes("Google") ||
-            v.name.includes("Samantha") ||
-            v.name.includes("David") ||
-            v.name.includes("Zira") ||
-            v.name.includes("Jenny") ||
-            v.name.includes("Microsoft"))
-      ) ||
-      voices.find((v) => v.lang.startsWith("en")) ||
-      voices[0]
+    // Prioritize natural and premier English voices
+    const preferred = voices.find(
+      (v) =>
+        v.lang.startsWith("en") &&
+        (v.name.includes("Google") ||
+          v.name.includes("Natural") ||
+          v.name.includes("Samantha") ||
+          v.name.includes("Jenny") ||
+          v.name.includes("David") ||
+          v.name.includes("Zira") ||
+          v.name.includes("Microsoft") ||
+          v.name.includes("English"))
     );
+    if (preferred) return preferred;
+
+    const anyEn = voices.find((v) => v.lang.toLowerCase().startsWith("en"));
+    if (anyEn) return anyEn;
+
+    return voices[0] || null;
   } catch {
     return null;
   }
@@ -280,10 +287,10 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
 
   const synth = window.speechSynthesis;
 
-  // Clear any existing speech heartbeat interval
-  if (speechResumeInterval) {
-    clearInterval(speechResumeInterval);
-    speechResumeInterval = null;
+  // Clear existing resume heartbeat
+  if (resumeInterval) {
+    clearInterval(resumeInterval);
+    resumeInterval = null;
   }
 
   try {
@@ -291,64 +298,77 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
     if (synth.paused) {
       synth.resume();
     }
-  } catch {
-    // Speech synthesis error
-  }
+  } catch {}
 
   currentSpeechText = text;
   currentSpeechTitle = title;
   isSpeakingState = true;
   notifySpeech();
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-  utterance.rate = 0.95;
-  utterance.pitch = 1.0;
-  utterance.volume = 1.0;
+  const doSpeak = () => {
+    try {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
 
-  const voice = getBestVoice(synth);
-  if (voice) {
-    utterance.voice = voice;
-  }
-
-  // Prevent Garbage Collection in Chrome by assigning to module variable and window
-  activeUtterance = utterance;
-  (window as unknown as { __virtoyUtterance: SpeechSynthesisUtterance }).__virtoyUtterance = utterance;
-
-  utterance.onend = () => {
-    isSpeakingState = false;
-    currentSpeechText = "";
-    activeUtterance = null;
-    if (speechResumeInterval) {
-      clearInterval(speechResumeInterval);
-      speechResumeInterval = null;
-    }
-    notifySpeech();
-  };
-
-  utterance.onerror = () => {
-    isSpeakingState = false;
-    currentSpeechText = "";
-    activeUtterance = null;
-    if (speechResumeInterval) {
-      clearInterval(speechResumeInterval);
-      speechResumeInterval = null;
-    }
-    notifySpeech();
-  };
-
-  try {
-    synth.speak(utterance);
-
-    // Chrome bug workaround: keep synthesis active and unpause if paused
-    speechResumeInterval = setInterval(() => {
-      if (synth.speaking && synth.paused) {
-        synth.resume();
+      const voice = findBestEnglishVoice(synth);
+      if (voice) {
+        utterance.voice = voice;
       }
-    }, 200);
-  } catch {
-    isSpeakingState = false;
-    notifySpeech();
+
+      utterance.onend = () => {
+        isSpeakingState = false;
+        currentSpeechText = "";
+        if (resumeInterval) {
+          clearInterval(resumeInterval);
+          resumeInterval = null;
+        }
+        notifySpeech();
+      };
+
+      utterance.onerror = () => {
+        isSpeakingState = false;
+        currentSpeechText = "";
+        if (resumeInterval) {
+          clearInterval(resumeInterval);
+          resumeInterval = null;
+        }
+        notifySpeech();
+      };
+
+      synth.speak(utterance);
+
+      // Chrome Speech bug prevention: resume periodically while utterance is active
+      resumeInterval = setInterval(() => {
+        if (synth.speaking && synth.paused) {
+          synth.resume();
+        }
+      }, 250);
+    } catch {
+      isSpeakingState = false;
+      notifySpeech();
+    }
+  };
+
+  const voices = synth.getVoices();
+  if (voices && voices.length > 0) {
+    doSpeak();
+  } else {
+    // Voices not loaded yet; wait for voiceschanged or trigger fallback after 60ms
+    let handled = false;
+    const onVoicesReady = () => {
+      if (handled) return;
+      handled = true;
+      synth.onvoiceschanged = null;
+      doSpeak();
+    };
+
+    synth.onvoiceschanged = onVoicesReady;
+    setTimeout(() => {
+      onVoicesReady();
+    }, 60);
   }
 }
 
@@ -358,11 +378,10 @@ export function stopVoiceNarration() {
       window.speechSynthesis.cancel();
     } catch {}
   }
-  if (speechResumeInterval) {
-    clearInterval(speechResumeInterval);
-    speechResumeInterval = null;
+  if (resumeInterval) {
+    clearInterval(resumeInterval);
+    resumeInterval = null;
   }
-  activeUtterance = null;
   isSpeakingState = false;
   currentSpeechText = "";
   notifySpeech();

@@ -11,60 +11,40 @@ export function IntroLoader() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // 1. Attempt immediate speech trigger
-    triggerWelcomeGreeting(true);
-
-    // 2. Continuous retry loop to start speech the millisecond browser unfreezes
-    const retryInterval = setInterval(() => {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        if (!window.speechSynthesis.speaking) {
-          triggerWelcomeGreeting(true);
-        } else {
-          clearInterval(retryInterval);
-        }
-      }
+    // Instantly trigger welcome greeting simultaneously as logo pieces assemble
+    const greetTimer = setTimeout(() => {
+      triggerWelcomeGreeting(true);
     }, 200);
 
-    // 3. Capturing listeners on window & document: any tap, mouse press, key or scroll unlocks speech instantly
-    const handleInstantUnlock = () => {
+    // Browser gesture unlock listener: fires greeting immediately on user interaction if autoplay was paused
+    const handleGestureUnlock = () => {
       triggerWelcomeGreeting(true);
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-        }
-      }
     };
 
-    window.addEventListener("pointerdown", handleInstantUnlock, { capture: true });
-    window.addEventListener("mousedown", handleInstantUnlock, { capture: true });
-    window.addEventListener("touchstart", handleInstantUnlock, { capture: true });
-    window.addEventListener("keydown", handleInstantUnlock, { capture: true });
-    window.addEventListener("click", handleInstantUnlock, { capture: true });
-    window.addEventListener("wheel", handleInstantUnlock, { capture: true });
-    window.addEventListener("focus", handleInstantUnlock, { capture: true });
+    window.addEventListener("pointerdown", handleGestureUnlock, { once: true });
+    window.addEventListener("touchstart", handleGestureUnlock, { once: true });
+    window.addEventListener("click", handleGestureUnlock, { once: true });
+    window.addEventListener("keydown", handleGestureUnlock, { once: true });
 
-    // Smooth progress counter calibrated to ~3.2s
+    // Smooth progress counter from 0 to 100% over ~2.8 seconds matching speech duration
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setLoading(false), 500);
+          setTimeout(() => setLoading(false), 350);
           return 100;
         }
         return prev + Math.floor(Math.random() * 4 + 2);
       });
-    }, 85);
+    }, 70);
 
     return () => {
-      clearInterval(retryInterval);
+      clearTimeout(greetTimer);
       clearInterval(interval);
-      window.removeEventListener("pointerdown", handleInstantUnlock, { capture: true });
-      window.removeEventListener("mousedown", handleInstantUnlock, { capture: true });
-      window.removeEventListener("touchstart", handleInstantUnlock, { capture: true });
-      window.removeEventListener("keydown", handleInstantUnlock, { capture: true });
-      window.removeEventListener("click", handleInstantUnlock, { capture: true });
-      window.removeEventListener("wheel", handleInstantUnlock, { capture: true });
-      window.removeEventListener("focus", handleInstantUnlock, { capture: true });
+      window.removeEventListener("pointerdown", handleGestureUnlock);
+      window.removeEventListener("touchstart", handleGestureUnlock);
+      window.removeEventListener("click", handleGestureUnlock);
+      window.removeEventListener("keydown", handleGestureUnlock);
     };
   }, []);
 
