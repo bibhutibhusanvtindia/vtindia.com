@@ -2,7 +2,7 @@
 
 // High-fidelity Web Audio API synthesizer for interactive audio feedback & chimes
 let audioCtx: AudioContext | null = null;
-let soundEnabled = true; // Enabled by default as requested by user
+let soundEnabled = true;
 
 type SoundListener = (enabled: boolean) => void;
 type SpeechListener = (state: { isPlaying: boolean; text: string; title: string; topicIndex: number }) => void;
@@ -43,7 +43,7 @@ let currentSpeechText = "";
 let currentSpeechTitle = "";
 let hasGreetedUser = false;
 
-function getAudioContext(): AudioContext | null {
+export function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
   if (!audioCtx) {
     const AudioContextClass =
@@ -112,7 +112,7 @@ export function enableSoundAndPlay(topicIdx = 0) {
 }
 
 /**
- * Crystal clear pleasant chime tone when sound is activated
+ * Crystal clear pleasant chime tone when sound is activated (Loud & Audible)
  */
 export function playChimeStartup() {
   if (!soundEnabled) return;
@@ -122,24 +122,24 @@ export function playChimeStartup() {
   try {
     const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
     notes.forEach((freq, idx) => {
-      const startTime = ctx.currentTime + idx * 0.07;
+      const startTime = ctx.currentTime + idx * 0.08;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
       osc.type = "sine";
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.12, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.35);
+      gain.gain.setValueAtTime(0.2, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.4);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(startTime);
-      osc.stop(startTime + 0.35);
+      osc.stop(startTime + 0.4);
     });
   } catch {
-    // Blocked before gesture
+    // AudioContext blocked before gesture
   }
 }
 
@@ -147,14 +147,14 @@ export function playChimeStartup() {
  * Interactive haptic click tone
  */
 export function playChimeClick() {
-  playHapticBeep(800, 0.04, "sine", 0.08);
+  playHapticBeep(800, 0.04, "sine", 0.12);
 }
 
 export function playHapticBeep(
   freq = 640,
   duration = 0.05,
   type: OscillatorType = "sine",
-  gainVal = 0.08
+  gainVal = 0.12
 ) {
   if (!soundEnabled) return;
   const ctx = getAudioContext();
@@ -183,17 +183,18 @@ export function playHapticBeep(
 
 export function playChimeSuccess() {
   if (!soundEnabled) return;
-  playHapticBeep(523.25, 0.08, "sine", 0.08);
-  setTimeout(() => playHapticBeep(659.25, 0.08, "sine", 0.08), 60);
-  setTimeout(() => playHapticBeep(783.99, 0.12, "sine", 0.1), 120);
+  playHapticBeep(523.25, 0.08, "sine", 0.12);
+  setTimeout(() => playHapticBeep(659.25, 0.08, "sine", 0.12), 60);
+  setTimeout(() => playHapticBeep(783.99, 0.12, "sine", 0.15), 120);
 }
 
 /**
  * Auto Greeting on website open:
  * Speaks ONLY the warm welcome greeting, nothing else until the user clicks something.
  */
-export function triggerWelcomeGreeting() {
-  if (hasGreetedUser || typeof window === "undefined") return;
+export function triggerWelcomeGreeting(force = false) {
+  if (typeof window === "undefined") return;
+  if (hasGreetedUser && !force) return;
   hasGreetedUser = true;
 
   if (soundEnabled) {
@@ -203,6 +204,10 @@ export function triggerWelcomeGreeting() {
       "Welcome to Virtoy Technologies"
     );
   }
+}
+
+export function resetGreetingState() {
+  hasGreetedUser = false;
 }
 
 /**
@@ -231,11 +236,14 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
   if (!soundEnabled) return;
 
   const synth = window.speechSynthesis;
-  synth.cancel();
 
-  // Chrome quirk fix: resume synth before speak
-  if (synth.paused) {
-    synth.resume();
+  try {
+    synth.cancel();
+    if (synth.paused) {
+      synth.resume();
+    }
+  } catch {
+    // Speech synthesis error
   }
 
   currentSpeechText = text;
@@ -244,32 +252,37 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
   notifySpeech();
 
   const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
   utterance.rate = 1.0;
-  utterance.pitch = 1.05;
+  utterance.pitch = 1.0;
   utterance.volume = 1.0;
 
-  const chooseVoice = () => {
+  const assignVoice = () => {
     const voices = synth.getVoices();
-    const englishVoice =
-      voices.find(
-        (v) =>
-          v.lang.startsWith("en") &&
-          (v.name.includes("Natural") ||
-            v.name.includes("Google") ||
-            v.name.includes("Samantha") ||
-            v.name.includes("David") ||
-            v.name.includes("Zira") ||
-            v.name.includes("Microsoft"))
-      ) || voices.find((v) => v.lang.startsWith("en")) || voices[0];
+    if (voices.length > 0) {
+      const englishVoice =
+        voices.find(
+          (v) =>
+            v.lang.startsWith("en") &&
+            (v.name.includes("Natural") ||
+              v.name.includes("Google") ||
+              v.name.includes("Samantha") ||
+              v.name.includes("David") ||
+              v.name.includes("Zira") ||
+              v.name.includes("Microsoft"))
+        ) || voices.find((v) => v.lang.startsWith("en")) || voices[0];
 
-    if (englishVoice) {
-      utterance.voice = englishVoice;
+      if (englishVoice) {
+        utterance.voice = englishVoice;
+      }
     }
   };
 
-  chooseVoice();
+  assignVoice();
   if (synth.getVoices().length === 0) {
-    synth.onvoiceschanged = chooseVoice;
+    synth.onvoiceschanged = () => {
+      assignVoice();
+    };
   }
 
   utterance.onend = () => {
@@ -284,12 +297,23 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
     notifySpeech();
   };
 
-  synth.speak(utterance);
+  try {
+    synth.speak(utterance);
+    // Chrome bug fix: occasionally wake up speech synthesis if it idles
+    if (synth.paused) {
+      synth.resume();
+    }
+  } catch {
+    isSpeakingState = false;
+    notifySpeech();
+  }
 }
 
 export function stopVoiceNarration() {
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+    } catch {}
   }
   isSpeakingState = false;
   currentSpeechText = "";

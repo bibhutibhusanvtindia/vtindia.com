@@ -34,6 +34,11 @@ export function IntroLoader() {
     };
   }, []);
 
+  const handleEnterWithAudio = () => {
+    triggerWelcomeGreeting(true);
+    setLoading(false);
+  };
+
   return (
     <AnimatePresence>
       {loading && (
@@ -43,7 +48,8 @@ export function IntroLoader() {
             y: "-100%",
             transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] },
           }}
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-[#fbf7f9] text-[#1a0a12] select-none"
+          onClick={handleEnterWithAudio}
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-[#fbf7f9] text-[#1a0a12] select-none cursor-pointer"
         >
           {/* Subtle Grid & Soft Ambient Magenta Glow */}
           <div className="absolute inset-0 bg-grid opacity-60" />
@@ -141,15 +147,27 @@ export function IntroLoader() {
                 />
               </div>
             </div>
+
+            {/* Tap to Enter with Audio Badge */}
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 }}
+              onClick={handleEnterWithAudio}
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-white px-5 py-2 text-xs font-bold text-primary shadow-md shadow-primary/20 hover:scale-105 hover:bg-primary hover:text-white transition"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+              </span>
+              <span>🎧 Enter with Voice Audio &amp; 3D WebXR</span>
+            </motion.button>
           </div>
 
-          {/* Quick Skip Button */}
-          <button
-            onClick={() => setLoading(false)}
-            className="absolute bottom-8 text-[11px] font-semibold text-muted/60 tracking-wider uppercase transition hover:text-primary"
-          >
-            Click anywhere to skip intro →
-          </button>
+          {/* Quick Skip Prompt */}
+          <p className="absolute bottom-6 text-[11px] font-semibold text-muted/70 tracking-wider uppercase">
+            Click anywhere to enter →
+          </p>
         </motion.div>
       )}
     </AnimatePresence>
