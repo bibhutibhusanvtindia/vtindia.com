@@ -10,7 +10,7 @@ import {
 } from "@/lib/sound";
 
 export function SoundToggle() {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {

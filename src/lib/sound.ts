@@ -2,7 +2,7 @@
 
 // High-fidelity Web Audio API synthesizer for interactive audio feedback & chimes
 let audioCtx: AudioContext | null = null;
-let soundEnabled = false;
+let soundEnabled = true; // Enabled by default as requested by user
 
 type SoundListener = (enabled: boolean) => void;
 type SpeechListener = (state: { isPlaying: boolean; text: string; title: string; topicIndex: number }) => void;
@@ -41,6 +41,7 @@ let currentTopicIndex = 0;
 let isSpeakingState = false;
 let currentSpeechText = "";
 let currentSpeechTitle = "";
+let hasGreetedUser = false;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -64,11 +65,18 @@ export function isSoundEnabled(): boolean {
 
 export function subscribeSound(fn: SoundListener): () => void {
   soundListeners.add(fn);
+  fn(soundEnabled);
   return () => soundListeners.delete(fn);
 }
 
 export function subscribeSpeech(fn: SpeechListener): () => void {
   speechListeners.add(fn);
+  fn({
+    isPlaying: isSpeakingState,
+    text: currentSpeechText,
+    title: currentSpeechTitle,
+    topicIndex: currentTopicIndex,
+  });
   return () => speechListeners.delete(fn);
 }
 
@@ -89,8 +97,7 @@ export function toggleSound(): boolean {
 
   if (soundEnabled) {
     playChimeStartup();
-    // Auto start the voice tour when sound is enabled
-    startVoiceTour(0);
+    startVoiceTour(currentTopicIndex);
   } else {
     stopVoiceNarration();
   }
@@ -108,27 +115,32 @@ export function enableSoundAndPlay(topicIdx = 0) {
  * Crystal clear pleasant chime tone when sound is activated
  */
 export function playChimeStartup() {
+  if (!soundEnabled) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-  notes.forEach((freq, idx) => {
-    const startTime = ctx.currentTime + idx * 0.07;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+  try {
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    notes.forEach((freq, idx) => {
+      const startTime = ctx.currentTime + idx * 0.07;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, startTime);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, startTime);
 
-    gain.gain.setValueAtTime(0.12, startTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.35);
+      gain.gain.setValueAtTime(0.12, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.35);
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
 
-    osc.start(startTime);
-    osc.stop(startTime + 0.35);
-  });
+      osc.start(startTime);
+      osc.stop(startTime + 0.35);
+    });
+  } catch {
+    // Blocked before gesture
+  }
 }
 
 /**
@@ -177,6 +189,23 @@ export function playChimeSuccess() {
 }
 
 /**
+ * Auto Greeting on website open:
+ * Speaks ONLY the warm welcome greeting, nothing else until the user clicks something.
+ */
+export function triggerWelcomeGreeting() {
+  if (hasGreetedUser || typeof window === "undefined") return;
+  hasGreetedUser = true;
+
+  if (soundEnabled) {
+    playChimeStartup();
+    speakText(
+      "A warm welcome to Virtoy Technologies Private Limited.",
+      "Welcome to Virtoy Technologies"
+    );
+  }
+}
+
+/**
  * Start or jump to a specific Voice Tour topic
  */
 export function startVoiceTour(topicIdx = 0) {
@@ -199,6 +228,7 @@ export function prevVoiceTopic() {
 
 export function speakText(text: string, title = "Virtoy Voice Guide") {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  if (!soundEnabled) return;
 
   const synth = window.speechSynthesis;
   synth.cancel();

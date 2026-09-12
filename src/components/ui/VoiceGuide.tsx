@@ -35,6 +35,7 @@ import {
   enableSoundAndPlay,
   playChimeClick,
   playChimeStartup,
+  triggerWelcomeGreeting,
 } from "@/lib/sound";
 import {
   answerCustomerQuery,
@@ -43,15 +44,14 @@ import {
 } from "@/lib/virtoyBot";
 
 const WELCOME_GREETING: BotAnswer = {
-  text: "Welcome to Virtoy Technologies! Founded by IIT alumni and senior engineers, we build enterprise software, ERP systems, and high-fidelity AR/VR simulations. How can I assist you today?",
-  speechText:
-    "Welcome to Virtoy Technologies. Founded by IIT alumni, we build enterprise software, custom ERPs, and high-fidelity AR and VR simulations across India and the UAE. How can I assist you today?",
+  text: "A warm welcome to Virtoy Technologies Private Limited! How can I assist you with our products, services, or solutions today?",
+  speechText: "A warm welcome to Virtoy Technologies Private Limited.",
   actionUrl: "/products",
   actionLabel: "Explore 16 Products",
 };
 
 export function VoiceGuide() {
-  const [soundOn, setSoundOn] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
   const [speechState, setSpeechState] = useState<{
     isPlaying: boolean;
     text: string;
@@ -126,13 +126,24 @@ export function VoiceGuide() {
       }
     }
 
-    // First interaction welcome greeting hook
+    // Attempt direct welcome greeting upon mount
+    const timer = setTimeout(() => {
+      if (!hasGreeted) {
+        triggerWelcomeGreeting();
+        setHasGreeted(true);
+      }
+    }, 800);
+
+    // First interaction welcome greeting hook (if browser requires gesture)
     const handleFirstInteraction = () => {
       if (!hasGreeted) {
+        triggerWelcomeGreeting();
         setHasGreeted(true);
       }
     };
     window.addEventListener("click", handleFirstInteraction, { once: true });
+    window.addEventListener("pointerdown", handleFirstInteraction, { once: true });
+    window.addEventListener("touchstart", handleFirstInteraction, { once: true });
 
     // Global click listener for spoken elements
     const handleVoiceTrigger = (e: MouseEvent) => {
@@ -149,9 +160,13 @@ export function VoiceGuide() {
     window.addEventListener("click", handleVoiceTrigger);
 
     return () => {
+      clearTimeout(timer);
       unsubSound();
       unsubSpeech();
       window.removeEventListener("click", handleVoiceTrigger);
+      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("pointerdown", handleFirstInteraction);
+      window.removeEventListener("touchstart", handleFirstInteraction);
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
@@ -201,7 +216,7 @@ export function VoiceGuide() {
     speakText(WELCOME_GREETING.speechText, "Virtoy Welcome");
   };
 
-  // 1. Minimized Floating Pill View (Ultra-compact, zero screen obstruction, bottom-left)
+  // 1. Minimized Floating Pill View (Ultra-compact, solid background, bottom-left)
   if (viewMode === "pill") {
     return (
       <div className="fixed bottom-6 left-6 z-40 animate-rise-in font-sans">
@@ -210,7 +225,7 @@ export function VoiceGuide() {
             playWelcomeGreeting();
             setViewMode("chat");
           }}
-          className="group flex items-center gap-2.5 rounded-full border border-primary/30 bg-surface/95 px-4 py-2.5 shadow-lg shadow-primary/15 backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-primary hover:bg-surface hover:shadow-xl hover:shadow-primary/25"
+          className="group flex items-center gap-2.5 rounded-full border-2 border-primary/40 bg-white dark:bg-[#1a0a12] px-4 py-2.5 shadow-2xl shadow-primary/20 transition-all duration-300 hover:scale-105 hover:border-primary hover:shadow-primary/35"
         >
           <span className="relative flex h-3 w-3">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
@@ -228,10 +243,10 @@ export function VoiceGuide() {
     );
   }
 
-  // 2. Expanded Interactive Card (Docked neatly on bottom-left)
+  // 2. Expanded Interactive Card (Solid background, docked on bottom-left)
   return (
     <div className="fixed bottom-6 left-4 sm:left-6 z-50 w-[calc(100vw-2rem)] sm:w-[26rem] max-w-[28rem] animate-rise-in font-sans">
-      <div className="relative overflow-hidden rounded-3xl border border-primary/35 bg-surface/95 p-4 sm:p-5 shadow-2xl shadow-primary/25 backdrop-blur-2xl transition-all">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-primary/40 bg-white/98 dark:bg-[#1a0a12]/98 p-4 sm:p-5 shadow-2xl shadow-primary/25 backdrop-blur-2xl transition-all">
         {/* Header with Switcher Tabs & Controls */}
         <div className="flex items-center justify-between gap-2 border-b border-border/70 pb-3">
           <div className="flex items-center gap-1 rounded-full bg-surface-muted p-1">
