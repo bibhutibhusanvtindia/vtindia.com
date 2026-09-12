@@ -120,26 +120,7 @@ export function VoiceGuide() {
       }
     }
 
-    // Attempt direct welcome greeting upon mount
-    const timer = setTimeout(() => {
-      if (!hasGreeted) {
-        triggerWelcomeGreeting();
-        setHasGreeted(true);
-      }
-    }, 800);
-
-    // First interaction welcome greeting hook (if browser requires gesture)
-    const handleFirstInteraction = () => {
-      if (!hasGreeted) {
-        triggerWelcomeGreeting();
-        setHasGreeted(true);
-      }
-    };
-    window.addEventListener("click", handleFirstInteraction, { once: true });
-    window.addEventListener("pointerdown", handleFirstInteraction, { once: true });
-    window.addEventListener("touchstart", handleFirstInteraction, { once: true });
-
-    // Global click listener for spoken elements
+    // Global click listener for spoken elements (e.g. clicking service cards)
     const handleVoiceTrigger = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest("[data-voice-speak]");
       if (target) {
@@ -154,18 +135,14 @@ export function VoiceGuide() {
     window.addEventListener("click", handleVoiceTrigger);
 
     return () => {
-      clearTimeout(timer);
       unsubSound();
       unsubSpeech();
       window.removeEventListener("click", handleVoiceTrigger);
-      window.removeEventListener("click", handleFirstInteraction);
-      window.removeEventListener("pointerdown", handleFirstInteraction);
-      window.removeEventListener("touchstart", handleFirstInteraction);
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
     };
-  }, [viewMode, hasGreeted]);
+  }, [viewMode]);
 
   const toggleMic = () => {
     if (!recognitionRef.current) return;
@@ -204,10 +181,11 @@ export function VoiceGuide() {
     speakText(res.speechText, `Virtoy AI: ${q}`);
   };
 
-  const playWelcomeGreeting = () => {
-    playChimeStartup();
+  const openChatMode = () => {
+    playChimeClick();
     setBotResponse(WELCOME_GREETING);
-    speakText(WELCOME_GREETING.speechText, "Virtoy Welcome");
+    setViewMode("chat");
+    setTimeout(() => inputRef.current?.focus(), 150);
   };
 
   // 1. Minimized Floating Pill View (Ultra-compact, solid background, bottom-left)
@@ -215,10 +193,7 @@ export function VoiceGuide() {
     return (
       <div className="fixed bottom-6 left-6 z-40 animate-rise-in font-sans">
         <button
-          onClick={() => {
-            playWelcomeGreeting();
-            setViewMode("chat");
-          }}
+          onClick={openChatMode}
           className="group flex items-center gap-2.5 rounded-full border-2 border-primary/40 bg-white dark:bg-[#1a0a12] px-4 py-2.5 shadow-2xl shadow-primary/20 transition-all duration-300 hover:scale-105 hover:border-primary hover:shadow-primary/35"
         >
           <span className="relative flex h-3 w-3">

@@ -13,12 +13,12 @@ export function IntroLoader() {
   useEffect(() => {
     // Instantly trigger welcome greeting simultaneously as logo pieces assemble
     const greetTimer = setTimeout(() => {
-      triggerWelcomeGreeting(true);
+      triggerWelcomeGreeting();
     }, 200);
 
-    // Browser gesture unlock listener: fires greeting immediately on user interaction if autoplay was paused
+    // Browser gesture unlock listener: fires greeting once if initial autoplay was paused
     const handleGestureUnlock = () => {
-      triggerWelcomeGreeting(true);
+      triggerWelcomeGreeting();
     };
 
     window.addEventListener("pointerdown", handleGestureUnlock, { once: true });
@@ -49,7 +49,7 @@ export function IntroLoader() {
   }, []);
 
   const handleEnterWithAudio = () => {
-    triggerWelcomeGreeting(true);
+    triggerWelcomeGreeting();
     setLoading(false);
   };
 

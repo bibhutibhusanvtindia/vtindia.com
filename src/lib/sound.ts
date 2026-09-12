@@ -108,7 +108,6 @@ export function toggleSound(): boolean {
 
   if (soundEnabled) {
     playChimeStartup();
-    startVoiceTour(currentTopicIndex);
   } else {
     stopVoiceNarration();
   }
@@ -207,12 +206,12 @@ export function playChimeSuccess() {
 
 /**
  * Auto Greeting on website open:
- * Speaks simultaneously with the logo animation:
+ * Speaks simultaneously with the logo animation ONCE:
  * "Welcome to Virtoy Technologies Private Limited." (nothing else).
  */
-export function triggerWelcomeGreeting(force = false) {
+export function triggerWelcomeGreeting() {
   if (typeof window === "undefined") return;
-  if (hasGreetedUser && !force) return;
+  if (hasGreetedUser) return; // Strict: only once per session
   hasGreetedUser = true;
 
   if (soundEnabled) {
@@ -222,6 +221,10 @@ export function triggerWelcomeGreeting(force = false) {
       "Welcome to Virtoy Technologies"
     );
   }
+}
+
+export function hasUserBeenGreeted(): boolean {
+  return hasGreetedUser;
 }
 
 export function resetGreetingState() {
