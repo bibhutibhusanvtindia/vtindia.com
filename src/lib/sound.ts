@@ -1,8 +1,12 @@
 "use client";
 
-// High-fidelity Web Audio API synthesizer for interactive audio feedback & chimes
+// High-fidelity Web Audio API synthesizer & Voice Assistant Engine
 let audioCtx: AudioContext | null = null;
 let soundEnabled = true;
+
+// Prevent Chrome V8 garbage collection bug on SpeechSynthesisUtterance
+let activeUtterance: SpeechSynthesisUtterance | null = null;
+let speechResumeInterval: ReturnType<typeof setInterval> | null = null;
 
 type SoundListener = (enabled: boolean) => void;
 type SpeechListener = (state: { isPlaying: boolean; text: string; title: string; topicIndex: number }) => void;
@@ -45,16 +49,20 @@ let hasGreetedUser = false;
 
 export function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
-  if (!audioCtx) {
-    const AudioContextClass =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
+  try {
+    if (!audioCtx) {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
     }
-  }
-  if (audioCtx && audioCtx.state === "suspended") {
-    audioCtx.resume();
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+  } catch {
+    // AudioContext blocked
   }
   return audioCtx;
 }
@@ -190,9 +198,9 @@ export function playChimeSuccess() {
 
 /**
  * Auto Greeting on website open:
- * Speaks ONLY the warm welcome greeting, nothing else until the user clicks something.
+ * Simultaneously speaks "Welcome to Virtoy Technologies Private Limited." while the logo animation plays.
  */
-export function triggerWelcomeGreeting(force = false) {
+export function triggerWelcomeGreeting(force = true) {
   if (typeof window === "undefined") return;
   if (hasGreetedUser && !force) return;
   hasGreetedUser = true;
@@ -200,7 +208,7 @@ export function triggerWelcomeGreeting(force = false) {
   if (soundEnabled) {
     playChimeStartup();
     speakText(
-      "A warm welcome to Virtoy Technologies Private Limited.",
+      "Welcome to Virtoy Technologies Private Limited.",
       "Welcome to Virtoy Technologies"
     );
   }
@@ -231,11 +239,38 @@ export function prevVoiceTopic() {
   startVoiceTour(prevIdx);
 }
 
+function getBestVoice(synth: SpeechSynthesis): SpeechSynthesisVoice | null {
+  const voices = synth.getVoices();
+  if (!voices || voices.length === 0) return null;
+
+  return (
+    voices.find(
+      (v) =>
+        v.lang.startsWith("en") &&
+        (v.name.includes("Natural") ||
+          v.name.includes("Google") ||
+          v.name.includes("Samantha") ||
+          v.name.includes("David") ||
+          v.name.includes("Zira") ||
+          v.name.includes("Jenny") ||
+          v.name.includes("Microsoft"))
+    ) ||
+    voices.find((v) => v.lang.startsWith("en")) ||
+    voices[0]
+  );
+}
+
 export function speakText(text: string, title = "Virtoy Voice Guide") {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   if (!soundEnabled) return;
 
   const synth = window.speechSynthesis;
+
+  // Clear any existing speech heartbeat interval
+  if (speechResumeInterval) {
+    clearInterval(speechResumeInterval);
+    speechResumeInterval = null;
+  }
 
   try {
     synth.cancel();
@@ -253,56 +288,64 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
-  utterance.rate = 1.0;
+  utterance.rate = 0.95;
   utterance.pitch = 1.0;
   utterance.volume = 1.0;
 
-  const assignVoice = () => {
-    const voices = synth.getVoices();
-    if (voices.length > 0) {
-      const englishVoice =
-        voices.find(
-          (v) =>
-            v.lang.startsWith("en") &&
-            (v.name.includes("Natural") ||
-              v.name.includes("Google") ||
-              v.name.includes("Samantha") ||
-              v.name.includes("David") ||
-              v.name.includes("Zira") ||
-              v.name.includes("Microsoft"))
-        ) || voices.find((v) => v.lang.startsWith("en")) || voices[0];
+  // Prevent Garbage Collection in Chrome by assigning to module variable and window
+  activeUtterance = utterance;
+  (window as unknown as { __virtoyUtterance: SpeechSynthesisUtterance }).__virtoyUtterance = utterance;
 
-      if (englishVoice) {
-        utterance.voice = englishVoice;
+  const voice = getBestVoice(synth);
+  if (voice) {
+    utterance.voice = voice;
+  } else {
+    // If voices are not yet loaded, wait for voiceschanged and speak
+    const onVoices = () => {
+      const v = getBestVoice(synth);
+      if (v) {
+        utterance.voice = v;
       }
-    }
-  };
-
-  assignVoice();
-  if (synth.getVoices().length === 0) {
-    synth.onvoiceschanged = () => {
-      assignVoice();
+      try {
+        synth.cancel();
+        synth.speak(utterance);
+      } catch {}
+      synth.removeEventListener("voiceschanged", onVoices);
     };
+    synth.addEventListener("voiceschanged", onVoices, { once: true });
   }
 
   utterance.onend = () => {
     isSpeakingState = false;
     currentSpeechText = "";
+    activeUtterance = null;
+    if (speechResumeInterval) {
+      clearInterval(speechResumeInterval);
+      speechResumeInterval = null;
+    }
     notifySpeech();
   };
 
   utterance.onerror = () => {
     isSpeakingState = false;
     currentSpeechText = "";
+    activeUtterance = null;
+    if (speechResumeInterval) {
+      clearInterval(speechResumeInterval);
+      speechResumeInterval = null;
+    }
     notifySpeech();
   };
 
   try {
     synth.speak(utterance);
-    // Chrome bug fix: occasionally wake up speech synthesis if it idles
-    if (synth.paused) {
-      synth.resume();
-    }
+
+    // Chrome bug workaround: keep synthesis active and unpause if paused
+    speechResumeInterval = setInterval(() => {
+      if (synth.speaking && synth.paused) {
+        synth.resume();
+      }
+    }, 250);
   } catch {
     isSpeakingState = false;
     notifySpeech();
@@ -315,6 +358,11 @@ export function stopVoiceNarration() {
       window.speechSynthesis.cancel();
     } catch {}
   }
+  if (speechResumeInterval) {
+    clearInterval(speechResumeInterval);
+    speechResumeInterval = null;
+  }
+  activeUtterance = null;
   isSpeakingState = false;
   currentSpeechText = "";
   notifySpeech();

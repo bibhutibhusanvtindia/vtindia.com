@@ -44,8 +44,8 @@ import {
 } from "@/lib/virtoyBot";
 
 const WELCOME_GREETING: BotAnswer = {
-  text: "A warm welcome to Virtoy Technologies Private Limited! How can I assist you with our products, services, or solutions today?",
-  speechText: "A warm welcome to Virtoy Technologies Private Limited.",
+  text: "Welcome to Virtoy Technologies Private Limited! How can I assist you with our products, services, or solutions today?",
+  speechText: "Welcome to Virtoy Technologies Private Limited.",
   actionUrl: "/products",
   actionLabel: "Explore 16 Products",
 };

@@ -11,26 +11,46 @@ export function IntroLoader() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Instantly trigger the warm welcome greeting during the logo assembly
-    const greetTimer = setTimeout(() => {
-      triggerWelcomeGreeting();
-    }, 300);
+    // 1. Immediately trigger the welcome greeting simultaneously with logo animation
+    triggerWelcomeGreeting(true);
 
-    // Smooth progress counter from 0 to 100%
+    const greetTimer = setTimeout(() => {
+      triggerWelcomeGreeting(true);
+    }, 150);
+
+    // 2. Gesture listener: any mouse move, pointer down, key or touch immediately resumes and speaks
+    const handleUnlockAndGreet = () => {
+      triggerWelcomeGreeting(true);
+    };
+
+    window.addEventListener("pointermove", handleUnlockAndGreet, { once: true });
+    window.addEventListener("mousemove", handleUnlockAndGreet, { once: true });
+    window.addEventListener("pointerdown", handleUnlockAndGreet, { once: true });
+    window.addEventListener("touchstart", handleUnlockAndGreet, { once: true });
+    window.addEventListener("click", handleUnlockAndGreet, { once: true });
+    window.addEventListener("keydown", handleUnlockAndGreet, { once: true });
+
+    // Smooth progress counter calibrated to ~2.8s to synchronize with spoken welcome greeting
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setLoading(false), 450);
+          setTimeout(() => setLoading(false), 500);
           return 100;
         }
-        return prev + Math.floor(Math.random() * 15 + 8);
+        return prev + Math.floor(Math.random() * 4 + 3);
       });
     }, 90);
 
     return () => {
       clearTimeout(greetTimer);
       clearInterval(interval);
+      window.removeEventListener("pointermove", handleUnlockAndGreet);
+      window.removeEventListener("mousemove", handleUnlockAndGreet);
+      window.removeEventListener("pointerdown", handleUnlockAndGreet);
+      window.removeEventListener("touchstart", handleUnlockAndGreet);
+      window.removeEventListener("click", handleUnlockAndGreet);
+      window.removeEventListener("keydown", handleUnlockAndGreet);
     };
   }, []);
 
