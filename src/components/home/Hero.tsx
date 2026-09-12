@@ -7,10 +7,20 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { heroSlides, capabilities } from "@/data/site";
 import { HeroVisual } from "@/components/home/HeroVisual";
+import { toggleVoiceTour, isSpeaking, subscribeSpeech } from "@/lib/sound";
 
 export function Hero() {
   const [active, setActive] = useState(0);
+  const [isTourPlaying, setIsTourPlaying] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    setIsTourPlaying(isSpeaking());
+    const unsub = subscribeSpeech((state) => {
+      setIsTourPlaying(state.isPlaying);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     if (shouldReduceMotion) return;
@@ -158,15 +168,32 @@ export function Hero() {
               <button
                 type="button"
                 onClick={() => {
-                  import("@/lib/sound").then((mod) => mod.enableSoundAndPlay(0));
+                  toggleVoiceTour(0);
                 }}
-                className="group inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-6 py-4 text-sm font-semibold text-primary backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/10 hover:shadow-md hover:shadow-primary/15"
+                className={`group inline-flex items-center gap-2 rounded-full border px-6 py-4 text-sm font-semibold backdrop-blur transition-all duration-300 hover:-translate-y-0.5 ${
+                  isTourPlaying
+                    ? "border-primary bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary-strong"
+                    : "border-primary/40 bg-primary/5 text-primary hover:border-primary hover:bg-primary/10 hover:shadow-md hover:shadow-primary/15"
+                }`}
               >
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-                </span>
-                <span>🎧 Voice Tour</span>
+                {isTourPlaying ? (
+                  <>
+                    <span className="flex items-end gap-1 h-3.5 px-0.5">
+                      <span className="w-0.5 bg-white rounded-full animate-[bounce_0.6s_infinite_100ms] h-full" />
+                      <span className="w-0.5 bg-white rounded-full animate-[bounce_0.6s_infinite_200ms] h-3/4" />
+                      <span className="w-0.5 bg-white rounded-full animate-[bounce_0.6s_infinite_300ms] h-full" />
+                    </span>
+                    <span>⏸️ Pause Tour</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                    </span>
+                    <span>🎧 Voice Tour</span>
+                  </>
+                )}
               </button>
 
               <Link

@@ -231,6 +231,24 @@ export function resetGreetingState() {
   hasGreetedUser = false;
 }
 
+export function isSpeaking(): boolean {
+  return isSpeakingState;
+}
+
+/**
+ * Toggle playback of the Voice Tour: if speaking, pauses/stops; if stopped, plays.
+ */
+export function toggleVoiceTour(topicIdx = 0): boolean {
+  if (isSpeakingState) {
+    playChimeClick();
+    stopVoiceNarration();
+    return false;
+  } else {
+    enableSoundAndPlay(topicIdx);
+    return true;
+  }
+}
+
 /**
  * Start or jump to a specific Voice Tour topic
  */
