@@ -200,7 +200,7 @@ export function playChimeSuccess() {
  * Auto Greeting on website open:
  * Simultaneously speaks "Welcome to Virtoy Technologies Private Limited." while the logo animation plays.
  */
-export function triggerWelcomeGreeting(force = true) {
+export function triggerWelcomeGreeting(force = true, onEnd?: () => void) {
   if (typeof window === "undefined") return;
   if (hasGreetedUser && !force) return;
   hasGreetedUser = true;
@@ -209,8 +209,11 @@ export function triggerWelcomeGreeting(force = true) {
     playChimeStartup();
     speakText(
       "Welcome to Virtoy Technologies Private Limited.",
-      "Welcome to Virtoy Technologies"
+      "Welcome to Virtoy Technologies",
+      onEnd
     );
+  } else if (onEnd) {
+    onEnd();
   }
 }
 
@@ -260,9 +263,15 @@ function getBestVoice(synth: SpeechSynthesis): SpeechSynthesisVoice | null {
   );
 }
 
-export function speakText(text: string, title = "Virtoy Voice Guide") {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  if (!soundEnabled) return;
+export function speakText(text: string, title = "Virtoy Voice Guide", onEnd?: () => void) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (onEnd) onEnd();
+    return;
+  }
+  if (!soundEnabled) {
+    if (onEnd) onEnd();
+    return;
+  }
 
   const synth = window.speechSynthesis;
 
@@ -324,6 +333,7 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
       speechResumeInterval = null;
     }
     notifySpeech();
+    if (onEnd) onEnd();
   };
 
   utterance.onerror = () => {
@@ -335,6 +345,7 @@ export function speakText(text: string, title = "Virtoy Voice Guide") {
       speechResumeInterval = null;
     }
     notifySpeech();
+    if (onEnd) onEnd();
   };
 
   try {

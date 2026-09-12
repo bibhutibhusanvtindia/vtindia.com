@@ -1,61 +1,79 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Zap } from "lucide-react";
-import { triggerWelcomeGreeting } from "@/lib/sound";
+import { Volume2, Sparkles, ArrowRight } from "lucide-react";
+import { triggerWelcomeGreeting, subscribeSpeech } from "@/lib/sound";
 
 export function IntroLoader() {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const hasTriggeredRef = useRef(false);
 
   useEffect(() => {
-    // 1. Immediately trigger the welcome greeting simultaneously with logo animation
-    triggerWelcomeGreeting(true);
+    // Subscribe to speech state to display animated equalizer while speaking
+    const unsubSpeech = subscribeSpeech((state) => {
+      setIsSpeaking(state.isPlaying);
+    });
 
-    const greetTimer = setTimeout(() => {
-      triggerWelcomeGreeting(true);
-    }, 150);
-
-    // 2. Gesture listener: any mouse move, pointer down, key or touch immediately resumes and speaks
-    const handleUnlockAndGreet = () => {
-      triggerWelcomeGreeting(true);
+    const startGreeting = () => {
+      if (hasTriggeredRef.current) return;
+      hasTriggeredRef.current = true;
+      triggerWelcomeGreeting(true, () => {
+        // When speech finishes, gracefully dismiss loader after brief pause
+        setTimeout(() => setLoading(false), 400);
+      });
     };
 
-    window.addEventListener("pointermove", handleUnlockAndGreet, { once: true });
-    window.addEventListener("mousemove", handleUnlockAndGreet, { once: true });
-    window.addEventListener("pointerdown", handleUnlockAndGreet, { once: true });
-    window.addEventListener("touchstart", handleUnlockAndGreet, { once: true });
-    window.addEventListener("click", handleUnlockAndGreet, { once: true });
-    window.addEventListener("keydown", handleUnlockAndGreet, { once: true });
+    // 1. Immediately attempt auto-greeting
+    startGreeting();
 
-    // Smooth progress counter calibrated to ~2.8s to synchronize with spoken welcome greeting
+    // 2. Gesture listener: any interaction awakens the speech synthesis & plays simultaneous greeting
+    const handleGesture = () => {
+      startGreeting();
+    };
+
+    window.addEventListener("pointerdown", handleGesture, { once: true });
+    window.addEventListener("touchstart", handleGesture, { once: true });
+    window.addEventListener("click", handleGesture, { once: true });
+    window.addEventListener("keydown", handleGesture, { once: true });
+
+    // Smooth progress counter calibrated to ~2.8s
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setLoading(false), 500);
+          // If speech is still playing, give it a moment to finish, otherwise exit
+          setTimeout(() => {
+            setLoading(false);
+          }, 600);
           return 100;
         }
         return prev + Math.floor(Math.random() * 4 + 3);
       });
-    }, 90);
+    }, 95);
 
     return () => {
-      clearTimeout(greetTimer);
+      unsubSpeech();
       clearInterval(interval);
-      window.removeEventListener("pointermove", handleUnlockAndGreet);
-      window.removeEventListener("mousemove", handleUnlockAndGreet);
-      window.removeEventListener("pointerdown", handleUnlockAndGreet);
-      window.removeEventListener("touchstart", handleUnlockAndGreet);
-      window.removeEventListener("click", handleUnlockAndGreet);
-      window.removeEventListener("keydown", handleUnlockAndGreet);
+      window.removeEventListener("pointerdown", handleGesture);
+      window.removeEventListener("touchstart", handleGesture);
+      window.removeEventListener("click", handleGesture);
+      window.removeEventListener("keydown", handleGesture);
     };
   }, []);
 
-  const handleEnterWithAudio = () => {
-    triggerWelcomeGreeting(true);
+  const handleScreenClick = () => {
+    // Re-trigger greeting if blocked by autoplay, while keeping animation active
+    triggerWelcomeGreeting(true, () => {
+      setTimeout(() => setLoading(false), 300);
+    });
+  };
+
+  const handleSkip = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setLoading(false);
   };
 
@@ -68,7 +86,7 @@ export function IntroLoader() {
             y: "-100%",
             transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] },
           }}
-          onClick={handleEnterWithAudio}
+          onClick={handleScreenClick}
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-[#fbf7f9] text-[#1a0a12] select-none cursor-pointer"
         >
           {/* Subtle Grid & Soft Ambient Magenta Glow */}
@@ -168,26 +186,43 @@ export function IntroLoader() {
               </div>
             </div>
 
-            {/* Tap to Enter with Audio Badge */}
-            <motion.button
+            {/* Animated Audio Status / Equalizer Badge */}
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
-              onClick={handleEnterWithAudio}
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-white px-5 py-2 text-xs font-bold text-primary shadow-md shadow-primary/20 hover:scale-105 hover:bg-primary hover:text-white transition"
+              transition={{ delay: 1.0 }}
+              className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-primary/40 bg-white dark:bg-[#1a0a12] px-5 py-2 text-xs font-bold text-primary shadow-md shadow-primary/20"
             >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-              </span>
-              <span>🎧 Enter with Voice Audio &amp; 3D WebXR</span>
-            </motion.button>
+              {isSpeaking ? (
+                <>
+                  <div className="flex items-end gap-1 h-3.5">
+                    <span className="w-0.5 bg-primary rounded-full animate-[bounce_0.6s_infinite_100ms] h-full" />
+                    <span className="w-0.5 bg-primary rounded-full animate-[bounce_0.6s_infinite_200ms] h-3/4" />
+                    <span className="w-0.5 bg-primary rounded-full animate-[bounce_0.6s_infinite_300ms] h-full" />
+                    <span className="w-0.5 bg-primary rounded-full animate-[bounce_0.6s_infinite_150ms] h-1/2" />
+                  </div>
+                  <span>🔊 Speaking: Welcome to Virtoy Technologies</span>
+                </>
+              ) : (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                  </span>
+                  <span>🎧 Welcome to Virtoy Technologies</span>
+                </>
+              )}
+            </motion.div>
           </div>
 
           {/* Quick Skip Prompt */}
-          <p className="absolute bottom-6 text-[11px] font-semibold text-muted/70 tracking-wider uppercase">
-            Click anywhere to enter →
-          </p>
+          <button
+            onClick={handleSkip}
+            className="absolute bottom-6 flex items-center gap-1 text-[11px] font-semibold text-muted/80 hover:text-primary tracking-wider uppercase transition"
+          >
+            <span>Skip to Website</span>
+            <ArrowRight className="h-3 w-3" />
+          </button>
         </motion.div>
       )}
     </AnimatePresence>

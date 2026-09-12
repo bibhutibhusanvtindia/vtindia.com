@@ -69,8 +69,8 @@ export function Header() {
         )}
       >
         <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          {/* Brand Logo */}
-          <div className="flex shrink-0 items-center">
+          {/* Brand Logo with generous right-side breathing space */}
+          <div className="flex shrink-0 items-center mr-6 xl:mr-10 2xl:mr-14">
             <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
               <Logo priority className="h-9 w-auto sm:h-11 transition-transform duration-300 hover:scale-[1.02]" />
             </Link>
@@ -127,12 +127,8 @@ export function Header() {
               href={`tel:+91${site.phones[0].number}`}
               className="hidden 2xl:flex group shrink-0 whitespace-nowrap items-center gap-2 rounded-full border border-border/70 bg-surface/60 px-3.5 py-2 text-xs font-medium text-muted backdrop-blur-sm transition-all hover:border-primary/40 hover:text-foreground"
             >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-              </span>
               <Phone className="h-3.5 w-3.5 text-primary" />
-              {site.phones[0].number}
+              <span>{site.phones[0].number}</span>
             </a>
             <Link
               href="/contact"
