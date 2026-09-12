@@ -8,6 +8,16 @@ let soundEnabled = true;
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 let speechResumeInterval: ReturnType<typeof setInterval> | null = null;
 
+// Preload voices immediately on client script load
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  try {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+  } catch {}
+}
+
 type SoundListener = (enabled: boolean) => void;
 type SpeechListener = (state: { isPlaying: boolean; text: string; title: string; topicIndex: number }) => void;
 
@@ -200,7 +210,7 @@ export function playChimeSuccess() {
  * Auto Greeting on website open:
  * Simultaneously speaks "Welcome to Virtoy Technologies Private Limited." while the logo animation plays.
  */
-export function triggerWelcomeGreeting(force = true, onEnd?: () => void) {
+export function triggerWelcomeGreeting(force = true) {
   if (typeof window === "undefined") return;
   if (hasGreetedUser && !force) return;
   hasGreetedUser = true;
@@ -209,11 +219,8 @@ export function triggerWelcomeGreeting(force = true, onEnd?: () => void) {
     playChimeStartup();
     speakText(
       "Welcome to Virtoy Technologies Private Limited.",
-      "Welcome to Virtoy Technologies",
-      onEnd
+      "Welcome to Virtoy Technologies"
     );
-  } else if (onEnd) {
-    onEnd();
   }
 }
 
@@ -243,35 +250,33 @@ export function prevVoiceTopic() {
 }
 
 function getBestVoice(synth: SpeechSynthesis): SpeechSynthesisVoice | null {
-  const voices = synth.getVoices();
-  if (!voices || voices.length === 0) return null;
+  try {
+    const voices = synth.getVoices();
+    if (!voices || voices.length === 0) return null;
 
-  return (
-    voices.find(
-      (v) =>
-        v.lang.startsWith("en") &&
-        (v.name.includes("Natural") ||
-          v.name.includes("Google") ||
-          v.name.includes("Samantha") ||
-          v.name.includes("David") ||
-          v.name.includes("Zira") ||
-          v.name.includes("Jenny") ||
-          v.name.includes("Microsoft"))
-    ) ||
-    voices.find((v) => v.lang.startsWith("en")) ||
-    voices[0]
-  );
+    return (
+      voices.find(
+        (v) =>
+          v.lang.startsWith("en") &&
+          (v.name.includes("Natural") ||
+            v.name.includes("Google") ||
+            v.name.includes("Samantha") ||
+            v.name.includes("David") ||
+            v.name.includes("Zira") ||
+            v.name.includes("Jenny") ||
+            v.name.includes("Microsoft"))
+      ) ||
+      voices.find((v) => v.lang.startsWith("en")) ||
+      voices[0]
+    );
+  } catch {
+    return null;
+  }
 }
 
-export function speakText(text: string, title = "Virtoy Voice Guide", onEnd?: () => void) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    if (onEnd) onEnd();
-    return;
-  }
-  if (!soundEnabled) {
-    if (onEnd) onEnd();
-    return;
-  }
+export function speakText(text: string, title = "Virtoy Voice Guide") {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  if (!soundEnabled) return;
 
   const synth = window.speechSynthesis;
 
@@ -301,28 +306,14 @@ export function speakText(text: string, title = "Virtoy Voice Guide", onEnd?: ()
   utterance.pitch = 1.0;
   utterance.volume = 1.0;
 
-  // Prevent Garbage Collection in Chrome by assigning to module variable and window
-  activeUtterance = utterance;
-  (window as unknown as { __virtoyUtterance: SpeechSynthesisUtterance }).__virtoyUtterance = utterance;
-
   const voice = getBestVoice(synth);
   if (voice) {
     utterance.voice = voice;
-  } else {
-    // If voices are not yet loaded, wait for voiceschanged and speak
-    const onVoices = () => {
-      const v = getBestVoice(synth);
-      if (v) {
-        utterance.voice = v;
-      }
-      try {
-        synth.cancel();
-        synth.speak(utterance);
-      } catch {}
-      synth.removeEventListener("voiceschanged", onVoices);
-    };
-    synth.addEventListener("voiceschanged", onVoices, { once: true });
   }
+
+  // Prevent Garbage Collection in Chrome by assigning to module variable and window
+  activeUtterance = utterance;
+  (window as unknown as { __virtoyUtterance: SpeechSynthesisUtterance }).__virtoyUtterance = utterance;
 
   utterance.onend = () => {
     isSpeakingState = false;
@@ -333,7 +324,6 @@ export function speakText(text: string, title = "Virtoy Voice Guide", onEnd?: ()
       speechResumeInterval = null;
     }
     notifySpeech();
-    if (onEnd) onEnd();
   };
 
   utterance.onerror = () => {
@@ -345,7 +335,6 @@ export function speakText(text: string, title = "Virtoy Voice Guide", onEnd?: ()
       speechResumeInterval = null;
     }
     notifySpeech();
-    if (onEnd) onEnd();
   };
 
   try {
@@ -356,7 +345,7 @@ export function speakText(text: string, title = "Virtoy Voice Guide", onEnd?: ()
       if (synth.speaking && synth.paused) {
         synth.resume();
       }
-    }, 250);
+    }, 200);
   } catch {
     isSpeakingState = false;
     notifySpeech();
