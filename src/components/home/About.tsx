@@ -11,25 +11,7 @@ import { services } from "@/data/services";
 import { products } from "@/data/products";
 import { clients } from "@/data/portfolio";
 import { team } from "@/data/team";
-
-const pillars = [
-  { icon: Eye, title: "Our Vision", body: site.vision, tag: "Strategic Focus" },
-  { icon: Target, title: "Our Mission", body: site.mission, tag: "Execution" },
-  { icon: HeartHandshake, title: "Our Support", body: site.supportPhilosophy, tag: "Commitment" },
-];
-
-/**
- * Counters use only figures that are verifiable from the migrated data itself —
- * the number of clients, products, services and people actually on this site.
- * No performance or revenue statistics are claimed, because the old site
- * publishes none.
- */
-const facts = [
-  { value: clients.length, label: "Client organisations", suffix: "+" },
-  { value: products.length, label: "Products built", suffix: "" },
-  { value: services.length, label: "Service lines", suffix: "" },
-  { value: team.length, label: "Team members", suffix: "+" },
-];
+import { useLanguage } from "@/lib/translations";
 
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -46,7 +28,6 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
     const updateCounter = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // easeOutExpo
       const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       const current = Math.floor(ease * value);
       setDisplayValue(current);
@@ -71,6 +52,52 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 }
 
 export function About() {
+  const { lang, t } = useLanguage();
+
+  const pillars = [
+    {
+      icon: Eye,
+      title: t("about_vision_title"),
+      body: t("about_vision_desc"),
+      tag: lang === "hi" ? "रणनीतिक विजन" : lang === "or" ? "ରଣନୀତିକ ଲକ୍ଷ୍ୟ" : "Strategic Focus",
+    },
+    {
+      icon: Target,
+      title: t("about_mission_title"),
+      body: t("about_mission_desc"),
+      tag: lang === "hi" ? "कार्ययोजना" : lang === "or" ? "କାର୍ଯ୍ୟନିଷ୍ଠା" : "Execution",
+    },
+    {
+      icon: HeartHandshake,
+      title: t("about_support_title"),
+      body: t("about_support_desc"),
+      tag: lang === "hi" ? "प्रतिबद्धता" : lang === "or" ? "ପ୍ରତିବଦ୍ଧତା" : "Commitment",
+    },
+  ];
+
+  const facts = [
+    {
+      value: clients.length,
+      label: lang === "hi" ? "प्रमाणित क्लाइंट्स" : lang === "or" ? "ପ୍ରମାଣିତ ଗ୍ରାହକ" : "Client organisations",
+      suffix: "+",
+    },
+    {
+      value: products.length,
+      label: lang === "hi" ? "विकसित उत्पाद" : lang === "or" ? "ଡିଜିଟାଲ୍ ପ୍ରଡକ୍ଟ" : "Products built",
+      suffix: "",
+    },
+    {
+      value: services.length,
+      label: lang === "hi" ? "सेवाएं" : lang === "or" ? "ଇଞ୍ଜିନିୟରିଂ ସେବା" : "Service lines",
+      suffix: "",
+    },
+    {
+      value: team.length,
+      label: lang === "hi" ? "टीम सदस्य" : lang === "or" ? "ଟିମ୍ ସଦସ୍ୟ" : "Team members",
+      suffix: "+",
+    },
+  ];
+
   return (
     <section className="relative overflow-hidden py-24">
       {/* Background ambient light */}
@@ -86,19 +113,24 @@ export function About() {
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
                 <Sparkles className="h-3 w-3" />
-                About VT India
+                {t("about_eyebrow")}
               </span>
               <h2 className="mt-5 text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
-                Building strong teams for <span className="gradient-text">success and innovation</span>
+                {t("about_title")}
               </h2>
-              <p className="mt-6 text-base leading-relaxed text-muted">{site.description}</p>
-              <p className="mt-4 text-base leading-relaxed text-muted">{site.founded}</p>
+              <p className="mt-6 text-base leading-relaxed text-muted">{t("about_description")}</p>
 
               <Link
                 href="/about"
                 className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:gap-3"
               >
-                <span>View more about us</span>
+                <span>
+                  {lang === "hi"
+                    ? "हमारे बारे में और जानें"
+                    : lang === "or"
+                    ? "ଆମ ବିଷୟରେ ଅଧିକ ଜାଣନ୍ତୁ"
+                    : "View more about us"}
+                </span>
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             </Reveal>
@@ -157,4 +189,3 @@ export function About() {
     </section>
   );
 }
-

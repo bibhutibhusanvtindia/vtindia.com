@@ -5,14 +5,16 @@ import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { heroSlides, capabilities } from "@/data/site";
+import { heroSlides } from "@/data/site";
 import { HeroVisual } from "@/components/home/HeroVisual";
 import { toggleVoiceTour, isSpeaking, subscribeSpeech } from "@/lib/sound";
+import { useLanguage } from "@/lib/translations";
 
 export function Hero() {
   const [active, setActive] = useState(0);
   const [isTourPlaying, setIsTourPlaying] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const { lang, t } = useLanguage();
 
   useEffect(() => {
     setIsTourPlaying(isSpeaking());
@@ -53,8 +55,29 @@ export function Hero() {
     rawY.set(0);
   }, [rawX, rawY]);
 
-  const slide = heroSlides[active];
-  const words = slide.title.split(" ");
+  // Localized Slide Headings
+  const currentEyebrow =
+    active === 0
+      ? t("hero_slide1_eyebrow")
+      : active === 1
+      ? t("hero_slide2_eyebrow")
+      : t("hero_slide3_eyebrow");
+
+  const currentTitle =
+    active === 0
+      ? t("hero_slide1_title")
+      : active === 1
+      ? t("hero_slide2_title")
+      : t("hero_slide3_title");
+
+  const currentSubtitle =
+    active === 0
+      ? t("hero_slide1_subtitle")
+      : active === 1
+      ? t("hero_slide2_subtitle")
+      : t("hero_slide3_subtitle");
+
+  const words = currentTitle.split(" ");
   const headWords = words.slice(0, -1).join(" ");
   const lastWord = words[words.length - 1];
 
@@ -64,14 +87,13 @@ export function Hero() {
       onPointerMove={handlePointerMove}
       onPointerLeave={resetPointer}
     >
-      {/* Layer 1 — technical grid, faded out toward the left so headline type
-          sits on clean ground and the eye is pulled to the visual on the right */}
+      {/* Technical grid */}
       <div
         className="absolute inset-0 bg-grid opacity-70 [mask-image:radial-gradient(ellipse_70%_60%_at_72%_45%,#000_10%,transparent_70%)]"
         aria-hidden="true"
       />
 
-      {/* Layer 7 — ambient brand glow */}
+      {/* Ambient brand glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <motion.div
           className="absolute right-[4%] top-[6%] h-[30rem] w-[30rem] rounded-full bg-primary/[0.08] blur-[120px]"
@@ -92,22 +114,22 @@ export function Hero() {
               className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary"
             >
               <Sparkles className="h-3.5 w-3.5 shrink-0" />
-              Premium Enterprise IT Solutions
-              <span className="hidden sm:inline">· Eastern India &amp; UAE</span>
+              {t("hero_badge")}
+              <span className="hidden sm:inline">· {t("hero_badge_sub")}</span>
             </motion.div>
 
             <div className="relative mt-7">
               <div className="relative h-5">
                 <AnimatePresence initial={false}>
                   <motion.p
-                    key={`eyebrow-${active}`}
+                    key={`eyebrow-${active}-${lang}`}
                     className="absolute inset-x-0 top-0 text-xs font-semibold uppercase tracking-[0.2em] text-muted"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
                   >
-                    {slide.eyebrow}
+                    {currentEyebrow}
                   </motion.p>
                 </AnimatePresence>
               </div>
@@ -115,7 +137,7 @@ export function Hero() {
               <h1 className="relative mt-3 min-h-[7.8rem] text-[2rem] font-semibold leading-[1.08] tracking-[-0.03em] text-balance xs:min-h-[8.6rem] xs:text-[2.25rem] sm:mt-4 sm:min-h-[11.5rem] sm:text-5xl lg:min-h-[14.6rem] lg:text-[4.1rem] lg:leading-[1.05]">
                 <AnimatePresence initial={false}>
                   <motion.span
-                    key={`head-${active}`}
+                    key={`head-${active}-${lang}`}
                     className="absolute inset-x-0 top-0 block"
                     initial={{ opacity: 0, y: 22 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -140,23 +162,21 @@ export function Hero() {
               <div className="relative mt-4 min-h-[4.2rem] max-w-lg sm:mt-6 sm:min-h-[3.5rem]">
                 <AnimatePresence initial={false}>
                   <motion.p
-                    key={`sub-${active}`}
+                    key={`sub-${active}-${lang}`}
                     className="absolute inset-x-0 top-0 text-sm leading-relaxed text-muted sm:text-lg"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.55, delay: 0.05, ease: [0.21, 0.47, 0.32, 0.98] }}
                   >
-                    {slide.subtitle}
+                    {currentSubtitle}
                   </motion.p>
                 </AnimatePresence>
               </div>
             </div>
 
-            {/* CSS-driven entrance */}
-            <div
-              className="mt-6 flex flex-wrap items-center gap-3 animate-rise-in [animation-delay:0.25s] sm:mt-8"
-            >
+            {/* Action Buttons */}
+            <div className="mt-6 flex flex-wrap items-center gap-3 animate-rise-in [animation-delay:0.25s] sm:mt-8">
               <Link
                 href="/services"
                 className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-primary px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-strong hover:shadow-xl hover:shadow-primary/35"
@@ -165,7 +185,7 @@ export function Hero() {
                   aria-hidden="true"
                   className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"
                 />
-                <span className="relative">Explore our solutions</span>
+                <span className="relative">{t("hero_cta_services")}</span>
                 <ArrowRight className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
 
@@ -187,7 +207,7 @@ export function Hero() {
                       <span className="w-0.5 bg-white rounded-full animate-[bounce_0.6s_infinite_200ms] h-3/4" />
                       <span className="w-0.5 bg-white rounded-full animate-[bounce_0.6s_infinite_300ms] h-full" />
                     </span>
-                    <span>⏸️ Pause Tour</span>
+                    <span>⏸️ {lang === "hi" ? "रोकें" : lang === "or" ? "ରୋକନ୍ତୁ" : "Pause"}</span>
                   </>
                 ) : (
                   <>
@@ -195,7 +215,7 @@ export function Hero() {
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                       <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                     </span>
-                    <span>🎧 Voice Tour</span>
+                    <span>🎧 {t("hero_cta_voice_tour")}</span>
                   </>
                 )}
               </button>
@@ -204,7 +224,7 @@ export function Hero() {
                 href="/contact"
                 className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-surface/80 px-6 py-4 text-sm font-semibold backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:text-primary"
               >
-                Contact us
+                {t("hero_cta_contact")}
               </Link>
             </div>
 
@@ -212,17 +232,17 @@ export function Hero() {
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-muted">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-                84+ Clients Deployed
+                {t("hero_trust_clients")}
               </span>
               <span className="h-1 w-1 rounded-full bg-muted/40" />
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                16 Products Live
+                {t("hero_trust_products")}
               </span>
               <span className="h-1 w-1 rounded-full bg-muted/40" />
               <span className="flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
-                24/7 Expert Support
+                {t("hero_trust_support")}
               </span>
             </div>
 
@@ -230,7 +250,12 @@ export function Hero() {
             <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-3" role="tablist" aria-label="Hero capability slides">
               {heroSlides.map((s, i) => {
                 const isSelected = i === active;
-                const labels = ["Enterprise Software", "AR/VR Spatial 3D", "Mobile Applications"];
+                const labels =
+                  lang === "hi"
+                    ? ["एंटरप्राइज सॉफ्टवेयर", "एआर/वीआर स्पेशियल", "मोबाइल ऐप्स"]
+                    : lang === "or"
+                    ? ["ଏଣ୍ଟରପ୍ରାଇଜ୍ ସଫ୍ଟୱେର୍", "ଏଆର୍/ଭିଆର୍ ସ୍ପାସିଆଲ୍", "ମୋବାଇଲ୍ ଆପ୍"]
+                    : ["Enterprise Software", "AR/VR Spatial 3D", "Mobile Applications"];
                 return (
                   <button
                     key={s.title}
@@ -248,83 +273,21 @@ export function Hero() {
                       <span className={`font-mono text-[10px] font-bold sm:text-xs ${isSelected ? "text-primary" : "text-muted"}`}>
                         0{i + 1}
                       </span>
-                      {isSelected && (
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-                        </span>
-                      )}
+                      <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? "bg-primary" : "bg-muted/40"}`} />
                     </div>
-                    <p className={`mt-1 line-clamp-1 text-[11px] font-semibold sm:text-xs ${isSelected ? "text-foreground" : "text-muted group-hover:text-foreground"}`}>
-                      {labels[i] || s.eyebrow}
-                    </p>
-
-                    {/* Animated Progress Bar */}
-                    <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-border/60">
-                      {isSelected ? (
-                        <motion.div
-                          key={`progress-${active}`}
-                          className="h-full bg-gradient-to-r from-primary to-accent-strong"
-                          initial={{ width: "0%" }}
-                          animate={{ width: "100%" }}
-                          transition={{ duration: 6, ease: "linear" }}
-                        />
-                      ) : (
-                        <div className="h-full w-0 bg-primary/20" />
-                      )}
-                    </div>
+                    <span className={`mt-2 text-xs font-semibold leading-tight line-clamp-1 sm:text-sm ${isSelected ? "text-foreground" : "text-muted"}`}>
+                      {labels[i]}
+                    </span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* ---------------- RIGHT: developer & enterprise visual ---------------- */}
-          <div className="relative flex justify-center lg:justify-end">
-            <HeroVisual pointerX={pointerX} pointerY={pointerY} active={active} />
-          </div>
+          {/* ---------------- RIGHT: Visual Stage ---------------- */}
+          <HeroVisual active={active} pointerX={pointerX} pointerY={pointerY} />
         </div>
       </Container>
-
-      {/* Layer 8 — capability marquee + transition into the next section */}
-      <div className="relative border-t border-border/70 bg-surface/50 backdrop-blur-sm">
-        <div className="flex overflow-hidden py-5" aria-hidden="true">
-          <motion.div
-            className="flex shrink-0 items-center gap-x-10 pr-10"
-            animate={shouldReduceMotion ? undefined : { x: ["0%", "-100%"] }}
-            transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-          >
-            {capabilities.map((cap) => (
-              <CapabilityChip key={cap} label={cap} />
-            ))}
-          </motion.div>
-          <motion.div
-            className="flex shrink-0 items-center gap-x-10 pr-10"
-            animate={shouldReduceMotion ? undefined : { x: ["0%", "-100%"] }}
-            transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-          >
-            {capabilities.map((cap) => (
-              <CapabilityChip key={`${cap}-2`} label={cap} />
-            ))}
-          </motion.div>
-        </div>
-        {/* readable list for assistive tech, since the marquee is aria-hidden */}
-        <p className="sr-only">
-          Capabilities: {capabilities.join(", ")}.
-        </p>
-        {/* edge fades so the marquee dissolves rather than cutting off */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent" aria-hidden="true" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent" aria-hidden="true" />
-      </div>
     </section>
-  );
-}
-
-function CapabilityChip({ label }: { label: string }) {
-  return (
-    <span className="flex items-center gap-3 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-      <span className="h-1 w-1 rounded-full bg-primary/60" />
-      {label}
-    </span>
   );
 }

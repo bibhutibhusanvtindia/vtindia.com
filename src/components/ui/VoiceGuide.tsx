@@ -20,9 +20,15 @@ import {
   Mic,
   MicOff,
   RotateCcw,
+  Languages,
 } from "lucide-react";
 import {
+  VoiceLanguage,
+  VOICE_LANGUAGES,
   isSoundEnabled,
+  getVoiceLanguage,
+  setVoiceLanguage,
+  subscribeLanguage,
   subscribeSound,
   subscribeSpeech,
   startVoiceTour,
@@ -39,46 +45,53 @@ import {
 } from "@/lib/sound";
 import {
   answerCustomerQuery,
-  SUGGESTED_QUESTIONS,
+  getSuggestedQuestions,
+  getWelcomeGreeting,
   BotAnswer,
 } from "@/lib/virtoyBot";
 
-const WELCOME_GREETING: BotAnswer = {
-  text: "Welcome to Virtoy Technologies Private Limited! How can I assist you with our products, services, or solutions today?",
-  speechText: "Welcome to Virtoy Technologies Private Limited.",
-  actionUrl: "/products",
-  actionLabel: "Explore 16 Products",
-};
-
 export function VoiceGuide() {
   const [soundOn, setSoundOn] = useState(true);
+  const [activeLang, setActiveLang] = useState<VoiceLanguage>("en");
   const [speechState, setSpeechState] = useState<{
     isPlaying: boolean;
     text: string;
     title: string;
     topicIndex: number;
+    language: VoiceLanguage;
   }>({
     isPlaying: false,
     text: "",
     title: "",
     topicIndex: 0,
+    language: "en",
   });
 
   // Display mode: 'pill' (compact), 'tour' (audio player), 'chat' (ask customer question)
   const [viewMode, setViewMode] = useState<"pill" | "tour" | "chat">("pill");
   const [customerQuery, setCustomerQuery] = useState("");
-  const [botResponse, setBotResponse] = useState<BotAnswer>(WELCOME_GREETING);
+  const [botResponse, setBotResponse] = useState<BotAnswer>(getWelcomeGreeting("en"));
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
-  const [hasGreeted, setHasGreeted] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     setSoundOn(isSoundEnabled());
+    setActiveLang(getVoiceLanguage());
+    setBotResponse(getWelcomeGreeting(getVoiceLanguage()));
+
     const unsubSound = subscribeSound((on) => {
       setSoundOn(on);
+    });
+
+    const unsubLang = subscribeLanguage((lang) => {
+      setActiveLang(lang);
+      setBotResponse(getWelcomeGreeting(lang));
+      if (recognitionRef.current) {
+        recognitionRef.current.lang = lang === "hi" ? "hi-IN" : lang === "or" ? "or-IN" : "en-US";
+      }
     });
 
     const unsubSpeech = subscribeSpeech((state) => {
@@ -94,7 +107,8 @@ export function VoiceGuide() {
         const recognition = new SpeechRecognitionClass();
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = "en-US";
+        const currentLang = getVoiceLanguage();
+        recognition.lang = currentLang === "hi" ? "hi-IN" : currentLang === "or" ? "or-IN" : "en-US";
 
         recognition.onstart = () => {
           setIsListening(true);
@@ -126,7 +140,7 @@ export function VoiceGuide() {
       if (target) {
         const textToSpeak = target.getAttribute("data-voice-speak");
         if (textToSpeak) {
-          speakText(textToSpeak, "Overview Narration");
+          speakText(textToSpeak, "Overview Narration", getVoiceLanguage());
           setViewMode("tour");
         }
       }
@@ -136,6 +150,7 @@ export function VoiceGuide() {
 
     return () => {
       unsubSound();
+      unsubLang();
       unsubSpeech();
       window.removeEventListener("click", handleVoiceTrigger);
       if (recognitionRef.current) {
@@ -143,6 +158,15 @@ export function VoiceGuide() {
       }
     };
   }, [viewMode]);
+
+  const handleLanguageChange = (lang: VoiceLanguage) => {
+    playChimeClick();
+    setVoiceLanguage(lang);
+    setBotResponse(getWelcomeGreeting(lang));
+    if (viewMode === "tour") {
+      startVoiceTour(speechState.topicIndex, lang);
+    }
+  };
 
   const toggleMic = () => {
     if (!recognitionRef.current) return;
@@ -152,6 +176,8 @@ export function VoiceGuide() {
     } else {
       playChimeClick();
       try {
+        recognitionRef.current.lang =
+          activeLang === "hi" ? "hi-IN" : activeLang === "or" ? "or-IN" : "en-US";
         recognitionRef.current.start();
         setIsListening(true);
       } catch (err) {
@@ -163,9 +189,9 @@ export function VoiceGuide() {
   const handleDirectQuery = (queryText: string) => {
     if (!queryText.trim()) return;
     playChimeClick();
-    const res = answerCustomerQuery(queryText);
+    const res = answerCustomerQuery(queryText, activeLang);
     setBotResponse(res);
-    speakText(res.speechText, `Virtoy AI: ${queryText.slice(0, 24)}...`);
+    speakText(res.speechText, `Virtoy AI: ${queryText.slice(0, 24)}...`, activeLang);
     setCustomerQuery("");
   };
 
@@ -176,17 +202,20 @@ export function VoiceGuide() {
 
   const handleSelectSuggested = (q: string) => {
     playChimeClick();
-    const res = answerCustomerQuery(q);
+    const res = answerCustomerQuery(q, activeLang);
     setBotResponse(res);
-    speakText(res.speechText, `Virtoy AI: ${q}`);
+    speakText(res.speechText, `Virtoy AI: ${q}`, activeLang);
   };
 
   const openChatMode = () => {
     playChimeClick();
-    setBotResponse(WELCOME_GREETING);
+    setBotResponse(getWelcomeGreeting(activeLang));
     setViewMode("chat");
     setTimeout(() => inputRef.current?.focus(), 150);
   };
+
+  const suggestedList = getSuggestedQuestions(activeLang);
+  const currentTopic = VOICE_TOPICS[speechState.topicIndex] || VOICE_TOPICS[0];
 
   // 1. Minimized Floating Pill View (Ultra-compact, solid background, bottom-left)
   if (viewMode === "pill") {
@@ -202,10 +231,10 @@ export function VoiceGuide() {
           </span>
           <Bot className="h-4 w-4 text-primary" />
           <span className="text-xs font-bold text-foreground">
-            {speechState.isPlaying ? "Speaking Aloud..." : "Voice & AI Assistant"}
+            {speechState.isPlaying ? "Speaking Aloud..." : "Voice Guide & AI"}
           </span>
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-            Mic Ready 🎙️
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary flex items-center gap-1">
+            {VOICE_LANGUAGES.find((l) => l.code === activeLang)?.flag || "🇬🇧"} {activeLang.toUpperCase()}
           </span>
         </button>
       </div>
@@ -214,7 +243,7 @@ export function VoiceGuide() {
 
   // 2. Expanded Interactive Card (Solid background, docked on bottom-left)
   return (
-    <div className="fixed bottom-6 left-4 sm:left-6 z-50 w-[calc(100vw-2rem)] sm:w-[26rem] max-w-[28rem] animate-rise-in font-sans">
+    <div className="fixed bottom-6 left-4 sm:left-6 z-50 w-[calc(100vw-2rem)] sm:w-[27rem] max-w-[29rem] animate-rise-in font-sans">
       <div className="relative overflow-hidden rounded-3xl border-2 border-primary/40 bg-white/98 dark:bg-[#1a0a12]/98 p-4 sm:p-5 shadow-2xl shadow-primary/25 backdrop-blur-2xl transition-all">
         {/* Header with Switcher Tabs & Controls */}
         <div className="flex items-center justify-between gap-2 border-b border-border/70 pb-3">
@@ -232,7 +261,7 @@ export function VoiceGuide() {
               }`}
             >
               <Bot className="h-3.5 w-3.5" />
-              Ask Virtoy AI
+              {activeLang === "hi" ? "विर्टॉय एआई" : activeLang === "or" ? "ଭର୍ଚ୍ଚୋଏ ଏଆଇ" : "Ask Virtoy AI"}
             </button>
 
             <button
@@ -247,7 +276,7 @@ export function VoiceGuide() {
               }`}
             >
               <Headphones className="h-3.5 w-3.5" />
-              Audio Tour
+              {activeLang === "hi" ? "ऑडियो टूर" : activeLang === "or" ? "ଅଡିଓ ଟୁର୍" : "Audio Tour"}
             </button>
           </div>
 
@@ -276,27 +305,67 @@ export function VoiceGuide() {
           </div>
         </div>
 
+        {/* Multi-Language Selector Bar (English • Hindi • Odia) */}
+        <div className="flex items-center justify-between gap-1.5 pt-2.5 pb-1 border-b border-border/50">
+          <div className="flex items-center gap-1 text-[11px] font-bold text-muted">
+            <Languages className="h-3.5 w-3.5 text-primary" />
+            <span>Language:</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-surface-muted/80 rounded-xl p-1">
+            {VOICE_LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => handleLanguageChange(lang.code)}
+                className={`flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold transition-all ${
+                  activeLang === lang.code
+                    ? "bg-primary text-white shadow-sm shadow-primary/30 scale-102"
+                    : "text-muted hover:text-foreground hover:bg-surface"
+                }`}
+                title={`Switch to ${lang.label}`}
+              >
+                <span>{lang.flag}</span>
+                <span>{lang.nativeName}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* ================= VIEW: CUSTOMER QUESTION / AI & MIC INPUT ================= */}
         {viewMode === "chat" && (
-          <div className="mt-3.5 space-y-3">
+          <div className="mt-3 space-y-3">
             {/* Welcome / Bot Response Bubble */}
             <div className="rounded-2xl border border-primary/30 bg-primary/[0.06] p-3.5 space-y-2.5 animate-rise-in">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-primary">
                   <Bot className="h-3.5 w-3.5" />
-                  Virtoy AI Assistant
+                  {activeLang === "hi"
+                    ? "विर्टॉय एआई सहायक"
+                    : activeLang === "or"
+                    ? "ଭର୍ଚ୍ଚୋଏ ଏଆଇ ସହାୟକ"
+                    : "Virtoy AI Assistant"}
                 </div>
                 {speechState.isPlaying ? (
                   <span className="text-[10px] font-semibold text-primary animate-pulse flex items-center gap-1">
-                    <Volume2 className="h-3 w-3" /> Speaking...
+                    <Volume2 className="h-3 w-3" />
+                    {activeLang === "hi"
+                      ? "बोल रहा है..."
+                      : activeLang === "or"
+                      ? "କୁହାଯାଉଛି..."
+                      : "Speaking..."}
                   </span>
                 ) : (
                   <button
-                    onClick={() => speakText(botResponse.speechText, "Virtoy AI")}
+                    onClick={() => speakText(botResponse.speechText, "Virtoy AI", activeLang)}
                     title="Repeat Audio"
                     className="text-[10px] font-semibold text-muted hover:text-primary flex items-center gap-1 transition"
                   >
-                    <RotateCcw className="h-3 w-3" /> Replay
+                    <RotateCcw className="h-3 w-3" />
+                    {activeLang === "hi"
+                      ? "पुनः सुनें"
+                      : activeLang === "or"
+                      ? "ପୁଣି ଶୁଣନ୍ତୁ"
+                      : "Replay"}
                   </button>
                 )}
               </div>
@@ -315,7 +384,11 @@ export function VoiceGuide() {
                   </Link>
 
                   <span className="text-[10px] font-semibold text-muted">
-                    100% Verified Data
+                    {activeLang === "hi"
+                      ? "100% प्रमाणित डेटा"
+                      : activeLang === "or"
+                      ? "୧୦୦% ପ୍ରମାଣିତ ତଥ୍ୟ"
+                      : "100% Verified Data"}
                   </span>
                 </div>
               )}
@@ -325,10 +398,14 @@ export function VoiceGuide() {
             <div className="space-y-1.5">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted flex items-center gap-1">
                 <HelpCircle className="h-3 w-3 text-primary" />
-                Suggested Inquiries
+                {activeLang === "hi"
+                  ? "सुझाए गए प्रश्न"
+                  : activeLang === "or"
+                  ? "ପ୍ରସ୍ତାବିତ ପ୍ରଶ୍ନ"
+                  : "Suggested Inquiries"}
               </p>
               <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto pr-1">
-                {SUGGESTED_QUESTIONS.slice(0, 4).map((q) => (
+                {suggestedList.slice(0, 4).map((q) => (
                   <button
                     key={q}
                     onClick={() => handleSelectSuggested(q)}
@@ -350,11 +427,21 @@ export function VoiceGuide() {
                   onChange={(e) => setCustomerQuery(e.target.value)}
                   placeholder={
                     isListening
-                      ? "🎙️ Listening... speak your question now"
+                      ? activeLang === "hi"
+                        ? "🎙️ सुन रहा हूँ... बोलिए"
+                        : activeLang === "or"
+                        ? "🎙️ ଶୁଣୁଛି... କୁହନ୍ତୁ"
+                        : "🎙️ Listening... speak your question now"
+                      : activeLang === "hi"
+                      ? "प्रश्न लिखें या माइक दबाएं..."
+                      : activeLang === "or"
+                      ? "ପ୍ରଶ୍ନ ଲେଖନ୍ତୁ ବା ମାଇକ୍ ଦବାନ୍ତୁ..."
                       : "Type or tap Mic to speak..."
                   }
                   className={`w-full rounded-2xl border bg-surface py-2.5 pl-3.5 pr-20 text-xs text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 ${
-                    isListening ? "border-primary ring-2 ring-primary/20 bg-primary/[0.03]" : "border-border"
+                    isListening
+                      ? "border-primary ring-2 ring-primary/20 bg-primary/[0.03]"
+                      : "border-border"
                   }`}
                 />
 
@@ -392,7 +479,7 @@ export function VoiceGuide() {
 
         {/* ================= VIEW: AUDIO TOUR ================= */}
         {viewMode === "tour" && (
-          <div className="mt-3.5 space-y-3.5">
+          <div className="mt-3 space-y-3">
             {/* Live Waveform & Current Topic text */}
             <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.04] to-accent-strong/[0.04] p-3.5">
               <div className="flex items-center justify-between mb-2">
@@ -401,7 +488,7 @@ export function VoiceGuide() {
                     0{speechState.topicIndex + 1}
                   </div>
                   <span className="text-xs font-bold text-foreground">
-                    {VOICE_TOPICS[speechState.topicIndex]?.title}
+                    {currentTopic.title[activeLang] || currentTopic.title.en}
                   </span>
                 </div>
 
@@ -414,13 +501,18 @@ export function VoiceGuide() {
                     <span className="w-0.5 bg-primary rounded-full animate-[bounce_0.6s_infinite_250ms] h-4/5" />
                   </div>
                 ) : (
-                  <span className="text-[10px] font-semibold text-muted">Paused</span>
+                  <span className="text-[10px] font-semibold text-muted">
+                    {activeLang === "hi"
+                      ? "विरामित"
+                      : activeLang === "or"
+                      ? "ବନ୍ଦ ଅଛି"
+                      : "Paused"}
+                  </span>
                 )}
               </div>
 
               <p className="text-xs leading-relaxed text-foreground font-medium line-clamp-3">
-                {speechState.text ||
-                  VOICE_TOPICS[speechState.topicIndex]?.text}
+                {speechState.text || currentTopic.text[activeLang] || currentTopic.text.en}
               </p>
             </div>
 
@@ -431,7 +523,7 @@ export function VoiceGuide() {
                   key={topic.id}
                   onClick={() => {
                     playChimeClick();
-                    startVoiceTour(idx);
+                    startVoiceTour(idx, activeLang);
                   }}
                   className={`flex flex-col items-start rounded-xl p-2.5 text-left transition-all ${
                     speechState.topicIndex === idx && speechState.isPlaying
@@ -440,10 +532,10 @@ export function VoiceGuide() {
                   }`}
                 >
                   <span className="text-xs font-bold leading-tight line-clamp-1">
-                    {topic.title}
+                    {topic.title[activeLang] || topic.title.en}
                   </span>
                   <span className="text-[10px] opacity-75 truncate w-full mt-0.5">
-                    {topic.subtitle}
+                    {topic.subtitle[activeLang] || topic.subtitle.en}
                   </span>
                 </button>
               ))}
@@ -472,18 +564,26 @@ export function VoiceGuide() {
                     className="flex items-center gap-2 rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white shadow-md shadow-primary/25 hover:bg-primary-strong transition"
                   >
                     <Square className="h-3 w-3 fill-current" />
-                    Pause Tour
+                    {activeLang === "hi"
+                      ? "रोकें"
+                      : activeLang === "or"
+                      ? "ରୋକନ୍ତୁ"
+                      : "Pause Tour"}
                   </button>
                 ) : (
                   <button
                     onClick={() => {
                       playChimeStartup();
-                      startVoiceTour(speechState.topicIndex);
+                      startVoiceTour(speechState.topicIndex, activeLang);
                     }}
                     className="flex items-center gap-2 rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white shadow-md shadow-primary/25 hover:bg-primary-strong transition"
                   >
                     <Play className="h-3 w-3 fill-current" />
-                    Play Voice
+                    {activeLang === "hi"
+                      ? "सुनें"
+                      : activeLang === "or"
+                      ? "ଶୁଣନ୍ତୁ"
+                      : "Play Voice"}
                   </button>
                 )}
 
@@ -503,7 +603,13 @@ export function VoiceGuide() {
                 onClick={() => setViewMode("chat")}
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
               >
-                <span>Ask AI</span>
+                <span>
+                  {activeLang === "hi"
+                    ? "एआई से पूछें"
+                    : activeLang === "or"
+                    ? "ଏଆଇ ସହ କଥା"
+                    : "Ask AI"}
+                </span>
                 <ArrowRight className="h-3 w-3" />
               </button>
             </div>

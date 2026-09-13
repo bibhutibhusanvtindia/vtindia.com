@@ -10,18 +10,35 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Icon } from "@/lib/icons";
 import { products } from "@/data/products";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { useLanguage } from "@/lib/translations";
 
 const FEATURED = ["safeact", "mobile-applications", "education-erp"];
 
-const CATEGORIES = [
-  { id: "all", label: "All Products" },
-  { id: "enterprise", label: "Enterprise & Safety", slugs: ["safeact", "payroll-software", "inventory-software", "asset-management", "crm-software"] },
-  { id: "institutional", label: "Campus & Education", slugs: ["education-erp", "school-management", "college-management", "library-management"] },
-  { id: "specialized", label: "Healthcare & Hospitality", slugs: ["hospital-management", "hotel-pms", "micro-finance", "billing-software"] },
-];
-
 export function ProductsShowcase() {
   const [activeCategory, setActiveCategory] = useState("all");
+  const { lang, t } = useLanguage();
+
+  const CATEGORIES = [
+    {
+      id: "all",
+      label: lang === "hi" ? "सभी उत्पाद" : lang === "or" ? "ସମସ୍ତ ପ୍ରଡକ୍ଟ" : "All Products",
+    },
+    {
+      id: "enterprise",
+      label: lang === "hi" ? "एंटरप्राइज व सुरक्षा" : lang === "or" ? "ଶିଳ୍ପ ଓ ସୁରକ୍ଷା" : "Enterprise & Safety",
+      slugs: ["safeact", "payroll-software", "inventory-software", "asset-management", "crm-software"],
+    },
+    {
+      id: "institutional",
+      label: lang === "hi" ? "कैंपस व शिक्षा" : lang === "or" ? "ଶିକ୍ଷା ଓ କଲେଜ" : "Campus & Education",
+      slugs: ["education-erp", "school-management", "college-management", "library-management"],
+    },
+    {
+      id: "specialized",
+      label: lang === "hi" ? "हेल्थकेयर व होटल" : lang === "or" ? "ହସ୍ପିଟାଲ୍ ଓ ହୋଟେଲ୍" : "Healthcare & Hospitality",
+      slugs: ["hospital-management", "hotel-pms", "micro-finance", "billing-software"],
+    },
+  ];
 
   const featured = FEATURED.map((slug) => products.find((p) => p.slug === slug)!).filter(Boolean);
   
@@ -42,16 +59,16 @@ export function ProductsShowcase() {
       <Container className="relative">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="Product ecosystem"
-            title="Purpose-built software, deployed in the field"
-            description="Every software product below is proven in real institutional and enterprise deployments."
+            eyebrow={t("products_eyebrow")}
+            title={t("products_title")}
+            description={t("products_subtitle")}
           />
           <Reveal delay={0.1}>
             <Link
               href="/products"
               className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-3 text-sm font-semibold shadow-sm transition hover:border-primary/50 hover:text-primary"
             >
-              All 16 products
+              {t("products_view_all")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Reveal>
@@ -104,13 +121,24 @@ export function ProductsShowcase() {
 
                   {product.usedBy?.length ? (
                     <div className="relative mt-8 border-t border-border/70 pt-4">
-                      <p className="text-[11px] font-semibold text-foreground">Verified Deployments:</p>
+                      <p className="text-[11px] font-semibold text-foreground">
+                        {lang === "hi"
+                          ? "प्रमाणित परिनियोजन:"
+                          : lang === "or"
+                          ? "ପ୍ରମାଣିତ ପ୍ରକଳ୍ପ:"
+                          : "Verified Deployments:"}
+                      </p>
                       <p className="mt-1 text-xs text-muted line-clamp-1">{product.usedBy.join(" · ")}</p>
                     </div>
                   ) : (
                     <div className="relative mt-8 border-t border-border/70 pt-4">
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
-                        Learn architecture <ArrowRight className="h-3 w-3" />
+                        {lang === "hi"
+                          ? "आर्किटेक्चर देखें"
+                          : lang === "or"
+                          ? "ଆର୍କିଟେକ୍ଚର ଦେଖନ୍ତୁ"
+                          : "Learn architecture"}{" "}
+                        <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>
                   )}
@@ -125,7 +153,13 @@ export function ProductsShowcase() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Layers className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold tracking-tight text-foreground">Explore Full Suite ({products.length} systems)</span>
+              <span className="text-sm font-semibold tracking-tight text-foreground">
+                {lang === "hi"
+                  ? `सभी प्रणालियां देखें (${products.length} उत्पाद)`
+                  : lang === "or"
+                  ? `ସମସ୍ତ ସଫ୍ଟୱେର୍ (${products.length}ଟି ପ୍ରଡକ୍ଟ)`
+                  : `Explore Full Suite (${products.length} systems)`}
+              </span>
             </div>
 
             <div className="flex flex-wrap gap-2" role="tablist" aria-label="Product categories">
@@ -185,4 +219,3 @@ export function ProductsShowcase() {
     </section>
   );
 }
-

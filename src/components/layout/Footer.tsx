@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
@@ -6,12 +8,14 @@ import { site } from "@/data/site";
 import { services } from "@/data/services";
 import { products } from "@/data/products";
 import { FacebookIcon, LinkedinIcon, XIcon, YoutubeIcon } from "@/lib/social-icons";
+import { useLanguage } from "@/lib/translations";
 
 export function Footer() {
+  const { lang, t } = useLanguage();
+
   return (
     <footer className="relative overflow-hidden border-t border-border bg-surface-muted">
-      {/* premium ground: faint grid + a single deep magenta bloom, kept low so
-          the footer reads as a considered ending rather than a pink slab */}
+      {/* faint grid & background glow */}
       <div
         className="absolute inset-0 bg-grid opacity-40 [mask-image:linear-gradient(to_bottom,#000,transparent_70%)]"
         aria-hidden="true"
@@ -28,7 +32,7 @@ export function Footer() {
       <Container className="relative grid gap-12 py-16 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
           <Logo variant="footer" className="h-10 w-auto" />
-          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">{site.tagline}</p>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">{t("footer_desc")}</p>
           <div className="mt-6 flex items-center gap-3">
             {[
               { href: site.social.facebook, icon: FacebookIcon, label: "Facebook" },
@@ -51,7 +55,7 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="text-sm font-semibold">Services</p>
+          <p className="text-sm font-semibold">{t("nav_services")}</p>
           <ul className="mt-4 space-y-2">
             {services.slice(0, 6).map((s) => (
               <li key={s.slug}>
@@ -64,7 +68,7 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="text-sm font-semibold">Products</p>
+          <p className="text-sm font-semibold">{t("nav_products")}</p>
           <ul className="mt-4 space-y-2">
             {products.slice(0, 6).map((p) => (
               <li key={p.slug}>
@@ -77,21 +81,26 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="text-sm font-semibold">Get in touch</p>
+          <p className="text-sm font-semibold">{t("nav_get_in_touch")}</p>
           <ul className="mt-4 space-y-3 text-sm text-muted">
-            {site.offices.map((office) => (
-              <li key={office.city} className="flex gap-2">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>
-                  <strong className="text-foreground">{office.label}: </strong>
-                  {office.address}
-                </span>
-              </li>
-            ))}
+            <li className="flex gap-2">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="text-foreground">{t("footer_kolkata_hq")}: </strong>
+                {t("footer_kolkata_addr")}
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="text-foreground">{t("footer_bhubaneswar_dev")}: </strong>
+                {t("footer_bhubaneswar_addr")}
+              </span>
+            </li>
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4 shrink-0 text-primary" />
               <a href={site.phones[0].href} className="hover:text-foreground">
-                {site.phones[0].number}
+                +91 {site.phones[0].number}
               </a>
               {" / "}
               <a href={site.phones[1].href} className="hover:text-foreground">
@@ -111,17 +120,17 @@ export function Footer() {
       <div className="relative border-t border-border">
         <Container className="flex flex-col items-center justify-between gap-4 py-8 pb-14 text-xs text-muted sm:flex-row sm:pb-8">
           <p>
-            © {site.copyrightYear} {site.legalName}. All rights reserved.
+            © {site.copyrightYear} {t("footer_rights")}
           </p>
           <div className="flex gap-5">
             <Link href="/privacy" className="hover:text-foreground">
-              Privacy Policy
+              {t("footer_privacy")}
             </Link>
             <Link href="/careers" className="hover:text-foreground">
-              Careers
+              {t("nav_careers")}
             </Link>
             <Link href="/contact" className="hover:text-foreground">
-              Contact
+              {t("nav_contact")}
             </Link>
           </div>
         </Container>

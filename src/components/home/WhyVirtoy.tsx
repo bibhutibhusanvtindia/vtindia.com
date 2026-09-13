@@ -5,63 +5,62 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
-
-const PILLARS = [
-  {
-    icon: GraduationCap,
-    number: "01",
-    title: "Founded by IIT Alumni & Senior Engineers",
-    tagline: "Engineering Rigor at Every Layer",
-    description:
-      "Founded by a team of experienced IIT alumni and energetic engineering professionals, building systems with mathematical precision and zero architectural debt.",
-    highlights: [
-      "Microservice & monolithic hybrid architectures",
-      "Strict compile-time type safety & peer code reviews",
-      "Zero-latency WebGL & real-time simulation pipelines",
-    ],
-  },
-  {
-    icon: ShieldCheck,
-    number: "02",
-    title: "84+ Verified Enterprise & Institutional Deployments",
-    tagline: "Field-Tested in Heavy Industry & Education",
-    description:
-      "Proven track record delivering mission-critical safety, ERP, and digital systems for industrial giants like Tata Steel, Vedanta, JSPL, and Dalmia Cement.",
-    highlights: [
-      "99.8% client retention rate over 10+ years",
-      "Over 40,000+ daily active users across systems",
-      "Multi-facility enterprise data synchronization",
-    ],
-  },
-  {
-    icon: Layers,
-    number: "03",
-    title: "16 Proprietary Production Software Systems",
-    tagline: "Modular IP, Ready for Custom Deployment",
-    description:
-      "From SafeAct Industrial Safety to Campus ERP, Healthcare Systems, and Hotel PMS — we build and own our core software IP with rapid customization.",
-    highlights: [
-      "Full source-level customization for enterprise workflows",
-      "Zero third-party vendor lock-in",
-      "Comprehensive API integration with existing legacy systems",
-    ],
-  },
-  {
-    icon: Headphones,
-    number: "04",
-    title: "24/7 Dedicated Support SLA & Dual Regional Hubs",
-    tagline: "On-Ground Engineering Support",
-    description:
-      "Direct access to certified software engineers stationed at our Kolkata Head Office and Bhubaneswar O-HUB, ensuring immediate turnaround.",
-    highlights: [
-      "Dedicated account managers & technical leads",
-      "Strict uptime SLAs & proactive system monitoring",
-      "On-site deployment, training & compliance auditing",
-    ],
-  },
-];
+import { useLanguage } from "@/lib/translations";
 
 export function WhyVirtoy() {
+  const { lang, t } = useLanguage();
+
+  const PILLARS = [
+    {
+      icon: GraduationCap,
+      number: "01",
+      title: t("why_card1_title"),
+      tagline: lang === "hi" ? "हर स्तर पर इंजीनियरिंग मानक" : lang === "or" ? "ଉଚ୍ଚମାନର ଇଞ୍ଜିନିୟରିଂ" : "Engineering Rigor at Every Layer",
+      description: t("why_card1_desc"),
+      highlights: [
+        lang === "hi" ? "माइक्रोसर्विस एवं हाइब्रिड आर्किटेक्चर" : lang === "or" ? "ମାଇକ୍ରୋସର୍ଭିସ୍ ଓ ହାଇବ୍ରିଡ୍ ଆର୍କିଟେକ୍ଚର" : "Microservice & monolithic hybrid architectures",
+        lang === "hi" ? "सख्त टाइप सेफ्टी और कोड ऑडिट" : lang === "or" ? "କୋଡ୍ ସୁରକ୍ଷା ଓ ଅଡିଟ୍" : "Strict compile-time type safety & peer code reviews",
+        lang === "hi" ? "रियल-टाइम सिमुलेशन पाइपलाइन" : lang === "or" ? "ରିଅଲ୍-ଟାଇମ୍ ସିମ୍ୟୁଲେସନ୍" : "Zero-latency WebGL & real-time simulation pipelines",
+      ],
+    },
+    {
+      icon: ShieldCheck,
+      number: "02",
+      title: t("why_card2_title"),
+      tagline: lang === "hi" ? "उद्योग व शिक्षा में सिद्ध सफलता" : lang === "or" ? "ଶିଳ୍ପ ଓ ଶିକ୍ଷାରେ ପରୀକ୍ଷିତ" : "Field-Tested in Heavy Industry & Education",
+      description: t("why_card2_desc"),
+      highlights: [
+        lang === "hi" ? "10+ वर्षों में 99.8% ग्राहक प्रतिधारण" : lang === "or" ? "୧୦+ ବର୍ଷରେ ୯୯.୮% ଗ୍ରାହକ ବିଶ୍ୱାସ" : "99.8% client retention rate over 10+ years",
+        lang === "hi" ? "40,000+ दैनिक सक्रिय उपयोगकर्ता" : lang === "or" ? "୪୦,୦୦୦+ ଦୈନିକ ଉପଭୋକ୍ତା" : "Over 40,000+ daily active users across systems",
+        lang === "hi" ? "मल्टी-फैसिलिटी एंटरप्राइज डेटा सिंक" : lang === "or" ? "ଏଣ୍ଟରପ୍ରାଇଜ୍ ଡାଟା ସିଙ୍କ୍" : "Multi-facility enterprise data synchronization",
+      ],
+    },
+    {
+      icon: Layers,
+      number: "03",
+      title: lang === "hi" ? "16 प्रोप्राइटरी सॉफ्टवेयर उत्पाद" : lang === "or" ? "୧୬ଟି ଡିଜିଟାଲ୍ ସଫ୍ଟୱେର୍ ପ୍ରଡକ୍ଟ" : "16 Proprietary Production Software Systems",
+      tagline: lang === "hi" ? "कस्टम डिप्लॉयमेंट के लिए तैयार" : lang === "or" ? "କଷ୍ଟମ୍ ବ୍ୟବହାର ପାଇଁ ପ୍ରସ୍ତୁତ" : "Modular IP, Ready for Custom Deployment",
+      description: lang === "hi" ? "सेफएक्ट इंडस्ट्रियल सेफ्टी से लेकर कैंपस ईआरपी, हॉस्पिटल और होटल पीएमएस तक—हमारा अपना कोर सॉफ्टवेयर।" : lang === "or" ? "ସେଫ୍‌ଆକ୍ଟ ଶିଳ୍ପ ନିରାପତ୍ତା ଠାରୁ କ୍ୟାମ୍ପସ୍ ଇଆରପି ଓ ହୋଟେଲ୍ ପିଏମ୍ଏସ୍ ପର୍ଯ୍ୟନ୍ତ ନିଜସ୍ୱ ସଫ୍ଟୱେର୍।" : "From SafeAct Industrial Safety to Campus ERP, Healthcare Systems, and Hotel PMS — we build and own our core software IP with rapid customization.",
+      highlights: [
+        lang === "hi" ? "एंटरप्राइज वर्कफ़्लो के लिए पूर्ण कस्टमाइज़ेशन" : lang === "or" ? "ସମ୍ପୂର୍ଣ୍ଣ କଷ୍ଟମାଇଜେସନ୍ ସୁବିଧା" : "Full source-level customization for enterprise workflows",
+        lang === "hi" ? "शून्य थर्ड-पार्टी वेंडर निर्भरता" : lang === "or" ? "ଶୂନ ତୃତୀୟ ପକ୍ଷ ନିର୍ଭରତା" : "Zero third-party vendor lock-in",
+        lang === "hi" ? "मौजूदा सिस्टम के साथ एपीआई एकीकरण" : lang === "or" ? "ଏପିଆଇ ଇଣ୍ଟିଗ୍ରେସନ୍ ସୁବିଧା" : "Comprehensive API integration with existing legacy systems",
+      ],
+    },
+    {
+      icon: Headphones,
+      number: "04",
+      title: t("why_card3_title"),
+      tagline: lang === "hi" ? "कोलकाता और भुवनेश्वर से ऑन-ग्राउंड सहायता" : lang === "or" ? "କୋଲକାତା ଓ ଭୁବନେଶ୍ୱରରୁ ସପୋର୍ଟ" : "On-Ground Engineering Support",
+      description: t("why_card3_desc"),
+      highlights: [
+        lang === "hi" ? "समर्पित अकाउंट मैनेजर व टेक्निकल लीड्स" : lang === "or" ? "ଉତ୍ସର୍ଗୀକୃତ ଟେକ୍ନିକାଲ୍ ଟିମ୍" : "Dedicated account managers & technical leads",
+        lang === "hi" ? "सख्त अपटाइम एसएलए व प्रोएक्टिव मॉनिटरिंग" : lang === "or" ? "୯୯.୯% ଅପଟାଇମ୍ ସୁନିଶ୍ଚିତ" : "Strict uptime SLAs & proactive system monitoring",
+        lang === "hi" ? "ऑन-साइट इंस्टालेशन व ट्रेनिंग सपोर्ट" : lang === "or" ? "ଅନ-ସାଇଟ୍ ଟ୍ରେନିଂ ଓ ଇନଷ୍ଟଲେସନ୍" : "On-site deployment, training & compliance auditing",
+      ],
+    },
+  ];
+
   return (
     <section className="relative overflow-hidden border-t border-border bg-surface-muted/40 py-24">
       {/* Subtle brand ambient glow */}
@@ -77,9 +76,15 @@ export function WhyVirtoy() {
       <Container className="relative">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="The Virtoy Advantage"
-            title="Why Leading Enterprises & Institutions Choose Us"
-            description="A blend of elite IIT engineering heritage, proven industrial reliability, and a decade of hands-on delivery."
+            eyebrow={t("why_eyebrow")}
+            title={t("why_title")}
+            description={
+              lang === "hi"
+                ? "आईआईटी इंजीनियरिंग उत्कृष्टता, सिद्ध विश्वसनीयता और एक दशक का अनुभव।"
+                : lang === "or"
+                ? "ଆଇଆଇଟି ଇଞ୍ଜିନିୟରିଂ ଉତ୍କର୍ଷତା, ନିର୍ଭରଯୋଗ୍ୟତା ଏବଂ ଗୋଟିଏ ଦଶନ୍ଧିର ଅଭିଜ୍ଞତା।"
+                : "A blend of elite IIT engineering heritage, proven industrial reliability, and a decade of hands-on delivery."
+            }
           />
         </div>
 
@@ -102,22 +107,22 @@ export function WhyVirtoy() {
                     </span>
                   </div>
 
-                  <span className="mt-6 inline-block text-xs font-semibold text-primary">
-                    {pillar.tagline}
-                  </span>
-                  <h3 className="mt-1 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted">
-                    {pillar.description}
-                  </p>
+                  <div className="mt-6">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                      {pillar.tagline}
+                    </span>
+                    <h3 className="mt-2 text-xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
+                      {pillar.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-muted">{pillar.description}</p>
+                  </div>
 
-                  <div className="mt-6 border-t border-border/70 pt-4">
-                    <ul className="space-y-2">
-                      {pillar.highlights.map((h) => (
-                        <li key={h} className="flex items-start gap-2 text-xs text-muted">
-                          <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-                          <span>{h}</span>
+                  <div className="mt-6 border-t border-border/70 pt-5">
+                    <ul className="space-y-2.5">
+                      {pillar.highlights.map((item) => (
+                        <li key={item} className="flex items-center gap-2.5 text-xs text-muted">
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-primary" />
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>

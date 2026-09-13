@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
@@ -6,13 +8,15 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Icon } from "@/lib/icons";
 import { services } from "@/data/services";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { useLanguage } from "@/lib/translations";
 
 export function ServicesGrid() {
+  const { lang, t } = useLanguage();
   const [lead, ...rest] = services.slice(0, 6);
 
   return (
     <section className="relative overflow-hidden border-t border-border bg-surface-muted py-24">
-      {/* faint brand pattern so the band isn't a flat grey slab */}
+      {/* faint brand pattern */}
       <div
         className="absolute inset-0 bg-grid opacity-40 [mask-image:linear-gradient(to_bottom,#000,transparent_60%)]"
         aria-hidden="true"
@@ -26,23 +30,23 @@ export function ServicesGrid() {
       <Container className="relative">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="What we do"
-            title="Services built around your growth"
-            description="From the first line of code to accreditation-ready ERP workflows — refined over a decade of delivery."
+            eyebrow={t("services_eyebrow")}
+            title={t("services_title")}
+            description={t("services_subtitle")}
           />
           <Reveal delay={0.1}>
             <Link
               href="/services"
               className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-3 text-sm font-semibold shadow-sm transition hover:border-primary/50 hover:text-primary"
             >
-              All 8 services
+              {t("services_view_all")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Reveal>
         </div>
 
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
-          {/* Lead card — deliberately larger so the grid has a focal point */}
+          {/* Lead card */}
           <Reveal className="lg:row-span-2">
             <Link
               href={`/services/${lead.slug}`}
@@ -58,7 +62,11 @@ export function ServicesGrid() {
               <div className="relative">
                 <div className="flex items-center justify-between">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-semibold tracking-wider text-white/90 backdrop-blur-sm">
-                    Flagship Offering
+                    {lang === "hi"
+                      ? "प्रमुख पेशकश"
+                      : lang === "or"
+                      ? "ପ୍ରମୁଖ ସେବା"
+                      : "Flagship Offering"}
                   </span>
                   <span className="font-mono text-xs text-white/70">01</span>
                 </div>
@@ -71,7 +79,13 @@ export function ServicesGrid() {
               </div>
 
               <div className="relative mt-10">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/70">Core Capabilities</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/70">
+                  {lang === "hi"
+                    ? "मुख्य क्षमताएं"
+                    : lang === "or"
+                    ? "ମୁଖ୍ୟ କ୍ଷମତା"
+                    : "Core Capabilities"}
+                </p>
                 <ul className="mt-3 space-y-2">
                   {lead.highlights.slice(0, 4).map((h) => (
                     <li key={h} className="flex items-center gap-2.5 text-xs text-white/90">
@@ -81,9 +95,19 @@ export function ServicesGrid() {
                   ))}
                 </ul>
                 <div className="mt-8 flex items-center justify-between border-t border-white/20 pt-4">
-                  <span className="text-xs font-medium text-white/80">Tailored Enterprise Architecture</span>
+                  <span className="text-xs font-medium text-white/80">
+                    {lang === "hi"
+                      ? "एंटरप्राइज आर्किटेक्चर"
+                      : lang === "or"
+                      ? "ଏଣ୍ଟରପ୍ରାଇଜ୍ ଆର୍କିଟେକ୍ଚର"
+                      : "Tailored Enterprise Architecture"}
+                  </span>
                   <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
-                    Explore service
+                    {lang === "hi"
+                      ? "सेवा देखें"
+                      : lang === "or"
+                      ? "ସେବା ଦେଖନ୍ତୁ"
+                      : "Explore service"}
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
                   </span>
                 </div>
@@ -99,34 +123,30 @@ export function ServicesGrid() {
               >
                 <Link
                   href={`/services/${service.slug}`}
-                  data-voice-speak={`Service Line: ${service.name}. ${service.summary}. Key capability: ${service.highlights[0]}.`}
-                  className="group relative flex h-full flex-col justify-between p-6"
+                  data-voice-speak={`Service: ${service.name}. ${service.summary}. Key highlights include ${service.highlights.slice(0, 2).join(", ")}.`}
+                  className="group relative flex h-full flex-col justify-between p-6 sm:p-7"
                 >
-                  {/* magenta accent bar that draws in on hover */}
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-0 top-0 h-[3px] w-0 bg-gradient-to-r from-primary to-accent-strong transition-all duration-500 group-hover:w-full"
-                  />
-
                   <div>
-                    <div className="flex items-start justify-between">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-400 group-hover:scale-110 group-hover:bg-primary group-hover:text-white">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-400 group-hover:scale-110 group-hover:bg-primary group-hover:text-white group-hover:shadow-md group-hover:shadow-primary/30">
                         <Icon name={service.icon} className="h-5 w-5" />
                       </div>
-                      <span className="font-mono text-xs font-semibold text-muted/70">
-                        {String(i + 2).padStart(2, "0")}
-                      </span>
+                      <ArrowUpRight className="h-5 w-5 text-muted transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-primary" />
                     </div>
-                    <h3 className="mt-5 font-semibold tracking-tight transition-colors group-hover:text-primary">{service.name}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">{service.summary}</p>
+                    <h3 className="mt-5 text-lg font-bold tracking-tight transition-colors group-hover:text-primary">
+                      {service.name}
+                    </h3>
+                    <p className="mt-2 text-xs leading-relaxed text-muted line-clamp-2">{service.summary}</p>
                   </div>
 
-                  <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4">
-                    <span className="text-[11px] font-medium text-muted">
-                      {service.highlights[0]}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-all duration-300 group-hover:translate-x-1">
-                      Details <ArrowUpRight className="h-3.5 w-3.5" />
+                  <div className="mt-6 border-t border-border/70 pt-3">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-all group-hover:gap-2">
+                      {lang === "hi"
+                        ? "विवरण देखें"
+                        : lang === "or"
+                        ? "ବିବରଣୀ ଦେଖନ୍ତୁ"
+                        : "View details"}
+                      <ArrowRight className="h-3 w-3" />
                     </span>
                   </div>
                 </Link>
