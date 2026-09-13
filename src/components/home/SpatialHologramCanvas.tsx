@@ -271,7 +271,6 @@ export function SpatialHologramCanvas() {
     if (!ctx) return;
 
     let animId: number;
-    let isVisible = true;
     const { points, edges, hotspots } = getModelGeometry(modelType);
 
     if (hotspots.length > 0 && !selectedHotspot) {
@@ -293,15 +292,23 @@ export function SpatialHologramCanvas() {
       resizeObserver.observe(canvas.parentElement);
     }
 
-    // Pause animation when out of viewport
+    let isRunning = true;
+    let isVisible = true;
+
+    // Pause animation completely when out of viewport to save 100% CPU/GPU cycles
     const intersectionObserver = new IntersectionObserver((entries) => {
-      isVisible = entries[0]?.isIntersecting ?? true;
-    });
+      const currentlyVisible = entries[0]?.isIntersecting ?? true;
+      if (currentlyVisible && !isVisible && isRunning) {
+        isVisible = true;
+        animId = requestAnimationFrame(render);
+      } else {
+        isVisible = currentlyVisible;
+      }
+    }, { threshold: 0.05 });
     intersectionObserver.observe(canvas);
 
     const render = () => {
-      if (!isVisible) {
-        animId = requestAnimationFrame(render);
+      if (!isVisible || !isRunning) {
         return;
       }
 
@@ -441,6 +448,7 @@ export function SpatialHologramCanvas() {
     render();
 
     return () => {
+      isRunning = false;
       cancelAnimationFrame(animId);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();

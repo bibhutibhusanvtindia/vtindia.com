@@ -37,9 +37,13 @@ export function Hero() {
   const handlePointerMove = useCallback(
     (event: React.PointerEvent<HTMLElement>) => {
       if (shouldReduceMotion || event.pointerType !== "mouse") return;
-      const rect = event.currentTarget.getBoundingClientRect();
-      rawX.set(((event.clientX - rect.left) / rect.width) * 2 - 1);
-      rawY.set(((event.clientY - rect.top) / rect.height) * 2 - 1);
+      const target = event.currentTarget;
+      const width = target.clientWidth || window.innerWidth;
+      const height = target.clientHeight || window.innerHeight;
+      const x = ((event.clientX - target.offsetLeft) / width) * 2 - 1;
+      const y = ((event.clientY - target.offsetTop) / height) * 2 - 1;
+      rawX.set(Math.max(-1, Math.min(1, x)));
+      rawY.set(Math.max(-1, Math.min(1, y)));
     },
     [rawX, rawY, shouldReduceMotion],
   );

@@ -140,6 +140,22 @@ body {
   animation: pulse-subtle 3s ease-in-out infinite;
 }
 
+/* GPU acceleration and performance utilities */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Optimize smooth scrolling and image rendering */
+img, svg, canvas {
+  transform: translateZ(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

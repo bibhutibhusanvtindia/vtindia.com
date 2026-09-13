@@ -101,79 +101,91 @@ export function HeroVisual({
       {/* Floating Card 1: Top-Left with gentle vertical float */}
       <motion.div
         style={{ x: card1X, y: card1Y }}
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -left-4 -top-6 z-20 hidden rounded-2xl border border-border/90 bg-surface/95 p-4 shadow-xl backdrop-blur-xl sm:flex sm:items-center sm:gap-3.5 sm:max-w-xs"
+        className="absolute -left-4 -top-6 z-20 hidden sm:block will-change-transform"
       >
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <CheckCircle2 className="h-5 w-5" />
-        </div>
-        <div className="min-w-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={slide.badge1Title}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.25 }}
-            >
-              <p className="truncate text-xs font-bold tracking-tight text-foreground">{slide.badge1Title}</p>
-              <p className="truncate text-[11px] font-medium text-muted">{slide.badge1Subtitle}</p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <motion.div
+          animate={{ y: [0, -7, 0] }}
+          transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+          className="flex items-center gap-3.5 rounded-2xl border border-border/90 bg-surface/95 p-4 shadow-xl backdrop-blur-xl max-w-xs"
+        >
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.badge1Title}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+              >
+                <p className="truncate text-xs font-bold tracking-tight text-foreground">{slide.badge1Title}</p>
+                <p className="truncate text-[11px] font-medium text-muted">{slide.badge1Subtitle}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Floating Card 2: Top-Right with reverse float */}
       <motion.div
         style={{ x: card2X, y: card2Y }}
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-        className="absolute -right-4 -top-4 z-20 hidden rounded-2xl border border-border/90 bg-surface/95 p-3.5 shadow-xl backdrop-blur-xl sm:flex sm:items-center sm:gap-3"
+        className="absolute -right-4 -top-4 z-20 hidden sm:block will-change-transform"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-md shadow-primary/25">
-          <ShieldCheck className="h-5 w-5" />
-        </div>
-        <div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={slide.badge2Title}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.25 }}
-            >
-              <p className="text-xs font-bold tracking-tight text-foreground">{slide.badge2Title}</p>
-              <p className="text-[10px] font-semibold text-primary">{slide.badge2Subtitle}</p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <motion.div
+          animate={{ y: [0, 7, 0] }}
+          transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+          className="flex items-center gap-3 rounded-2xl border border-border/90 bg-surface/95 p-3.5 shadow-xl backdrop-blur-xl"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-md shadow-primary/25">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.badge2Title}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+              >
+                <p className="text-xs font-bold tracking-tight text-foreground">{slide.badge2Title}</p>
+                <p className="text-[10px] font-semibold text-primary">{slide.badge2Subtitle}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Floating Card 3: Bottom-Right with float */}
       <motion.div
         style={{ x: card3X, y: card3Y }}
-        animate={{ y: [0, -6, 0] }}
-        transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-        className="absolute -bottom-6 -right-4 z-20 hidden rounded-2xl border border-border/90 bg-surface/95 p-4 shadow-xl backdrop-blur-xl sm:flex sm:items-center sm:gap-3.5"
+        className="absolute -bottom-6 -right-4 z-20 hidden sm:block will-change-transform"
       >
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Layers className="h-5 w-5" />
-        </div>
-        <div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={slide.badge3Title}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.25 }}
-            >
-              <p className="text-xs font-bold tracking-tight text-foreground">{slide.badge3Title}</p>
-              <p className="text-[11px] font-medium text-muted">{slide.badge3Subtitle}</p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <motion.div
+          animate={{ y: [0, -6, 0] }}
+          transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+          className="flex items-center gap-3.5 rounded-2xl border border-border/90 bg-surface/95 p-4 shadow-xl backdrop-blur-xl"
+        >
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Layers className="h-5 w-5" />
+          </div>
+          <div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.badge3Title}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+              >
+                <p className="text-xs font-bold tracking-tight text-foreground">{slide.badge3Title}</p>
+                <p className="text-[11px] font-medium text-muted">{slide.badge3Subtitle}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   );
