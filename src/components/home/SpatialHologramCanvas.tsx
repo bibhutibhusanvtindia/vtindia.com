@@ -13,6 +13,8 @@ import {
   Eye,
 } from "lucide-react";
 
+import { useLanguage } from "@/lib/translations";
+
 type ModelType = "turbine" | "headset" | "digital-twin";
 
 interface Point3D {
@@ -42,6 +44,7 @@ export function SpatialHologramCanvas() {
   const [showHotspots, setShowHotspots] = useState(true);
   const [autoRotate, setAutoRotate] = useState(true);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
+  const { lang } = useLanguage();
 
   // Rotation angles
   const rotXRef = useRef(0.3);
@@ -93,26 +96,26 @@ export function SpatialHologramCanvas() {
       hotspots.push({
         id: "valve-1",
         pIndex: 6,
-        title: "High-Pressure Relief Valve",
-        metric: "142.4 PSI • Normal",
+        title: lang === "hi" ? "उच्च दबाव रिलीफ वाल्व" : lang === "or" ? "ଉଚ୍ଚ ଚାପ ରିଲିଫ୍ ଭଲଭ୍" : "High-Pressure Relief Valve",
+        metric: lang === "hi" ? "142.4 PSI • सामान्य" : lang === "or" ? "୧୪୨.୪ PSI • ସ୍ୱାଭାବିକ" : "142.4 PSI • Normal",
         status: "nominal",
-        description: "Simulated emergency pressure drop drill threshold.",
+        description: lang === "hi" ? "आपातकालीन दबाव ड्रॉप थ्रेशोल्ड सिमुलेशन।" : lang === "or" ? "ଜରୁରୀକାଳୀନ ଚାପ ହ୍ରାସ ସିମ୍ୟୁଲେସନ୍।" : "Simulated emergency pressure drop drill threshold.",
       });
       hotspots.push({
         id: "core-bearing",
         pIndex: Math.floor(points.length / 2),
-        title: "Thermal Bearing Chamber",
-        metric: "78.2°C • Optimal",
+        title: lang === "hi" ? "थर्मल बेयरिंग चैंबर" : lang === "or" ? "ତାପଜ ବିୟରିଂ ଚ୍ୟାମ୍ବର" : "Thermal Bearing Chamber",
+        metric: lang === "hi" ? "78.2°C • इष्टतम" : lang === "or" ? "୭୮.୨°C • ସର୍ବୋତ୍ତମ" : "78.2°C • Optimal",
         status: "optimal",
-        description: "Real-time thermal telemetry synchronized over WebXR.",
+        description: lang === "hi" ? "वेबएक्सआर पर रीयल-टाइम थर्मल टेलीमेट्री सिंक।" : lang === "or" ? "WebXR ରେ ରିଅଲ୍-ଟାଇମ୍ ତାପମାତ୍ରା ଡାଟା।" : "Real-time thermal telemetry synchronized over WebXR.",
       });
       hotspots.push({
         id: "exhaust",
         pIndex: points.length - 5,
-        title: "Vibration Sensor Array",
+        title: lang === "hi" ? "कंपन सेंसर ऐरे" : lang === "or" ? "କମ୍ପନ ସେନ୍ସର ଆରେ" : "Vibration Sensor Array",
         metric: "0.04 mm/s RMS",
         status: "nominal",
-        description: "6-DOF haptic trigger node for hazardous vibration warnings.",
+        description: lang === "hi" ? "खतरनाक कंपन चेतावनियों के लिए 6-DoF हैप्टिक ट्रिगर नोड।" : lang === "or" ? "ବିପଦଜନକ କମ୍ପନ ସୂଚନା ପାଇଁ ୬-DoF ହାପ୍ଟିକ୍ ନୋଡ୍।" : "6-DOF haptic trigger node for hazardous vibration warnings.",
       });
     } else if (type === "headset") {
       // VR Headset geometry (box visor + strap arcs + lens nodes)
@@ -523,7 +526,7 @@ export function SpatialHologramCanvas() {
             }`}
           >
             <Shield className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">SafeAct</span> Turbine
+            <span className="hidden sm:inline">SafeAct</span> {lang === "hi" ? "टर्बाइन" : lang === "or" ? "ଟର୍ବାଇନ୍" : "Turbine"}
           </button>
           <button
             onClick={() => {
@@ -537,7 +540,7 @@ export function SpatialHologramCanvas() {
             }`}
           >
             <Eye className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Spatial</span> Headset
+            <span className="hidden sm:inline">Spatial</span> {lang === "hi" ? "हेडसेट" : lang === "or" ? "ହେଡ୍‌ସେଟ୍" : "Headset"}
           </button>
           <button
             onClick={() => {
@@ -551,7 +554,7 @@ export function SpatialHologramCanvas() {
             }`}
           >
             <Box className="h-3.5 w-3.5" />
-            <span>Digital Twin</span>
+            <span>{lang === "hi" ? "डिजिटल ट्विन" : lang === "or" ? "ଡିଜିଟାଲ୍ ଟ୍ୱିନ୍" : "Digital Twin"}</span>
           </button>
         </div>
 
@@ -567,7 +570,11 @@ export function SpatialHologramCanvas() {
             }`}
           >
             <Layers className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Wireframe</span>
+            <span className="hidden sm:inline">
+              {isWireframe
+                ? lang === "hi" ? "वायरफ्रेम" : lang === "or" ? "ୱାୟାରଫ୍ରେମ୍" : "Wireframe"
+                : lang === "hi" ? "सॉलिड" : lang === "or" ? "ସଲିଡ୍" : "Solid"}
+            </span>
           </button>
           <button
             onClick={() => setAutoRotate(!autoRotate)}
@@ -579,7 +586,11 @@ export function SpatialHologramCanvas() {
             }`}
           >
             <Activity className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{autoRotate ? "Auto" : "Paused"}</span>
+            <span className="hidden sm:inline">
+              {autoRotate
+                ? lang === "hi" ? "ऑटो" : lang === "or" ? "ଅଟୋ" : "Auto"
+                : lang === "hi" ? "रुका" : lang === "or" ? "ସ୍ଥିର" : "Paused"}
+            </span>
           </button>
           <button
             onClick={resetView}
@@ -611,14 +622,22 @@ export function SpatialHologramCanvas() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          <span className="font-semibold text-foreground">Interactive 3D WebXR Studio</span>
+          <span className="font-semibold text-foreground">
+            {lang === "hi" ? "इंटरएक्टिव 3D वेबएक्सआर स्टूडियो" : lang === "or" ? "ଇଣ୍ଟରାକ୍ଟିଭ୍ 3D WebXR ଷ୍ଟୁଡିଓ" : "Interactive 3D WebXR Studio"}
+          </span>
           <span className="text-muted">| 60 FPS</span>
         </div>
 
         {/* Interactive Hint */}
         <div className="pointer-events-none absolute bottom-3 right-3 hidden items-center gap-1.5 rounded-lg border border-border/80 bg-surface/85 px-2.5 py-1 text-[10px] font-medium text-muted backdrop-blur-md sm:flex">
           <Sparkles className="h-3 w-3 text-primary" />
-          <span>Click &amp; drag to rotate in 3D</span>
+          <span>
+            {lang === "hi"
+              ? "3D में घुमाने के लिए क्लिक व ड्रैग करें"
+              : lang === "or"
+              ? "3D ଘୂରାଇବା ପାଇଁ କ୍ଲିକ୍ ଓ ଡ୍ରାଗ୍ କରନ୍ତୁ"
+              : "Click & drag to rotate in 3D"}
+          </span>
         </div>
       </div>
 
@@ -626,7 +645,11 @@ export function SpatialHologramCanvas() {
       <div className="border-t border-border/80 bg-surface-muted/40 p-4 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-bold uppercase tracking-wider text-muted">
-            Telemetry Hotspots &amp; Sensor Nodes:
+            {lang === "hi"
+              ? "टेलीमेट्री हॉटस्पॉट्स एवं सेंसर नोड्स:"
+              : lang === "or"
+              ? "ଟେଲିମେଟ୍ରି ହଟ୍‌ସ୍ପଟ୍ ଓ ସେନ୍ସର ନୋଡ୍:"
+              : "Telemetry Hotspots & Sensor Nodes:"}
           </span>
           <div className="flex flex-wrap gap-1.5">
             {hotspots.map((hs) => (

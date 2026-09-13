@@ -7,20 +7,15 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { clients } from "@/data/portfolio";
+import { useLanguage } from "@/lib/translations";
 
-/**
- * Two counter-scrolling rows of real client logos. Logos rest in monochrome so
- * 80+ different brand palettes read as one calm band, and return to full colour
- * on hover — nothing is permanently recoloured or misrepresented.
- *
- * Pauses on hover and freezes entirely under prefers-reduced-motion.
- */
 const withLogos = clients.filter((c) => c.image);
 const rowA = withLogos.filter((_, i) => i % 2 === 0).slice(0, 20);
 const rowB = withLogos.filter((_, i) => i % 2 === 1).slice(0, 20);
 
 export function ClientMarquee() {
   const shouldReduceMotion = useReducedMotion();
+  const { lang, t } = useLanguage();
 
   return (
     <section className="relative overflow-hidden border-t border-border bg-surface-muted/60 py-24">
@@ -39,13 +34,25 @@ export function ClientMarquee() {
           <Reveal>
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                Trusted by Industry Leaders
+                {t("marquee_eyebrow")}
               </span>
               <h2 className="mt-4 text-3xl font-bold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl">
-                {withLogos.length} Verified Deployments Across <span className="gradient-text">Eastern India &amp; UAE</span>
+                {withLogos.length}{" "}
+                {lang === "hi"
+                  ? "प्रमाणित परिनियोजन "
+                  : lang === "or"
+                  ? "ପ୍ରମାଣିତ ପ୍ରକଳ୍ପ "
+                  : "Verified Deployments Across "}
+                <span className="gradient-text">
+                  {lang === "hi"
+                    ? "पूर्वी भारत और यूएई"
+                    : lang === "or"
+                    ? "ପୂର୍ବ ଭାରତ ଓ ୟୁଏଇ"
+                    : "Eastern India & UAE"}
+                </span>
               </h2>
               <p className="mt-4 text-base leading-relaxed text-muted">
-                Powering heavy industrial giants, state universities, medical institutions, and corporate enterprises.
+                {t("marquee_desc")}
               </p>
             </div>
           </Reveal>
@@ -54,7 +61,7 @@ export function ClientMarquee() {
               href="/clients"
               className="group inline-flex items-center gap-2 rounded-full border border-primary/30 bg-surface px-6 py-3.5 text-sm font-semibold shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"
             >
-              View all 84+ clients
+              {t("marquee_btn")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Reveal>
@@ -98,21 +105,23 @@ function MarqueeRow({
           className="flex shrink-0 gap-4 pr-4 [animation-play-state:running] group-hover:[animation-play-state:paused]"
           animate={paused ? undefined : { x: reverse ? ["-100%", "0%"] : ["0%", "-100%"] }}
           transition={{ duration, repeat: Infinity, ease: "linear" }}
-          style={{ willChange: "transform" }}
         >
-          {items.map((client) => (
+          {items.map((client, idx) => (
             <div
-              key={`${copy}-${client.name}-${client.image}`}
-              className="flex h-20 w-44 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white p-3.5 shadow-lg shadow-black/40 transition-all duration-300 hover:scale-105 hover:border-primary hover:shadow-2xl hover:shadow-primary/25"
-              title={client.name}
+              key={`${client.name}-${copy}-${idx}`}
+              className="flex h-20 w-44 items-center justify-center rounded-2xl border border-border/70 bg-surface/80 px-5 shadow-xs backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:bg-surface hover:shadow-md sm:h-22 sm:w-52"
             >
-              <Image
-                src={client.image!}
-                alt={client.name}
-                width={144}
-                height={80}
-                className="max-h-full w-auto object-contain"
-              />
+              {client.image && (
+                <div className="relative h-12 w-full">
+                  <Image
+                    src={client.image}
+                    alt={client.name}
+                    fill
+                    sizes="200px"
+                    className="object-contain grayscale opacity-65 transition-all duration-300 hover:grayscale-0 hover:opacity-100"
+                  />
+                </div>
+              )}
             </div>
           ))}
         </motion.div>

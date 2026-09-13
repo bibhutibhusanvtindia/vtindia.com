@@ -1,14 +1,17 @@
+"use client";
+
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import type { PortfolioItem } from "@/data/portfolio";
+import { useLanguage } from "@/lib/translations";
 
 /**
- * Neutral project presentation. Deliberately has no category filter: the old
- * site's filter buttons are non-functional and its items carry no category
- * tags, so any classification here would be inferred rather than sourced.
+ * Neutral project presentation with dynamic multi-language localization.
  */
 export function ProjectGrid({ items }: { items: PortfolioItem[] }) {
+  const { lang } = useLanguage();
+
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item, i) => {
@@ -27,7 +30,9 @@ export function ProjectGrid({ items }: { items: PortfolioItem[] }) {
             {/* Top badge */}
             <div className="absolute left-5 top-5 z-10 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[11px] font-medium text-white/90 backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              <span>Institutional</span>
+              <span>
+                {lang === "hi" ? "संस्थागत परिनियोजन" : lang === "or" ? "ସାଂସ୍ଥାନିକ ପ୍ରକଳ୍ପ" : "Institutional"}
+              </span>
             </div>
 
             <div className="relative flex h-full flex-col justify-end p-6">
@@ -38,7 +43,8 @@ export function ProjectGrid({ items }: { items: PortfolioItem[] }) {
                 {item.location ? <p className="text-xs font-medium text-white/80">{item.location}</p> : <span />}
                 {item.link ? (
                   <span className="inline-flex items-center gap-1 text-xs font-semibold text-white/90 underline-offset-4 transition group-hover:text-white group-hover:underline">
-                    View project <ExternalLink className="h-3.5 w-3.5" />
+                    {lang === "hi" ? "प्रोजेक्ट देखें" : lang === "or" ? "ପ୍ରକଳ୍ପ ଦେଖନ୍ତୁ" : "View project"}{" "}
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </span>
                 ) : null}
               </div>

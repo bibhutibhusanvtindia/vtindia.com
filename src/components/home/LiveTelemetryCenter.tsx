@@ -21,38 +21,91 @@ interface ServerNode {
   name: string;
   location: string;
   role: string;
-  status: "Operational" | "Optimal";
+  status: string;
   baseLatency: number;
 }
 
-const NODES: ServerNode[] = [
-  {
-    name: "Bhubaneswar O-HUB Cluster",
-    location: "Odisha, India",
-    role: "Spatial WebXR & R&D Simulation Engine",
-    status: "Operational",
-    baseLatency: 12,
-  },
-  {
-    name: "Kolkata HQ Datacenter",
-    location: "West Bengal, India",
-    role: "Primary Enterprise ERP & Core Services Hub",
-    status: "Optimal",
-    baseLatency: 15,
-  },
-  {
-    name: "Asia-Pacific Cloud Gateway",
-    location: "Mumbai / UAE Edge",
-    role: "Multi-Region Redundancy & High-Availability API",
-    status: "Optimal",
-    baseLatency: 22,
-  },
-];
+const NODES_MAP: Record<"en" | "hi" | "or", ServerNode[]> = {
+  en: [
+    {
+      name: "Bhubaneswar O-HUB Cluster",
+      location: "Odisha, India",
+      role: "Spatial WebXR & R&D Simulation Engine",
+      status: "Operational",
+      baseLatency: 12,
+    },
+    {
+      name: "Kolkata HQ Datacenter",
+      location: "West Bengal, India",
+      role: "Primary Enterprise ERP & Core Services Hub",
+      status: "Optimal",
+      baseLatency: 15,
+    },
+    {
+      name: "Asia-Pacific Cloud Gateway",
+      location: "Mumbai / UAE Edge",
+      role: "Multi-Region Redundancy & High-Availability API",
+      status: "Optimal",
+      baseLatency: 22,
+    },
+  ],
+  hi: [
+    {
+      name: "भुवनेश्वर ओ-हब क्लस्टर",
+      location: "ओडिशा, भारत",
+      role: "स्पेशियल वेबएक्सआर एवं अनुसंधान सिमुलेशन इंजन",
+      status: "सक्रिय परिचालन",
+      baseLatency: 12,
+    },
+    {
+      name: "कोलकाता मुख्यालय डेटा सेंटर",
+      location: "पश्चिम बंगाल, भारत",
+      role: "मुख्य एंटरप्राइज ईआरपी एवं कोर सेवा हब",
+      status: "इष्टतम स्थिति",
+      baseLatency: 15,
+    },
+    {
+      name: "एशिया-प्रशांत क्लाउड गेटवे",
+      location: "मुंबई / यूएई एज",
+      role: "बहु-क्षेत्रीय रिडंडेंसी एवं उच्च-उपलब्धता एपीआई",
+      status: "इष्टतम स्थिति",
+      baseLatency: 22,
+    },
+  ],
+  or: [
+    {
+      name: "ଭୁବନେଶ୍ୱର O-HUB କ୍ଲଷ୍ଟର୍",
+      location: "ଓଡ଼ିଶା, ଭାରତ",
+      role: "ସ୍ପାସିଆଲ୍ WebXR ଓ ଗବେଷଣା ସିମ୍ୟୁଲେସନ୍ ଇଞ୍ଜିନ୍",
+      status: "ସକ୍ରିୟ ପରିଚାଳନା",
+      baseLatency: 12,
+    },
+    {
+      name: "କୋଲକାତା ମୁଖ୍ୟାଳୟ ଡାଟା ସେଣ୍ଟର୍",
+      location: "ପଶ୍ଚିମବଙ୍ଗ, ଭାରତ",
+      role: "ମୁଖ୍ୟ ଏଣ୍ଟରପ୍ରାଇଜ୍ ERP ଓ ସେବା ହବ୍",
+      status: "ସର୍ବୋତ୍ତମ ସ୍ଥିତି",
+      baseLatency: 15,
+    },
+    {
+      name: "ଏସିଆ-ପ୍ରଶାନ୍ତ କ୍ଲାଉଡ୍ ଗେଟୱେ",
+      location: "ମୁମ୍ବାଇ / ୟୁଏଇ",
+      role: "ବହୁ-ଆଞ୍ଚଳିକ ନିରବଚ୍ଛିନ୍ନ API ନେଟୱର୍କ",
+      status: "ସର୍ବୋତ୍ତମ ସ୍ଥିତି",
+      baseLatency: 22,
+    },
+  ],
+};
+
+import { useLanguage } from "@/lib/translations";
 
 export function LiveTelemetryCenter() {
   const [latencies, setLatencies] = useState<number[]>([12, 15, 22]);
   const [lastPingTime, setLastPingTime] = useState<string>("Just now");
   const [isPinging, setIsPinging] = useState(false);
+  const { lang, t } = useLanguage();
+
+  const nodes = NODES_MAP[lang] || NODES_MAP.en;
 
   // Live slight ping jitter simulation
   const refreshPings = () => {
@@ -60,7 +113,7 @@ export function LiveTelemetryCenter() {
     playHapticBeep(780, 0.04);
     setTimeout(() => {
       setLatencies(
-        NODES.map((node) => node.baseLatency + Math.floor(Math.random() * 5 - 2))
+        nodes.map((node) => node.baseLatency + Math.floor(Math.random() * 5 - 2))
       );
       setLastPingTime(new Date().toLocaleTimeString());
       setIsPinging(false);
@@ -70,11 +123,11 @@ export function LiveTelemetryCenter() {
   useEffect(() => {
     const interval = setInterval(() => {
       setLatencies(
-        NODES.map((node) => node.baseLatency + Math.floor(Math.random() * 5 - 2))
+        nodes.map((node) => node.baseLatency + Math.floor(Math.random() * 5 - 2))
       );
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [nodes]);
 
   return (
     <section className="relative overflow-hidden border-t border-border bg-surface-muted/50 py-20">
@@ -86,13 +139,13 @@ export function LiveTelemetryCenter() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              Global Engineering Telemetry &amp; SLA
+              {t("telemetry_badge")}
             </div>
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
-              Enterprise Infrastructure &amp; High Availability
+              {t("telemetry_title")}
             </h2>
             <p className="mt-2 text-sm text-muted sm:text-base">
-              Real-time monitoring across our dual regional engineering hubs and distributed cloud clusters.
+              {t("telemetry_desc")}
             </p>
           </div>
 
@@ -102,13 +155,13 @@ export function LiveTelemetryCenter() {
             className="flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-xs font-semibold text-foreground shadow-sm transition hover:border-primary hover:text-primary"
           >
             <RefreshCw className={`h-3.5 w-3.5 text-primary ${isPinging ? "animate-spin" : ""}`} />
-            <span>Ping All Clusters</span>
+            <span>{lang === "hi" ? "सभी क्लस्टर्स पिंग करें" : lang === "or" ? "ସମସ୍ତ କ୍ଲଷ୍ଟର୍ ପିଙ୍ଗ୍ କରନ୍ତୁ" : "Ping All Clusters"}</span>
           </button>
         </div>
 
         {/* 3 Node Cards */}
         <div className="mt-10 grid gap-5 sm:grid-cols-3">
-          {NODES.map((node, i) => (
+          {nodes.map((node, i) => (
             <SpotlightCard key={node.name} enableTilt={false} className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -139,20 +192,38 @@ export function LiveTelemetryCenter() {
           <div className="flex flex-wrap items-center gap-6 text-xs font-medium text-foreground">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-primary" />
-              <span>ISO 9001:2015 Quality Certified</span>
+              <span>
+                {lang === "hi"
+                  ? "ISO 9001:2015 गुणवत्ता प्रमाणित"
+                  : lang === "or"
+                  ? "ISO 9001:2015 ଗୁଣବତ୍ତା ପ୍ରମାଣିତ"
+                  : "ISO 9001:2015 Quality Certified"}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Lock className="h-4 w-4 text-primary" />
-              <span>TLS 1.3 &amp; End-to-End Encryption</span>
+              <span>
+                {lang === "hi"
+                  ? "TLS 1.3 एवं एंड-टू-एंड एन्क्रिप्शन"
+                  : lang === "or"
+                  ? "TLS 1.3 ଓ ଏଣ୍ଡ-ଟୁ-ଏଣ୍ଡ ଏନକ୍ରିପସନ୍"
+                  : "TLS 1.3 & End-to-End Encryption"}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-primary" />
-              <span>99.98% Guaranteed Uptime SLA</span>
+              <span>
+                {lang === "hi"
+                  ? "99.98% गारंटीड अपटाइम एसएलए"
+                  : lang === "or"
+                  ? "୯୯.୯୮% ଗ୍ୟାରେଣ୍ଟିଡ୍ ଅପଟାଇମ୍ SLA"
+                  : "99.98% Guaranteed Uptime SLA"}
+              </span>
             </div>
           </div>
 
           <span className="font-mono text-[11px] text-muted">
-            Last Ping: {lastPingTime}
+            {lang === "hi" ? "अंतिम पिंग:" : lang === "or" ? "ଶେଷ ପିଙ୍ଗ୍:" : "Last Ping:"} {lastPingTime}
           </span>
         </div>
       </Container>

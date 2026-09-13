@@ -18,36 +18,106 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { site } from "@/data/site";
 
-const HUBS = [
-  {
-    city: "Bhubaneswar, Odisha",
-    label: "Innovation & Spatial Computing Center",
-    type: "Engineering & R&D Hub",
-    address: "Tower-A, 4th Floor, Room 409, (O-HUB), SEZ Road, Chandaka Industrial Estate, Bhubaneswar, Odisha",
-    phone: "9861802325",
-    focus: "AR/VR Simulators · 3D Spatial Systems · Enterprise ERP R&D",
-    status: "Active 24/7 Operations",
-  },
-  {
-    city: "Kolkata, West Bengal",
-    label: "Corporate Head Office",
-    type: "Corporate Headquarters",
-    address: "3rd Floor, Jharanalaya, 635 Baishnabghatta, Patuli, Kolkata, West Bengal - 700084",
-    phone: "03369029591",
-    focus: "Enterprise Software Architecture · Client Relations · Corporate Governance",
-    status: "Corporate Management",
-  },
-];
+interface HubInfo {
+  city: string;
+  label: string;
+  type: string;
+  address: string;
+  phone: string;
+  focus: string;
+  status: string;
+}
 
-const DEPLOYMENT_REGIONS = [
-  { name: "Eastern India Core", area: "Odisha · West Bengal · Jharkhand", desc: "84+ Enterprise & Institutional Clients" },
-  { name: "Middle East Presence", area: "United Arab Emirates (UAE)", desc: "Enterprise IT & Logistics Systems" },
-  { name: "United Kingdom", area: "London & Regional Partners", desc: "Software & Strategic Technology Consulting" },
-];
+const HUBS_MAP: Record<"en" | "hi" | "or", HubInfo[]> = {
+  en: [
+    {
+      city: "Bhubaneswar, Odisha",
+      label: "Innovation & Spatial Computing Center",
+      type: "Engineering & R&D Hub",
+      address: "Tower-A, 4th Floor, Room 409, (O-HUB), SEZ Road, Chandaka Industrial Estate, Bhubaneswar, Odisha",
+      phone: "9861802325",
+      focus: "AR/VR Simulators · 3D Spatial Systems · Enterprise ERP R&D",
+      status: "Active 24/7 Operations",
+    },
+    {
+      city: "Kolkata, West Bengal",
+      label: "Corporate Head Office",
+      type: "Corporate Headquarters",
+      address: "3rd Floor, Jharanalaya, 635 Baishnabghatta, Patuli, Kolkata, West Bengal - 700084",
+      phone: "03369029591",
+      focus: "Enterprise Software Architecture · Client Relations · Corporate Governance",
+      status: "Corporate Management",
+    },
+  ],
+  hi: [
+    {
+      city: "भुवनेश्वर, ओडिशा",
+      label: "नवाचार एवं स्पेशियल कंप्यूटिंग केंद्र",
+      type: "इंजीनियरिंग एवं अनुसंधान हब",
+      address: "टावर-ए, चौथी मंजिल, कमरा 409, (ओ-हब), सेज रोड, चंदका औद्योगिक एस्टेट, भुवनेश्वर, ओडिशा",
+      phone: "9861802325",
+      focus: "एआर/वीआर सिमुलेटर · 3D स्पेशियल सिस्टम्स · एंटरप्राइज ईआरपी अनुसंधान",
+      status: "24/7 सक्रिय परिचालन",
+    },
+    {
+      city: "कोलकाता, पश्चिम बंगाल",
+      label: "कॉर्पोरेट प्रधान कार्यालय",
+      type: "कॉर्पोरेट मुख्यालय",
+      address: "तीसरी मंजिल, झरनालय, 635 वैष्णवघाटा, पटुली, कोलकाता, पश्चिम बंगाल - 700084",
+      phone: "03369029591",
+      focus: "एंटरप्राइज सॉफ्टवेयर आर्किटेक्चर · क्लाइंट संबंध · कॉर्पोरेट गवर्नेंस",
+      status: "कॉर्पोरेट प्रबंधन",
+    },
+  ],
+  or: [
+    {
+      city: "ଭୁବନେଶ୍ୱର, ଓଡ଼ିଶା",
+      label: "ଉଦ୍ଭାବନ ଓ ସ୍ପାସିଆଲ୍ କମ୍ପ୍ୟୁଟିଂ କେନ୍ଦ୍ର",
+      type: "ଇଞ୍ଜିନିୟରିଂ ଓ ଗବେଷଣା ହବ୍",
+      address: "ଟାୱାର-ଏ, ଚତୁର୍ଥ ମହଲା, ରୁମ୍ ୪୦୯, (O-HUB), SEZ ରୋଡ୍, ଚନ୍ଦକା ଶିଳ୍ପାଞ୍ଚଳ, ଭୁବନେଶ୍ୱର, ଓଡ଼ିଶା",
+      phone: "9861802325",
+      focus: "AR/VR ସିମ୍ୟୁଲେଟର · 3D ସ୍ପାସିଆଲ୍ ସିଷ୍ଟମ୍ · ଏଣ୍ଟରପ୍ରାଇଜ୍ ERP ଗବେଷଣା",
+      status: "୨୪/୭ ସକ୍ରିୟ ପରିଚାଳନା",
+    },
+    {
+      city: "କୋଲକାତା, ପଶ୍ଚିମବଙ୍ଗ",
+      label: "କର୍ପୋରେଟ୍ ମୁଖ୍ୟ କାର୍ଯ୍ୟାଳୟ",
+      type: "କର୍ପୋରେଟ୍ ମୁଖ୍ୟାଳୟ",
+      address: "ତୃତୀୟ ମହଲା, ଝରଣାଳୟ, ୬୩୫ ବୈଷ୍ଣବଘାଟା, ପାଟୁଲି, କୋଲକାତା, ପଶ୍ଚିମବଙ୍ଗ - ୭୦୦୦୮୪",
+      phone: "03369029591",
+      focus: "ଏଣ୍ଟରପ୍ରାଇଜ୍ ସଫ୍ଟୱେର୍ ଆର୍କିଟେକ୍ଚର · ଗ୍ରାହକ ସମ୍ପର୍କ · କର୍ପୋରେଟ୍ ପରିଚାଳନା",
+      status: "କର୍ପୋରେଟ୍ ନେତୃତ୍ୱ",
+    },
+  ],
+};
+
+const DEPLOYMENT_REGIONS_MAP = {
+  en: [
+    { name: "Eastern India Core", area: "Odisha · West Bengal · Jharkhand", desc: "84+ Enterprise & Institutional Clients" },
+    { name: "Middle East Presence", area: "United Arab Emirates (UAE)", desc: "Enterprise IT & Logistics Systems" },
+    { name: "United Kingdom", area: "London & Regional Partners", desc: "Software & Strategic Technology Consulting" },
+  ],
+  hi: [
+    { name: "पूर्वी भारत मुख्य क्षेत्र", area: "ओडिशा · पश्चिम बंगाल · झारखंड", desc: "84+ एंटरप्राइज व संस्थागत क्लाइंट्स" },
+    { name: "मध्य पूर्व उपस्थिति", area: "संयुक्त अरब अमीरात (UAE)", desc: "एंटरप्राइज आईटी एवं लॉजिस्टिक्स सिस्टम्स" },
+    { name: "यूनाइटेड किंगडम", area: "लंदन एवं क्षेत्रीय भागीदार", desc: "सॉफ्टवेयर एवं रणनीतिक परामर्श" },
+  ],
+  or: [
+    { name: "ପୂର୍ବ ଭାରତ କେନ୍ଦ୍ର", area: "ଓଡ଼ିଶା · ପଶ୍ଚିମବଙ୍ଗ · ଝାଡ଼ଖଣ୍ଡ", desc: "୮୪+ ଏଣ୍ଟରପ୍ରାଇଜ୍ ଓ ସାଂସ୍ଥାନିକ ଗ୍ରାହକ" },
+    { name: "ମଧ୍ୟପ୍ରାଚ୍ୟ ଉପସ୍ଥିତି", area: "ୟୁନାଇଟେଡ୍ ଆରବ ଏମିରେଟ୍ସ (UAE)", desc: "ଏଣ୍ଟରପ୍ରାଇଜ୍ IT ଓ ଲଜିଷ୍ଟିକ୍ସ ପ୍ରଣାଳୀ" },
+    { name: "ୟୁନାଇଟେଡ୍ କିଙ୍ଗଡମ୍", area: "ଲଣ୍ଡନ ଓ ଆଞ୍ଚଳିକ ପାର୍ଟନର", desc: "ସଫ୍ଟୱେର୍ ଓ ରଣନୀତିକ ପରାମର୍ଶ" },
+  ],
+};
+
+import { useLanguage } from "@/lib/translations";
 
 export function GlobalFootprint() {
   const [selectedHub, setSelectedHub] = useState(0);
-  const hub = HUBS[selectedHub];
+  const { lang, t } = useLanguage();
+
+  const hubs = HUBS_MAP[lang] || HUBS_MAP.en;
+  const regions = DEPLOYMENT_REGIONS_MAP[lang] || DEPLOYMENT_REGIONS_MAP.en;
+  const hub = hubs[selectedHub] || hubs[0];
 
   return (
     <section className="relative overflow-hidden border-t border-border bg-surface py-24">
@@ -60,9 +130,9 @@ export function GlobalFootprint() {
       <Container className="relative">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="Regional Presence & Global Reach"
-            title="Dual Regional Hubs, Worldwide Delivery"
-            description="Anchored by our Innovation Hub at O-HUB Bhubaneswar and Corporate HQ in Kolkata, serving clients across India, the UAE, and the UK."
+            eyebrow={t("footprint_badge")}
+            title={t("footprint_title")}
+            description={t("footprint_desc")}
           />
         </div>
 
@@ -70,9 +140,9 @@ export function GlobalFootprint() {
           {/* Left Hub Switcher: 5 Cols */}
           <div className="space-y-4 lg:col-span-5">
             <p className="text-xs font-bold uppercase tracking-wider text-muted">
-              Select Primary Operations Center
+              {lang === "hi" ? "प्राथमिक केंद्र चुनें" : lang === "or" ? "ମୁଖ୍ୟ କେନ୍ଦ୍ର ଚୟନ କରନ୍ତୁ" : "Select Primary Operations Center"}
             </p>
-            {HUBS.map((h, i) => {
+            {hubs.map((h, i) => {
               const isSelected = i === selectedHub;
               return (
                 <button
@@ -102,10 +172,10 @@ export function GlobalFootprint() {
             {/* Global Regions Strip */}
             <div className="mt-6 rounded-2xl border border-border/80 bg-surface-muted/50 p-5">
               <p className="text-xs font-bold uppercase tracking-wider text-foreground">
-                Client Deployment Reach
+                {lang === "hi" ? "क्लाइंट परिनियोजन विस्तार" : lang === "or" ? "ପ୍ରକଳ୍ପ ବିସ୍ତୃତି" : "Client Deployment Reach"}
               </p>
               <div className="mt-3 space-y-2.5">
-                {DEPLOYMENT_REGIONS.map((reg) => (
+                {regions.map((reg) => (
                   <div key={reg.name} className="flex items-start gap-2 text-xs">
                     <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
                     <div>
@@ -134,18 +204,22 @@ export function GlobalFootprint() {
                   </div>
                 </div>
                 <span className="rounded-full bg-emerald-500/10 px-3 py-1 font-mono text-xs font-bold text-emerald-600">
-                  Direct Line Active
+                  {lang === "hi" ? "डायरेक्ट लाइन सक्रिय" : lang === "or" ? "ସିଧାସଳଖ ଲାଇନ୍ ସକ୍ରିୟ" : "Direct Line Active"}
                 </span>
               </div>
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted">Facility Address:</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
+                    {lang === "hi" ? "केंद्र का पता:" : lang === "or" ? "କେନ୍ଦ୍ରର ଠିକଣା:" : "Facility Address:"}
+                  </p>
                   <p className="mt-1 text-sm leading-relaxed text-foreground">{hub.address}</p>
                 </div>
 
                 <div className="rounded-2xl border border-border/80 bg-surface-muted/60 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted">Specialized Engineering Focus:</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
+                    {lang === "hi" ? "विशिष्ट इंजीनियरिंग फोकस:" : lang === "or" ? "ମୁଖ୍ୟ ଇଞ୍ଜିନିୟରିଂ ଲକ୍ଷ୍ୟ:" : "Specialized Engineering Focus:"}
+                  </p>
                   <p className="mt-1 text-xs font-semibold text-primary">{hub.focus}</p>
                 </div>
 
@@ -155,10 +229,10 @@ export function GlobalFootprint() {
                     className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-5 py-2.5 text-xs font-bold text-primary transition hover:bg-primary hover:text-white"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    Call Direct: {hub.phone}
+                    {lang === "hi" ? "कॉल करें:" : lang === "or" ? "କଲ୍ କରନ୍ତୁ:" : "Call Direct:"} {hub.phone}
                   </a>
                   <span className="text-xs text-muted">
-                    Official Email: <strong className="text-foreground">{site.email}</strong>
+                    {lang === "hi" ? "आधिकारिक ईमेल:" : lang === "or" ? "ଅଫିସିଆଲ୍ ଇମେଲ୍:" : "Official Email:"} <strong className="text-foreground">{site.email}</strong>
                   </span>
                 </div>
               </div>

@@ -36,76 +36,212 @@ interface VRModule {
   headsets: string[];
 }
 
-const VR_MODULES: VRModule[] = [
-  {
-    id: "safeact-vr",
-    title: "SafeAct Industrial VR Hazard Simulator",
-    category: "Heavy Industry & Mining Safety",
-    badge: "Enterprise Flagship",
-    description:
-      "Full 6-DOF virtual reality hazard training environment deployed for Tata Steel and Vedanta, simulating high-risk industrial scenarios with zero physical danger.",
-    image: "/images/hero/hero-vr.jpg",
-    metrics: [
-      { label: "Hazard Scenarios", value: "40+ Real Scenarios" },
-      { label: "Accident Reduction", value: "92% Retention" },
-      { label: "Simulation Accuracy", value: "Physics-Based" },
-    ],
-    features: [
-      "Dynamic fire, chemical & height hazard scenarios",
-      "Real-time biometric & reaction-time scoring",
-      "Multi-user cooperative emergency evacuation drills",
-      "LMS integration & automated compliance certification",
-    ],
-    headsets: ["Meta Quest 3 / Pro", "HTC Vive Focus 3", "Apple Vision Pro", "WebXR Browser"],
-  },
-  {
-    id: "spatial-digital-twin",
-    title: "Spatial 3D Digital Twin & Factory Floor",
-    category: "Smart Manufacturing & Architecture",
-    badge: "Spatial 3D",
-    description:
-      "Interactive 3D digital twins and architectural walkthroughs with real-time IoT telemetry, BIM integration, and spatial spatial navigation.",
-    image: "/images/hero/hero-developer.jpg",
-    metrics: [
-      { label: "Rendering Engine", value: "Unreal 5 & Unity" },
-      { label: "Frame Rate", value: "90 FPS Locked" },
-      { label: "IoT Synchronization", value: "<50ms Latency" },
-    ],
-    features: [
-      "Photorealistic real-time CAD / BIM asset ingestion",
-      "Live sensor data overlaid in 3D spatial space",
-      "Interactive collision detection & walkthroughs",
-      "Cross-platform WebGL & standalone executable",
-    ],
-    headsets: ["Meta Quest 3", "PC VR / HTC Vive", "Apple Vision Pro", "WebGL (Desktop/Mobile)"],
-  },
-  {
-    id: "medical-xr",
-    title: "Medical & Surgical XR Interactive Training",
-    category: "Healthcare & Anatomy Simulation",
-    badge: "Clinical XR",
-    description:
-      "High-precision 3D anatomical modeling and surgical procedural simulations for medical colleges and healthcare institutions.",
-    image: "/images/hero/hero-mobile.jpg",
-    metrics: [
-      { label: "Anatomical Fidelity", value: "Sub-millimeter" },
-      { label: "Haptic Feedback", value: "Supported" },
-      { label: "Multi-Platform", value: "iOS / Android / XR" },
-    ],
-    features: [
-      "Interactive volumetric 3D organ manipulation",
-      "Step-by-step guided surgical workflow validation",
-      "Multi-student collaborative examination rooms",
-      "Comprehensive scoring and performance analytics",
-    ],
-    headsets: ["Meta Quest 3", "Apple Vision Pro", "Tablet AR (iOS/Android)", "WebXR"],
-  },
-];
+const VR_MODULES_MAP: Record<"en" | "hi" | "or", VRModule[]> = {
+  en: [
+    {
+      id: "safeact-vr",
+      title: "SafeAct Industrial VR Hazard Simulator",
+      category: "Heavy Industry & Mining Safety",
+      badge: "Enterprise Flagship",
+      description:
+        "Full 6-DOF virtual reality hazard training environment deployed for Tata Steel and Vedanta, simulating high-risk industrial scenarios with zero physical danger.",
+      image: "/images/hero/hero-vr.jpg",
+      metrics: [
+        { label: "Hazard Scenarios", value: "40+ Real Scenarios" },
+        { label: "Accident Reduction", value: "92% Retention" },
+        { label: "Simulation Accuracy", value: "Physics-Based" },
+      ],
+      features: [
+        "Dynamic fire, chemical & height hazard scenarios",
+        "Real-time biometric & reaction-time scoring",
+        "Multi-user cooperative emergency evacuation drills",
+        "LMS integration & automated compliance certification",
+      ],
+      headsets: ["Meta Quest 3 / Pro", "HTC Vive Focus 3", "Apple Vision Pro", "WebXR Browser"],
+    },
+    {
+      id: "spatial-digital-twin",
+      title: "Spatial 3D Digital Twin & Factory Floor",
+      category: "Smart Manufacturing & Architecture",
+      badge: "Spatial 3D",
+      description:
+        "Interactive 3D digital twins and architectural walkthroughs with real-time IoT telemetry, BIM integration, and spatial spatial navigation.",
+      image: "/images/hero/hero-developer.jpg",
+      metrics: [
+        { label: "Rendering Engine", value: "Unreal 5 & Unity" },
+        { label: "Frame Rate", value: "90 FPS Locked" },
+        { label: "IoT Synchronization", value: "<50ms Latency" },
+      ],
+      features: [
+        "Photorealistic real-time CAD / BIM asset ingestion",
+        "Live sensor data overlaid in 3D spatial space",
+        "Interactive collision detection & walkthroughs",
+        "Cross-platform WebGL & standalone executable",
+      ],
+      headsets: ["Meta Quest 3", "PC VR / HTC Vive", "Apple Vision Pro", "WebGL (Desktop/Mobile)"],
+    },
+    {
+      id: "medical-xr",
+      title: "Medical & Surgical XR Interactive Training",
+      category: "Healthcare & Anatomy Simulation",
+      badge: "Clinical XR",
+      description:
+        "High-precision 3D anatomical modeling and surgical procedural simulations for medical colleges and healthcare institutions.",
+      image: "/images/hero/hero-mobile.jpg",
+      metrics: [
+        { label: "Anatomical Fidelity", value: "Sub-millimeter" },
+        { label: "Haptic Feedback", value: "Supported" },
+        { label: "Multi-Platform", value: "iOS / Android / XR" },
+      ],
+      features: [
+        "Interactive volumetric 3D organ manipulation",
+        "Step-by-step guided surgical workflow validation",
+        "Multi-student collaborative examination rooms",
+        "Comprehensive scoring and performance analytics",
+      ],
+      headsets: ["Meta Quest 3", "Apple Vision Pro", "Tablet AR (iOS/Android)", "WebXR"],
+    },
+  ],
+  hi: [
+    {
+      id: "safeact-vr",
+      title: "सेफएक्ट इंडस्ट्रियल वीआर हैज़र्ड सिमुलेटर",
+      category: "भारी उद्योग एवं खनन सुरक्षा",
+      badge: "एंटरप्राइज फ्लैगशिप",
+      description:
+        "टाटा स्टील और वेदांता के लिए विकसित 6-DoF वर्चुअल रियलिटी ट्रेनिंग प्लेटफॉर्म, जो बिना किसी शारीरिक जोखिम के खतरनाक औद्योगिक परिदृश्यों का सटीक सिमुलेशन प्रदान करता है।",
+      image: "/images/hero/hero-vr.jpg",
+      metrics: [
+        { label: "खतरा परिदृश्य", value: "40+ वास्तविक परिदृश्य" },
+        { label: "दुर्घटना कमी", value: "92% स्मरण दर" },
+        { label: "सिमुलेशन सटीकता", value: "भौतिकी आधारित" },
+      ],
+      features: [
+        "गतिशील आग, रासायनिक और ऊंचाई खतरा परिदृश्य",
+        "रीयल-टाइम बायोमेट्रिक और रिएक्शन-टाइम स्कोरिंग",
+        "बहु-उपयोगकर्ता आपातकालीन निकासी अभ्यास",
+        "एलएमएस एकीकरण एवं स्वचालित अनुपालन प्रमाणन",
+      ],
+      headsets: ["Meta Quest 3 / Pro", "HTC Vive Focus 3", "Apple Vision Pro", "WebXR"],
+    },
+    {
+      id: "spatial-digital-twin",
+      title: "स्पेशियल 3D डिजिटल ट्विन एवं फैक्ट्री फ्लोर",
+      category: "स्मार्ट मैन्युफैक्चरिंग एवं आर्किटेक्चर",
+      badge: "स्पेशियल 3D",
+      description:
+        "रीयल-टाइम आईओटी टेलीमेट्री, बीआईएम एकीकरण और स्पेशियल नेविगेशन के साथ इंटरएक्टिव 3D डिजिटल ट्विन्स एवं आर्किटेक्चरल वॉकथ्रू।",
+      image: "/images/hero/hero-developer.jpg",
+      metrics: [
+        { label: "रेंडरिंग इंजन", value: "Unreal 5 एवं Unity" },
+        { label: "फ्रेम दर", value: "90 FPS स्थिर" },
+        { label: "आईओटी सिंक्रोनाइज़ेशन", value: "<50ms लेटेंसी" },
+      ],
+      features: [
+        "फोटो-रियलिस्टिक रीयल-टाइम सीएडी / बीआईएम मॉडल",
+        "3D स्पेस में लाइव सेंसर डेटा ओवरले",
+        "इंटरएक्टिव कोलिशन डिटेक्शन वॉकथ्रू",
+        "क्रॉस-प्लेटफॉर्म वेबजीएल व स्टैंडअलोन सॉफ्टवेयर",
+      ],
+      headsets: ["Meta Quest 3", "PC VR / HTC Vive", "Apple Vision Pro", "WebGL"],
+    },
+    {
+      id: "medical-xr",
+      title: "मेडिकल एवं सर्जिकल एक्सआर प्रशिक्षण",
+      category: "हेल्थकेयर एवं एनाटॉमी सिमुलेशन",
+      badge: "क्लिनिकल XR",
+      description:
+        "मेडिकल कॉलेजों और स्वास्थ्य संस्थानों के लिए उच्च-सटीक 3D एनाटॉमिकल मॉडलिंग और सर्जिकल प्रक्रिया सिमुलेशन।",
+      image: "/images/hero/hero-mobile.jpg",
+      metrics: [
+        { label: "एनाटॉमिकल सटीकता", value: "सब-मिलीमीटर" },
+        { label: "हैप्टिक फीडबैक", value: "समर्थित" },
+        { label: "मल्टी-प्लेटफॉर्म", value: "iOS / Android / XR" },
+      ],
+      features: [
+        "इंटरएक्टिव 3D अंग मैनिपुलेशन",
+        "चरण-दर-चरण निर्देशित सर्जिकल वर्कफ़्लो",
+        "बहु-छात्र सहयोगात्मक परीक्षा कक्ष",
+        "व्यापक स्कोरिंग और प्रदर्शन विश्लेषण",
+      ],
+      headsets: ["Meta Quest 3", "Apple Vision Pro", "Tablet AR", "WebXR"],
+    },
+  ],
+  or: [
+    {
+      id: "safeact-vr",
+      title: "ସେଫ୍‌ଆକ୍ଟ ଶିଳ୍ପ VR ବିପଦ ସିମ୍ୟୁଲେଟର",
+      category: "ଭାରୀ ଶିଳ୍ପ ଓ ଖଣି ନିରାପତ୍ତା",
+      badge: "ଏଣ୍ଟରପ୍ରାଇଜ୍ ଫ୍ଲାଗ୍‌ସିପ୍",
+      description:
+        "ଟାଟା ଷ୍ଟିଲ୍ ଓ ବେଦାନ୍ତା ପାଇଁ ନିୟୋଜିତ ୬-DoF ଭର୍ଚ୍ଚୁଆଲ୍ ରିଆଲିଟି ପ୍ରଶିକ୍ଷଣ ପ୍ଲାଟଫର୍ମ, ଯାହା ଶୂନ୍ୟ ବିପଦରେ ଶିଳ୍ପ ଦୁର୍ଘଟଣାର ସଠିକ୍ ସିମ୍ୟୁଲେସନ୍ ପ୍ରଦାନ କରେ।",
+      image: "/images/hero/hero-vr.jpg",
+      metrics: [
+        { label: "ବିପଦ ଦୃଶ୍ୟାବଳୀ", value: "୪୦+ ବାସ୍ତବ ଡ୍ରିଲ୍" },
+        { label: "ଦୁର୍ଘଟଣା ହ୍ରାସ", value: "୯୨% ସ୍ମରଣ ହାର" },
+        { label: "ସଠିକତା", value: "ଭୌତିକ ବିଜ୍ଞାନ ଆଧାରିତ" },
+      ],
+      features: [
+        "ନିଆଁ, ରାସାୟନିକ ଓ ଉଚ୍ଚତା ବିପଦର ରିଅଲ୍-ଟାଇମ୍ ଡ୍ରିଲ୍",
+        "ବାୟୋମେଟ୍ରିକ୍ ଓ ରିଆକ୍ସନ୍ ସ୍କୋରିଂ ସିଷ୍ଟମ୍",
+        "ବହୁ-ଉପଭୋକ୍ତା ଜରୁରୀକାଳୀନ ଉଦ୍ଧାର ଅଭ୍ୟାସ",
+        "LMS ସଂଯୋଗ ଓ ସ୍ୱୟଂଚାଳିତ ପ୍ରମାଣପତ୍ର",
+      ],
+      headsets: ["Meta Quest 3 / Pro", "HTC Vive Focus 3", "Apple Vision Pro", "WebXR"],
+    },
+    {
+      id: "spatial-digital-twin",
+      title: "ସ୍ପାସିଆଲ୍ 3D ଡିଜିଟାଲ୍ ଟ୍ୱିନ୍ ଓ କାରଖାନା ମଡେଲ୍",
+      category: "ସ୍ମାର୍ଟ ଉତ୍ପାଦନ ଓ ଆର୍କିଟେକ୍ଚର",
+      badge: "ସ୍ପାସିଆଲ୍ 3D",
+      description:
+        "ରିଅଲ୍-ଟାଇମ୍ IoT ଟେଲିମେଟ୍ରି, BIM ଇଣ୍ଟିଗ୍ରେସନ୍ ସହ ଇଣ୍ଟରାକ୍ଟିଭ୍ 3D ଡିଜିଟାଲ୍ ଟ୍ୱିନ୍ ଓ କାରଖାନା ୱାକ୍‌ଥ୍ରୁ।",
+      image: "/images/hero/hero-developer.jpg",
+      metrics: [
+        { label: "ରେଣ୍ଡରିଂ ଇଞ୍ଜିନ୍", value: "Unreal 5 ଓ Unity" },
+        { label: "ଫ୍ରେମ୍ ରେଟ୍", value: "୯୦ FPS ସ୍ଥିର" },
+        { label: "IoT ସମନ୍ୱୟ", value: "<୫୦ms ଲେଟେନ୍ସି" },
+      ],
+      features: [
+        "ଫଟୋ-ରିଅଲିଷ୍ଟିକ୍ CAD / BIM ଆସେଟ୍ ପ୍ରୋସେସିଂ",
+        "3D ସ୍ପେସ୍‌ରେ ଲାଇଭ୍ ସେନ୍ସର ଡାଟା ପ୍ରଦର୍ଶନ",
+        "ଇଣ୍ଟରାକ୍ଟିଭ୍ କଲିଜନ୍ ଡିଟେକ୍ସନ୍",
+        "କ୍ରସ୍-ପ୍ଲାଟଫର୍ମ WebGL ଓ ସଫ୍ଟୱେର୍",
+      ],
+      headsets: ["Meta Quest 3", "PC VR / HTC Vive", "Apple Vision Pro", "WebGL"],
+    },
+    {
+      id: "medical-xr",
+      title: "ଚିକିତ୍ସା ଓ ଶଲ୍ୟକର୍ମ XR ପ୍ରଶିକ୍ଷଣ",
+      category: "ସ୍ୱାସ୍ଥ୍ୟସେବା ଓ ଶରୀରବିଜ୍ଞାନ",
+      badge: "କ୍ଲିନିକାଲ୍ XR",
+      description:
+        "ମେଡିକାଲ୍ କଲେଜ ଓ ସ୍ୱାସ୍ଥ୍ୟ ପ୍ରତିଷ୍ଠାନ ପାଇଁ ଉଚ୍ଚ-ସଠିକ 3D ଆନାଟୋମି ଏବଂ ଶଲ୍ୟଚିକିତ୍ସା ପ୍ରଣାଳୀ ସିମ୍ୟୁଲେସନ୍।",
+      image: "/images/hero/hero-mobile.jpg",
+      metrics: [
+        { label: "ଆନାଟୋମିକାଲ୍ ସଠିକତା", value: "ସବ୍-ମିଲିମିଟର" },
+        { label: "ହାପ୍ଟିକ୍ ଫିଡ୍‌ବ୍ୟାକ୍", value: "ସମର୍ଥିତ" },
+        { label: "ମଲ୍ଟି-ପ୍ଲାଟଫର୍ମ", value: "iOS / Android / XR" },
+      ],
+      features: [
+        "ଇଣ୍ଟରାକ୍ଟିଭ୍ 3D ଅଙ୍ଗ ପ୍ରତ୍ୟଙ୍ଗ ପରିଚାଳନା",
+        "ପର୍ଯ୍ୟାୟକ୍ରମେ ଅସ୍ତ୍ରୋପଚାର ପ୍ରଶିକ୍ଷଣ",
+        "ବହୁ-ଛାତ୍ର ସହଯୋଗୀ ପରୀକ୍ଷା କକ୍ଷ",
+        "ବ୍ୟାପକ ସ୍କୋରିଂ ଓ ମୂଲ୍ୟାଙ୍କନ ରିପୋର୍ଟ",
+      ],
+      headsets: ["Meta Quest 3", "Apple Vision Pro", "Tablet AR", "WebXR"],
+    },
+  ],
+};
+
+import { useLanguage } from "@/lib/translations";
 
 export function SpatialLab() {
   const [activeTab, setActiveTab] = useState(0);
   const [viewMode, setViewMode] = useState<"3d-sandbox" | "field-case">("3d-sandbox");
-  const activeModule = VR_MODULES[activeTab];
+  const { lang, t } = useLanguage();
+  const modules = VR_MODULES_MAP[lang] || VR_MODULES_MAP.en;
+  const activeModule = modules[activeTab] || modules[0];
 
   return (
     <section className="relative overflow-hidden border-t border-border bg-surface-muted/60 py-24">
@@ -128,13 +264,25 @@ export function SpatialLab() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
               <Glasses className="h-3.5 w-3.5" />
-              Spatial Computing &amp; AR/VR Studio
+              {t("spatial_badge")}
             </div>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              Immersive Simulations for <span className="gradient-text">Zero-Risk Mastery</span>
+              {lang === "hi" ? (
+                <>
+                  शून्य-जोखिम प्रशिक्षण के लिए <span className="gradient-text">इमर्सिव सिमुलेशन</span>
+                </>
+              ) : lang === "or" ? (
+                <>
+                  ବିପଦମୁକ୍ତ ପ୍ରଶିକ୍ଷଣ ପାଇଁ <span className="gradient-text">ଇମର୍ସିଭ୍ ସିମ୍ୟୁଲେସନ୍</span>
+                </>
+              ) : (
+                <>
+                  Immersive Simulations for <span className="gradient-text">Zero-Risk Mastery</span>
+                </>
+              )}
             </h2>
             <p className="mt-3 max-w-2xl text-base text-muted sm:text-lg">
-              Engineered by IIT alumni and 3D simulation specialists, Virtoy designs photorealistic virtual reality and spatial workflows deployed across heavy industry, education, and defense.
+              {t("spatial_desc")}
             </p>
           </div>
 
@@ -150,7 +298,7 @@ export function SpatialLab() {
                 }`}
               >
                 <RotateCw className="h-3.5 w-3.5" />
-                Live 3D WebXR Studio
+                {lang === "hi" ? "लाइव 3D स्टूडियो" : lang === "or" ? "ଲାଇଭ୍ 3D ଷ୍ଟୁଡିଓ" : "Live 3D WebXR Studio"}
               </button>
               <button
                 onClick={() => setViewMode("field-case")}
@@ -161,7 +309,7 @@ export function SpatialLab() {
                 }`}
               >
                 <Layers className="h-3.5 w-3.5" />
-                Field Deployments
+                {lang === "hi" ? "फील्ड परिनियोजन" : lang === "or" ? "ପ୍ରକଳ୍ପ ସମୂହ" : "Field Deployments"}
               </button>
             </div>
 
@@ -170,7 +318,7 @@ export function SpatialLab() {
                 href="/products/virtual-reality"
                 className="group inline-flex items-center gap-2 rounded-full border border-primary/30 bg-surface px-5 py-2.5 text-xs font-semibold shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"
               >
-                VR Overview
+                {lang === "hi" ? "वीआर विवरण" : lang === "or" ? "ଭିଆର୍ ବିବରଣୀ" : "VR Overview"}
                 <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Reveal>
@@ -186,7 +334,7 @@ export function SpatialLab() {
           <>
             {/* Interactive Module Switcher Tabs */}
             <div className="mt-12 flex flex-wrap gap-3" role="tablist" aria-label="VR Simulation Modules">
-              {VR_MODULES.map((mod, idx) => (
+              {modules.map((mod, idx) => (
                 <button
                   key={mod.id}
                   role="tab"
@@ -248,7 +396,9 @@ export function SpatialLab() {
 
                       {/* Features Checklist */}
                       <div className="mt-6">
-                        <p className="text-xs font-bold uppercase tracking-wider text-foreground">Capabilities &amp; Architecture</p>
+                        <p className="text-xs font-bold uppercase tracking-wider text-foreground">
+                          {lang === "hi" ? "क्षमताएं एवं आर्किटेक्चर" : lang === "or" ? "କ୍ଷମତା ଓ ଆର୍କିଟେକ୍ଚର" : "Capabilities & Architecture"}
+                        </p>
                         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                           {activeModule.features.map((feat) => (
                             <li key={feat} className="flex items-start gap-2 text-xs text-muted">
@@ -261,7 +411,9 @@ export function SpatialLab() {
 
                       {/* Hardware Support Badges */}
                       <div className="mt-8 flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-semibold text-foreground">Hardware Target:</span>
+                        <span className="text-xs font-semibold text-foreground">
+                          {lang === "hi" ? "समर्थित हेडसेट:" : lang === "or" ? "ସମର୍ଥିତ ହେଡ୍‌ସେଟ୍:" : "Hardware Target:"}
+                        </span>
                         {activeModule.headsets.map((h) => (
                           <span
                             key={h}
@@ -292,7 +444,9 @@ export function SpatialLab() {
                               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                             </span>
-                            <span className="font-mono text-xs font-semibold text-white">Spatial Telemetry Active</span>
+                            <span className="font-mono text-xs font-semibold text-white">
+                              {lang === "hi" ? "स्पेशियल टेलीमेट्री सक्रिय" : lang === "or" ? "ସ୍ପାସିଆଲ୍ ଟେଲିମେଟ୍ରି ସକ୍ରିୟ" : "Spatial Telemetry Active"}
+                            </span>
                           </div>
                           <span className="rounded bg-primary/80 px-2 py-0.5 font-mono text-[10px] font-bold text-white">
                             6-DOF VR

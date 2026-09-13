@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -5,19 +7,30 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { featuredTeam, team } from "@/data/team";
+import { useLanguage } from "@/lib/translations";
 
 export function TeamPreview() {
+  const { lang, t } = useLanguage();
+
   return (
     <section className="py-24">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading eyebrow="We are there for you" title="Our professionals" />
+          <SectionHeading
+            eyebrow={t("team_badge")}
+            title={t("team_title")}
+            description={t("team_desc")}
+          />
           <Reveal delay={0.1}>
             <Link
               href="/team"
               className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-3 text-sm font-semibold transition hover:border-primary/50 hover:text-primary"
             >
-              Meet all {team.length}
+              {lang === "hi"
+                ? `सभी ${team.length} सदस्यों से मिलें`
+                : lang === "or"
+                ? `ସମସ୍ତ ${team.length} ସଦସ୍ୟଙ୍କ ସହ ମିଶନ୍ତୁ`
+                : `Meet all ${team.length}`}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Reveal>

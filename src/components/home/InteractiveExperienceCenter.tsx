@@ -25,10 +25,13 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 
+import { useLanguage } from "@/lib/translations";
+
 type TabMode = "vr-physics" | "safeact-stream" | "cloud-engine";
 
 export function InteractiveExperienceCenter() {
   const [activeTab, setActiveTab] = useState<TabMode>("vr-physics");
+  const { lang, t } = useLanguage();
 
   return (
     <section className="relative overflow-hidden border-t border-border bg-surface py-24">
@@ -47,13 +50,25 @@ export function InteractiveExperienceCenter() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
               <Sparkles className="h-3.5 w-3.5" />
-              Live Interactive Technology Lab
+              {t("exp_badge")}
             </div>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              Experience the Engine <span className="gradient-text">In Real Time</span>
+              {lang === "hi" ? (
+                <>
+                  रियल टाइम में हमारे इंजन का <span className="gradient-text">अनुभव करें</span>
+                </>
+              ) : lang === "or" ? (
+                <>
+                  ରିଅଲ୍ ଟାଇମ୍‌ରେ ଆମ ଇଞ୍ଜିନ୍‌ର <span className="gradient-text">ଅନୁଭୂତି ନିଅନ୍ତୁ</span>
+                </>
+              ) : (
+                <>
+                  Experience the Engine <span className="gradient-text">In Real Time</span>
+                </>
+              )}
             </h2>
             <p className="mt-3 max-w-2xl text-base text-muted sm:text-lg">
-              Interact with our live simulation engines, industrial telemetry dashboards, and cloud architecture simulators.
+              {t("exp_desc")}
             </p>
           </div>
 
@@ -70,7 +85,7 @@ export function InteractiveExperienceCenter() {
               }`}
             >
               <Glasses className="h-4 w-4" />
-              <span>3D Spatial Physics</span>
+              <span>{t("exp_tab_vr")}</span>
             </button>
             <button
               role="tab"
@@ -83,7 +98,7 @@ export function InteractiveExperienceCenter() {
               }`}
             >
               <ShieldCheck className="h-4 w-4" />
-              <span>SafeAct Hazard Telemetry</span>
+              <span>{t("exp_tab_safeact")}</span>
             </button>
             <button
               role="tab"
@@ -96,7 +111,7 @@ export function InteractiveExperienceCenter() {
               }`}
             >
               <Cpu className="h-4 w-4" />
-              <span>ERP Cloud Pipeline</span>
+              <span>{t("exp_tab_cloud")}</span>
             </button>
           </div>
         </div>
@@ -120,6 +135,22 @@ function VRPhysicsSandbox() {
   const [wireframe, setWireframe] = useState(false);
   const [particles, setParticles] = useState(true);
   const [drillMode, setDrillMode] = useState<"fire" | "confined" | "height">("fire");
+  const { lang } = useLanguage();
+
+  const drills = [
+    {
+      id: "fire",
+      label: lang === "hi" ? "केमिकल फायर ड्रिल" : lang === "or" ? "ରାସାୟନିକ ଅଗ୍ନି ନିରାପତ୍ତା" : "Chemical Fire Drill",
+    },
+    {
+      id: "confined",
+      label: lang === "hi" ? "सीमित स्थान ड्रिल" : lang === "or" ? "ସଂକୀର୍ଣ୍ଣ ସ୍ଥାନ ଡ୍ରିଲ୍" : "Confined Space",
+    },
+    {
+      id: "height",
+      label: lang === "hi" ? "ऊंचाई रिग ड्रिल" : lang === "or" ? "ଉଚ୍ଚତା ରିଗ୍ ଡ୍ରିଲ୍" : "High-Altitude Rig",
+    },
+  ];
 
   return (
     <motion.div
@@ -138,26 +169,28 @@ function VRPhysicsSandbox() {
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
               </span>
               <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-500">
-                Spatial 3D Engine: Online
+                {lang === "hi" ? "स्पेशियल 3D इंजन: सक्रिय" : lang === "or" ? "ସ୍ପାସିଆଲ୍ 3D ଇଞ୍ଜିନ୍: ସକ୍ରିୟ" : "Spatial 3D Engine: Online"}
               </span>
             </div>
 
             <h3 className="mt-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Virtual Reality Simulation Sandbox
+              {lang === "hi" ? "वर्चुअल रियलिटी सिमुलेशन सैंडबॉक्स" : lang === "or" ? "ଭର୍ଚ୍ଚୁଆଲ୍ ରିଆଲିଟି ସିମ୍ୟୁଲେସନ୍ ସ୍ୟାଣ୍ଡବକ୍ସ" : "Virtual Reality Simulation Sandbox"}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Test real-time parameter controls that drive our 6-DOF industrial training simulators deployed at Tata Steel and Vedanta.
+              {lang === "hi"
+                ? "टाटा स्टील और वेदांता में तैनात हमारे 6-DoF औद्योगिक प्रशिक्षण सिमुलेटरों के रियल-टाइम पैरामीटर नियंत्रण का परीक्षण करें।"
+                : lang === "or"
+                ? "ଟାଟା ଷ୍ଟିଲ୍ ଓ ବେଦାନ୍ତାରେ କାର୍ଯ୍ୟରତ ଆମ ୬-DoF ଶିଳ୍ପ ନିରାପତ୍ତା ସିମ୍ୟୁଲେଟରର ରିଅଲ୍-ଟାଇମ୍ ନିୟନ୍ତ୍ରଣ ପରୀକ୍ଷା କରନ୍ତୁ।"
+                : "Test real-time parameter controls that drive our 6-DOF industrial training simulators deployed at Tata Steel and Vedanta."}
             </p>
 
             {/* Interactive Drill Mode Selector */}
             <div className="mt-6">
-              <p className="text-xs font-semibold uppercase tracking-wider text-foreground">Select Simulation Drill:</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                {lang === "hi" ? "सिमुलेशन ड्रिल चुनें:" : lang === "or" ? "ସିମ୍ୟୁଲେସନ୍ ଡ୍ରିଲ୍ ଚୟନ କରନ୍ତୁ:" : "Select Simulation Drill:"}
+              </p>
               <div className="mt-2.5 grid grid-cols-3 gap-2">
-                {[
-                  { id: "fire", label: "Chemical Fire Drill" },
-                  { id: "confined", label: "Confined Space" },
-                  { id: "height", label: "High-Altitude Rig" },
-                ].map((d) => (
+                {drills.map((d) => (
                   <button
                     key={d.id}
                     onClick={() => setDrillMode(d.id as any)}
@@ -176,7 +209,9 @@ function VRPhysicsSandbox() {
             {/* Parameter Toggles */}
             <div className="mt-6 space-y-4 rounded-2xl border border-border/80 bg-surface-muted/60 p-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-foreground">Orbital Rotation Speed:</span>
+                <span className="text-xs font-medium text-foreground">
+                  {lang === "hi" ? "ऑर्बिटल घूर्णन गति:" : lang === "or" ? "ଘୂର୍ଣ୍ଣନ ଗତି:" : "Orbital Rotation Speed:"}
+                </span>
                 <div className="flex items-center gap-1.5">
                   {[0.5, 1, 2].map((s) => (
                     <button
@@ -193,26 +228,34 @@ function VRPhysicsSandbox() {
               </div>
 
               <div className="flex items-center justify-between border-t border-border/60 pt-3">
-                <span className="text-xs font-medium text-foreground">Holographic Wireframe Grid:</span>
+                <span className="text-xs font-medium text-foreground">
+                  {lang === "hi" ? "होलोग्राफिक वायरफ्रेम ग्रिड:" : lang === "or" ? "ହୋଲୋଗ୍ରାଫିକ୍ ୱାୟାରଫ୍ରେମ୍:" : "Holographic Wireframe Grid:"}
+                </span>
                 <button
                   onClick={() => setWireframe(!wireframe)}
                   className={`rounded-lg px-3 py-1 font-mono text-xs font-semibold transition ${
                     wireframe ? "bg-primary text-white" : "bg-surface text-muted"
                   }`}
                 >
-                  {wireframe ? "ENABLED" : "SOLID"}
+                  {wireframe
+                    ? lang === "hi" ? "सक्षम" : lang === "or" ? "ସକ୍ଷମ" : "ENABLED"
+                    : lang === "hi" ? "सॉलिड" : lang === "or" ? "ସଲିଡ୍" : "SOLID"}
                 </button>
               </div>
 
               <div className="flex items-center justify-between border-t border-border/60 pt-3">
-                <span className="text-xs font-medium text-foreground">Spatial Particle Physics:</span>
+                <span className="text-xs font-medium text-foreground">
+                  {lang === "hi" ? "स्पेशियल पार्टिकल फिजिक्स:" : lang === "or" ? "ସ୍ପାସିଆଲ୍ ପାର୍ଟିକିଲ୍ ଫିଜିକ୍ସ:" : "Spatial Particle Physics:"}
+                </span>
                 <button
                   onClick={() => setParticles(!particles)}
                   className={`rounded-lg px-3 py-1 font-mono text-xs font-semibold transition ${
                     particles ? "bg-emerald-600 text-white" : "bg-surface text-muted"
                   }`}
                 >
-                  {particles ? "ACTIVE (60 FPS)" : "MUTED"}
+                  {particles
+                    ? lang === "hi" ? "सक्रिय (60 FPS)" : lang === "or" ? "ସକ୍ରିୟ (୬୦ FPS)" : "ACTIVE (60 FPS)"
+                    : lang === "hi" ? "शांत" : lang === "or" ? "ବନ୍ଦ" : "MUTED"}
                 </button>
               </div>
             </div>
@@ -220,15 +263,21 @@ function VRPhysicsSandbox() {
             {/* Live Telemetry Pills */}
             <div className="mt-6 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-xl border border-border/70 bg-surface p-2.5">
-                <p className="text-[10px] text-muted">Physics FPS</p>
+                <p className="text-[10px] text-muted">
+                  {lang === "hi" ? "फिजिक्स FPS" : lang === "or" ? "ଫିଜିକ୍ସ FPS" : "Physics FPS"}
+                </p>
                 <p className="font-mono text-sm font-bold text-emerald-500">90 FPS</p>
               </div>
               <div className="rounded-xl border border-border/70 bg-surface p-2.5">
-                <p className="text-[10px] text-muted">Tracking Latency</p>
+                <p className="text-[10px] text-muted">
+                  {lang === "hi" ? "ट्रैकिंग लेटेंसी" : lang === "or" ? "ଟ୍ରାକିଂ ଲେଟେନ୍ସି" : "Tracking Latency"}
+                </p>
                 <p className="font-mono text-sm font-bold text-primary">&lt;11 ms</p>
               </div>
               <div className="rounded-xl border border-border/70 bg-surface p-2.5">
-                <p className="text-[10px] text-muted">Headset Support</p>
+                <p className="text-[10px] text-muted">
+                  {lang === "hi" ? "हेडसेट सपोर्ट" : lang === "or" ? "ହେଡ୍‌ସେଟ୍ ସପୋର୍ଟ" : "Headset Support"}
+                </p>
                 <p className="font-mono text-xs font-bold text-foreground">6-DOF Native</p>
               </div>
             </div>
@@ -286,12 +335,24 @@ function VRPhysicsSandbox() {
             {/* Live HUD Badges on the 3D Canvas */}
             <div className="absolute left-5 top-5 flex items-center gap-2 rounded-lg border border-white/15 bg-black/60 px-3 py-1.5 text-xs text-white backdrop-blur-md">
               <Activity className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Drill Active: {drillMode.toUpperCase()}</span>
+              <span>
+                {lang === "hi"
+                  ? `ड्रिल सक्रिय: ${drillMode.toUpperCase()}`
+                  : lang === "or"
+                  ? `ଡ୍ରିଲ୍ ସକ୍ରିୟ: ${drillMode.toUpperCase()}`
+                  : `Drill Active: ${drillMode.toUpperCase()}`}
+              </span>
             </div>
 
             <div className="absolute bottom-5 right-5 flex items-center gap-2 rounded-lg border border-white/15 bg-black/60 px-3 py-1.5 text-xs text-white backdrop-blur-md">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span>Spatial Biometrics Synced</span>
+              <span>
+                {lang === "hi"
+                  ? "बायोमेट्रिक्स सिंक"
+                  : lang === "or"
+                  ? "ବାୟୋମେଟ୍ରିକ୍ସ ସିଙ୍କ୍"
+                  : "Spatial Biometrics Synced"}
+              </span>
             </div>
           </div>
         </div>
@@ -303,10 +364,45 @@ function VRPhysicsSandbox() {
 /** 2. SafeAct Live Industrial Hazard Telemetry Simulator */
 function SafeActTelemetrySandbox() {
   const [alertCount, setAlertCount] = useState(0);
+  const { lang } = useLanguage();
+
   const [logs, setLogs] = useState([
-    { id: 1, time: "10:42:15", location: "Tata Steel · Blast Furnace #3", type: "PPE Compliance Check", status: "100% Validated", severity: "normal" },
-    { id: 2, time: "10:42:18", location: "Vedanta Aluminum · Smelter Potline", type: "Thermal Gas Pressure", status: "Stable · 1.4 Bar", severity: "normal" },
-    { id: 3, time: "10:42:22", location: "JSPL Angul · Pellet Plant", type: "Conveyor Proximity Sensor", status: "Clearance 3.2m", severity: "normal" },
+    {
+      id: 1,
+      time: "10:42:15",
+      location: "Tata Steel · Blast Furnace #3",
+      type: "PPE Compliance Check",
+      typeHi: "पीपीई अनुपालन जांच",
+      typeOr: "PPE ନିୟମ ଯାଞ୍ଚ",
+      status: "100% Validated",
+      statusHi: "100% प्रमाणित",
+      statusOr: "୧୦୦% ପ୍ରମାଣିତ",
+      severity: "normal",
+    },
+    {
+      id: 2,
+      time: "10:42:18",
+      location: "Vedanta Aluminum · Smelter Potline",
+      type: "Thermal Gas Pressure",
+      typeHi: "थर्मल गैस दबाव स्तर",
+      typeOr: "ତାପଜ ଗ୍ୟାସ୍ ଚାପ",
+      status: "Stable · 1.4 Bar",
+      statusHi: "स्थिर · 1.4 Bar",
+      statusOr: "ସ୍ଥିର · ୧.୪ Bar",
+      severity: "normal",
+    },
+    {
+      id: 3,
+      time: "10:42:22",
+      location: "JSPL Angul · Pellet Plant",
+      type: "Conveyor Proximity Sensor",
+      typeHi: "कन्वेयर निकटता सेंसर",
+      typeOr: "କନଭେୟର ସେନ୍ସର ଯାଞ୍ଚ",
+      status: "Clearance 3.2m",
+      statusHi: "दूरी 3.2m सुरक्षित",
+      statusOr: "ଦୂରତା ୩.୨m ସୁରକ୍ଷିତ",
+      severity: "normal",
+    },
   ]);
 
   const triggerHazardDrill = () => {
@@ -315,7 +411,11 @@ function SafeActTelemetrySandbox() {
       time: new Date().toLocaleTimeString(),
       location: "Tata Steel Kalinganagar · Zone 4B",
       type: "SIMULATED HAZARD DRILL · Gas Influx",
+      typeHi: "आपातकालीन सिमुलेशन ड्रिल · गैस रिसाव",
+      typeOr: "ଜରୁରୀକାଳୀନ ସିମ୍ୟୁଲେସନ୍ ଡ୍ରିଲ୍ · ଗ୍ୟାସ୍ ନିର୍ଗମନ",
       status: "Automated Evacuation Siren Fired · VR Checklist Deployed",
+      statusHi: "स्वचालित सायरन सक्रिय · वीआर चेकलिस्ट तैनात",
+      statusOr: "ସ୍ୱୟଂଚାଳିତ ସାଇରନ୍ ସକ୍ରିୟ · VR ନିୟମାବଳୀ ଜାରି",
       severity: "alert",
     };
     setLogs((prev) => [newLog, ...prev.slice(0, 4)]);
@@ -338,45 +438,63 @@ function SafeActTelemetrySandbox() {
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
               </span>
               <span className="font-mono text-xs font-bold uppercase tracking-wider text-primary">
-                SafeAct Industrial Telemetry
+                {lang === "hi" ? "सेफएक्ट औद्योगिक टेलीमेट्री" : lang === "or" ? "ସେଫ୍‌ଆକ୍ଟ ଶିଳ୍ପ ଟେଲିମେଟ୍ରି" : "SafeAct Industrial Telemetry"}
               </span>
             </div>
 
             <h3 className="mt-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Real-Time Plant Safety Console
+              {lang === "hi" ? "रियल-टाइम प्लांट सुरक्षा कंसोल" : lang === "or" ? "ରିଅଲ୍-ଟାଇମ୍ ପ୍ଲାଣ୍ଟ ସୁରକ୍ଷା କନସୋଲ୍" : "Real-Time Plant Safety Console"}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Live event stream mirroring the SafeAct incident management platform used across steel, mining, and power generation facilities.
+              {lang === "hi"
+                ? "स्टील, खनन और ऊर्जा संयंत्रों में प्रयुक्त सेफएक्ट घटना प्रबंधन प्रणाली का सीधा लाइव इवेंट स्ट्रीम।"
+                : lang === "or"
+                ? "ଷ୍ଟିଲ୍, ଖଣି ଓ ଶକ୍ତି କାରଖାନାରେ ବ୍ୟବହୃତ ସେଫ୍‌ଆକ୍ଟ ପରିଚାଳନା ପ୍ରଣାଳୀର ଲାଇଭ୍ ଇଭେଣ୍ଟ ଷ୍ଟ୍ରିମ୍।"
+                : "Live event stream mirroring the SafeAct incident management platform used across steel, mining, and power generation facilities."}
             </p>
 
             <div className="mt-6 rounded-2xl border border-border/80 bg-surface-muted/60 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold text-foreground">Interactive Simulation Trigger</p>
-                  <p className="text-[11px] text-muted">Inject an emergency safety drill into the live pipeline</p>
+                  <p className="text-xs font-bold text-foreground">
+                    {lang === "hi" ? "इंटरएक्टिव सिमुलेशन ट्रिगर" : lang === "or" ? "ସିମ୍ୟୁଲେସନ୍ ଟ୍ରିଗର୍" : "Interactive Simulation Trigger"}
+                  </p>
+                  <p className="text-[11px] text-muted">
+                    {lang === "hi" ? "लाइव पाइपलाइन में आपातकालीन सुरक्षा ड्रिल इंजेक्ट करें" : lang === "or" ? "ଲାଇଭ୍ ପାଇପ୍‌ଲାଇନ୍‌ରେ ସୁରକ୍ଷା ଡ୍ରିଲ୍ ଚଲାନ୍ତୁ" : "Inject an emergency safety drill into the live pipeline"}
+                  </p>
                 </div>
                 <button
                   onClick={triggerHazardDrill}
                   className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white shadow-md shadow-primary/25 transition hover:bg-primary-strong active:scale-95"
                 >
                   <Flame className="h-3.5 w-3.5" />
-                  Simulate Drill
+                  {lang === "hi" ? "ड्रिल ट्रिगर करें" : lang === "or" ? "ଡ୍ରିଲ୍ ଚଲାନ୍ତୁ" : "Simulate Drill"}
                 </button>
               </div>
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-xl border border-border/70 bg-surface p-2.5">
-                <p className="text-[10px] text-muted">Total Drills</p>
+                <p className="text-[10px] text-muted">
+                  {lang === "hi" ? "कुल ड्रिल्स" : lang === "or" ? "ମୋଟ ଡ୍ରିଲ୍" : "Total Drills"}
+                </p>
                 <p className="font-mono text-sm font-bold text-foreground">{40 + alertCount}</p>
               </div>
               <div className="rounded-xl border border-border/70 bg-surface p-2.5">
-                <p className="text-[10px] text-muted">Incident Rate</p>
-                <p className="font-mono text-sm font-bold text-emerald-500">0.00% Zero</p>
+                <p className="text-[10px] text-muted">
+                  {lang === "hi" ? "दुर्घटना दर" : lang === "or" ? "ଦୁର୍ଘଟଣା ହାର" : "Incident Rate"}
+                </p>
+                <p className="font-mono text-sm font-bold text-emerald-500">
+                  {lang === "hi" ? "0.00% शून्य" : lang === "or" ? "୦.୦୦% ଶୂନ" : "0.00% Zero"}
+                </p>
               </div>
               <div className="rounded-xl border border-border/70 bg-surface p-2.5">
-                <p className="text-[10px] text-muted">Active Workers</p>
-                <p className="font-mono text-sm font-bold text-foreground">2,840 Live</p>
+                <p className="text-[10px] text-muted">
+                  {lang === "hi" ? "सक्रिय श्रमिक" : lang === "or" ? "ସକ୍ରିୟ ଶ୍ରମିକ" : "Active Workers"}
+                </p>
+                <p className="font-mono text-sm font-bold text-foreground">
+                  {lang === "hi" ? "2,840 लाइव" : lang === "or" ? "୨,୮୪୦ ଲାଇଭ୍" : "2,840 Live"}
+                </p>
               </div>
             </div>
           </div>
@@ -390,7 +508,9 @@ function SafeActTelemetrySandbox() {
                 <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
                 <span className="ml-2 text-[11px] text-white/60">safeact-telemetry-feed:port-3600</span>
               </div>
-              <span className="text-[10px] text-emerald-400">STREAMING ACTIVE</span>
+              <span className="text-[10px] text-emerald-400">
+                {lang === "hi" ? "स्ट्रीमिंग सक्रिय" : lang === "or" ? "ଷ୍ଟ୍ରିମିଂ ସକ୍ରିୟ" : "STREAMING ACTIVE"}
+              </span>
             </div>
 
             <div className="my-4 space-y-2.5 overflow-y-auto max-h-72">
@@ -410,20 +530,28 @@ function SafeActTelemetrySandbox() {
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-white/50">[{log.time}] {log.location}</span>
                       {log.severity === "alert" ? (
-                        <span className="rounded bg-primary px-1.5 py-0.5 text-[9px] font-bold text-white">DRILL INJECTED</span>
+                        <span className="rounded bg-primary px-1.5 py-0.5 text-[9px] font-bold text-white">
+                          {lang === "hi" ? "ड्रिल इंजेक्टेड" : lang === "or" ? "ଡ୍ରିଲ୍ ସକ୍ରିୟ" : "DRILL INJECTED"}
+                        </span>
                       ) : (
-                        <span className="text-[10px] text-emerald-400">VERIFIED</span>
+                        <span className="text-[10px] text-emerald-400">
+                          {lang === "hi" ? "सत्यापित" : lang === "or" ? "ପ୍ରମାଣିତ" : "VERIFIED"}
+                        </span>
                       )}
                     </div>
-                    <p className="mt-1 text-xs">{log.type}</p>
-                    <p className="mt-0.5 text-[11px] text-white/70">{log.status}</p>
+                    <p className="mt-1 text-xs">
+                      {lang === "hi" ? (log as any).typeHi || log.type : lang === "or" ? (log as any).typeOr || log.type : log.type}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-white/70">
+                      {lang === "hi" ? (log as any).statusHi || log.status : lang === "or" ? (log as any).statusOr || log.status : log.status}
+                    </p>
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
 
             <div className="flex items-center justify-between border-t border-white/10 pt-3 text-[11px] text-white/50">
-              <span>Verified Deployment: Tata Steel · Vedanta · JSPL</span>
+              <span>{lang === "hi" ? "प्रमाणित परिनियोजन: टाटा स्टील · वेदांता · जेएसपीएल" : lang === "or" ? "ପ୍ରମାଣିତ ପ୍ରକଳ୍ପ: ଟାଟା ଷ୍ଟିଲ୍ · ବେଦାନ୍ତା · JSPL" : "Verified Deployment: Tata Steel · Vedanta · JSPL"}</span>
               <span>Encrypted SHA-256</span>
             </div>
           </div>
@@ -437,6 +565,7 @@ function SafeActTelemetrySandbox() {
 function CloudArchitectureSandbox() {
   const [requestCount, setRequestCount] = useState(14820);
   const [dbLatency, setDbLatency] = useState(0.8);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -461,45 +590,62 @@ function CloudArchitectureSandbox() {
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-400" />
               </span>
               <span className="font-mono text-xs font-bold uppercase tracking-wider text-blue-500">
-                Enterprise Cloud Mesh
+                {lang === "hi" ? "एंटरप्राइज क्लाउड मेश" : lang === "or" ? "ଏଣ୍ଟରପ୍ରାଇଜ୍ କ୍ଲାଉଡ୍ ମେଶ୍" : "Enterprise Cloud Mesh"}
               </span>
             </div>
 
             <h3 className="mt-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              High-Throughput ERP Engine
+              {lang === "hi" ? "हाई-थ्रूपुट ईआरपी इंजन" : lang === "or" ? "ହାଇ-ଥ୍ରୁପୁଟ୍ ERP ଇଞ୍ଜିନ୍" : "High-Throughput ERP Engine"}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Built on scalable microservice clusters with sub-millisecond query caches powering 84+ institutions across Eastern India and UAE.
+              {lang === "hi"
+                ? "सब-मिलीसेकंड क्वेरी कैश के साथ स्केलेबल माइक्रोसर्विस क्लस्टर, जो पूर्वी भारत और यूएई में 84+ संस्थानों को शक्ति प्रदान करता है।"
+                : lang === "or"
+                ? "ସବ୍-ମିଲିସେକେଣ୍ଡ କ୍ୟାଶ୍ ସହିତ ସ୍କେଲେବଲ୍ ମାଇକ୍ରୋସର୍ଭିସ୍ କ୍ଲଷ୍ଟର୍, ଯାହା ପୂର୍ବ ଭାରତ ଓ ୟୁଏଇର ୮୪+ ଅନୁଷ୍ଠାନକୁ ପରିଚାଳନା କରେ।"
+                : "Built on scalable microservice clusters with sub-millisecond query caches powering 84+ institutions across Eastern India and UAE."}
             </p>
 
             <div className="mt-6 space-y-3">
               <div className="flex items-center justify-between rounded-xl border border-border/80 bg-surface-muted/60 p-3">
-                <span className="text-xs font-medium text-foreground">API Throughput (req/sec):</span>
+                <span className="text-xs font-medium text-foreground">
+                  {lang === "hi" ? "एपीआई थ्रूपुट (req/sec):" : lang === "or" ? "API ଥ୍ରୁପୁଟ୍ (req/sec):" : "API Throughput (req/sec):"}
+                </span>
                 <span className="font-mono text-xs font-bold text-primary">4,820 req/s</span>
               </div>
               <div className="flex items-center justify-between rounded-xl border border-border/80 bg-surface-muted/60 p-3">
-                <span className="text-xs font-medium text-foreground">Redis Cache Latency:</span>
+                <span className="text-xs font-medium text-foreground">
+                  {lang === "hi" ? "रेडिस कैश लेटेंसी:" : lang === "or" ? "ରେଡିସ୍ କ୍ୟାଶ୍ ଲେଟେନ୍ସି:" : "Redis Cache Latency:"}
+                </span>
                 <span className="font-mono text-xs font-bold text-emerald-500">{dbLatency} ms</span>
               </div>
               <div className="flex items-center justify-between rounded-xl border border-border/80 bg-surface-muted/60 p-3">
-                <span className="text-xs font-medium text-foreground">Annual Uptime SLA:</span>
-                <span className="font-mono text-xs font-bold text-foreground">99.98% High Availability</span>
+                <span className="text-xs font-medium text-foreground">
+                  {lang === "hi" ? "वार्षिक अपटाइम एसएलए:" : lang === "or" ? "ବାର୍ଷିକ ଅପଟାଇମ୍ SLA:" : "Annual Uptime SLA:"}
+                </span>
+                <span className="font-mono text-xs font-bold text-foreground">
+                  {lang === "hi" ? "99.98% उच्च उपलब्धता" : lang === "or" ? "୯୯.୯୮% ନିରବଚ୍ଛିନ୍ନ ସେବା" : "99.98% High Availability"}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Right: Architecture Diagram Nodes */}
           <div className="flex flex-col gap-4 rounded-3xl border border-border/90 bg-surface-muted/40 p-6 lg:col-span-7">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted">Live Pipeline Nodes</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted">
+              {lang === "hi" ? "लाइव पाइपलाइन नोड्स" : lang === "or" ? "ଲାଇଭ୍ ପାଇପ୍‌ଲାଇନ୍ ନୋଡ୍" : "Live Pipeline Nodes"}
+            </p>
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-primary/30 bg-surface p-4 shadow-sm">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Server className="h-5 w-5" />
                 </div>
                 <h4 className="mt-3 text-sm font-bold text-foreground">Edge CDN &amp; Nginx</h4>
-                <p className="mt-1 text-[11px] text-muted">SSL Termination &amp; DDoS Shield</p>
+                <p className="mt-1 text-[11px] text-muted">
+                  {lang === "hi" ? "एसएसएल एवं डीडीओएस शील्ड" : lang === "or" ? "SSL ଓ DDoS ସୁରକ୍ଷା" : "SSL Termination & DDoS Shield"}
+                </p>
                 <div className="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-500">
-                  <CheckCircle2 className="h-3 w-3" /> Healthy
+                  <CheckCircle2 className="h-3 w-3" />
+                  {lang === "hi" ? "स्वस्थ" : lang === "or" ? "ସକ୍ରିୟ" : "Healthy"}
                 </div>
               </div>
 
@@ -508,9 +654,12 @@ function CloudArchitectureSandbox() {
                   <Cpu className="h-5 w-5" />
                 </div>
                 <h4 className="mt-3 text-sm font-bold text-foreground">Node/Python Microservices</h4>
-                <p className="mt-1 text-[11px] text-muted">Auto-Scaling Docker Pods</p>
+                <p className="mt-1 text-[11px] text-muted">
+                  {lang === "hi" ? "ऑटो-स्केलिंग डॉकर पॉड्स" : lang === "or" ? "ଅଟୋ-ସ୍କେଲିଂ ଡକର୍ ପଡ୍‌ସ୍" : "Auto-Scaling Docker Pods"}
+                </p>
                 <div className="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-500">
-                  <CheckCircle2 className="h-3 w-3" /> 16 Pods Live
+                  <CheckCircle2 className="h-3 w-3" />
+                  {lang === "hi" ? "16 पॉड्स लाइव" : lang === "or" ? "୧୬ଟି ପଡ୍ ଲାଇଭ୍" : "16 Pods Live"}
                 </div>
               </div>
 
@@ -519,7 +668,9 @@ function CloudArchitectureSandbox() {
                   <Database className="h-5 w-5" />
                 </div>
                 <h4 className="mt-3 text-sm font-bold text-foreground">PostgreSQL &amp; Redis</h4>
-                <p className="mt-1 text-[11px] text-muted">ACID Multi-AZ Replication</p>
+                <p className="mt-1 text-[11px] text-muted">
+                  {lang === "hi" ? "एसीआईडी मल्टी-एज़ेड रेप्लिकेशन" : lang === "or" ? "ACID ମଲ୍ଟି-AZ ପ୍ରତିରୂପଣ" : "ACID Multi-AZ Replication"}
+                </p>
                 <div className="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-500">
                   <CheckCircle2 className="h-3 w-3" /> 0.8ms Query
                 </div>
@@ -527,7 +678,9 @@ function CloudArchitectureSandbox() {
             </div>
 
             <div className="rounded-2xl border border-border/80 bg-surface p-4 flex items-center justify-between">
-              <span className="text-xs font-semibold text-muted">Total Requests Processed:</span>
+              <span className="text-xs font-semibold text-muted">
+                {lang === "hi" ? "कुल प्रोसेस्ड अनुरोध:" : lang === "or" ? "ମୋଟ ପ୍ରକ୍ରିୟାକୃତ ଅନୁରୋଧ:" : "Total Requests Processed:"}
+              </span>
               <span className="font-mono text-sm font-bold text-primary">{requestCount.toLocaleString()}</span>
             </div>
           </div>

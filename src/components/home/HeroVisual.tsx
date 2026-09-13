@@ -4,6 +4,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, MotionValue, useTransform } from "framer-motion";
 import { CheckCircle2, Layers, ShieldCheck, Star } from "lucide-react";
 import { heroSlides } from "@/data/site";
+import { useLanguage } from "@/lib/translations";
 
 export function HeroVisual({
   pointerX,
@@ -15,6 +16,7 @@ export function HeroVisual({
   active?: number;
 }) {
   const slide = heroSlides[active] || heroSlides[0];
+  const { lang, t } = useLanguage();
 
   // Multilayer parallax transformations
   const imgX = useTransform(pointerX, [-1, 1], [-8, 8]);
@@ -28,6 +30,56 @@ export function HeroVisual({
 
   const card3X = useTransform(pointerX, [-1, 1], [12, -12]);
   const card3Y = useTransform(pointerY, [-1, 1], [-12, 12]);
+
+  // Dynamic localized badge text
+  const badge1Title =
+    active === 0
+      ? t("hero_slide1_b1_title")
+      : active === 1
+      ? t("hero_slide2_b1_title")
+      : t("hero_slide3_b1_title");
+
+  const badge1Sub =
+    active === 0
+      ? t("hero_slide1_b1_sub")
+      : active === 1
+      ? t("hero_slide2_b1_sub")
+      : t("hero_slide3_b1_sub");
+
+  const badge2Title =
+    active === 0
+      ? t("hero_slide1_b2_title")
+      : active === 1
+      ? t("hero_slide2_b2_title")
+      : t("hero_slide3_b2_title");
+
+  const badge2Sub =
+    active === 0
+      ? t("hero_slide1_b2_sub")
+      : active === 1
+      ? t("hero_slide2_b2_sub")
+      : t("hero_slide3_b2_sub");
+
+  const badge3Title =
+    active === 0
+      ? t("hero_slide1_b3_title")
+      : active === 1
+      ? t("hero_slide2_b3_title")
+      : t("hero_slide3_b3_title");
+
+  const badge3Sub =
+    active === 0
+      ? t("hero_slide1_b3_sub")
+      : active === 1
+      ? t("hero_slide2_b3_sub")
+      : t("hero_slide3_b3_sub");
+
+  const locationLabel =
+    active === 0
+      ? t("hero_slide1_loc")
+      : active === 1
+      ? t("hero_slide2_loc")
+      : t("hero_slide3_loc");
 
   return (
     <div className="relative w-full max-w-lg lg:max-w-xl">
@@ -78,14 +130,14 @@ export function HeroVisual({
               </span>
               <AnimatePresence mode="wait">
                 <motion.span
-                  key={slide.locationLabel}
+                  key={`${locationLabel}-${lang}`}
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.3 }}
                   className="text-xs font-semibold text-white"
                 >
-                  {slide.locationLabel}
+                  {locationLabel}
                 </motion.span>
               </AnimatePresence>
             </div>
@@ -114,14 +166,14 @@ export function HeroVisual({
           <div className="min-w-0">
             <AnimatePresence mode="wait">
               <motion.div
-                key={slide.badge1Title}
+                key={`${badge1Title}-${lang}`}
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25 }}
               >
-                <p className="truncate text-xs font-bold tracking-tight text-foreground">{slide.badge1Title}</p>
-                <p className="truncate text-[11px] font-medium text-muted">{slide.badge1Subtitle}</p>
+                <p className="truncate text-xs font-bold tracking-tight text-foreground">{badge1Title}</p>
+                <p className="truncate text-[11px] font-medium text-muted">{badge1Sub}</p>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -144,14 +196,14 @@ export function HeroVisual({
           <div>
             <AnimatePresence mode="wait">
               <motion.div
-                key={slide.badge2Title}
+                key={`${badge2Title}-${lang}`}
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25 }}
               >
-                <p className="text-xs font-bold tracking-tight text-foreground">{slide.badge2Title}</p>
-                <p className="text-[10px] font-semibold text-primary">{slide.badge2Subtitle}</p>
+                <p className="text-xs font-bold tracking-tight text-foreground">{badge2Title}</p>
+                <p className="text-[10px] font-semibold text-primary">{badge2Sub}</p>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -174,14 +226,14 @@ export function HeroVisual({
           <div>
             <AnimatePresence mode="wait">
               <motion.div
-                key={slide.badge3Title}
+                key={`${badge3Title}-${lang}`}
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25 }}
               >
-                <p className="text-xs font-bold tracking-tight text-foreground">{slide.badge3Title}</p>
-                <p className="text-[11px] font-medium text-muted">{slide.badge3Subtitle}</p>
+                <p className="text-xs font-bold tracking-tight text-foreground">{badge3Title}</p>
+                <p className="text-[11px] font-medium text-muted">{badge3Sub}</p>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -190,4 +242,3 @@ export function HeroVisual({
     </div>
   );
 }
-

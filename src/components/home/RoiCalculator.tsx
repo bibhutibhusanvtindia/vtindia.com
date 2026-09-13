@@ -3,21 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Calculator,
-  Sparkles,
   TrendingUp,
   Clock,
   ShieldAlert,
   ArrowRight,
   Sliders,
-  DollarSign,
   Building2,
   Users,
 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Reveal } from "@/components/ui/Reveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { useLanguage } from "@/lib/translations";
 
 interface IndustryConfig {
   id: string;
@@ -28,40 +25,110 @@ interface IndustryConfig {
   riskReductionRate: string;
 }
 
-const INDUSTRIES: IndustryConfig[] = [
-  {
-    id: "industrial",
-    name: "Heavy Industry & Mining",
-    hourlyValue: 850,
-    incidentCost: 1500000,
-    typicalDeliveryWeeks: 8,
-    riskReductionRate: "92%",
-  },
-  {
-    id: "education",
-    name: "Universities & Higher Ed",
-    hourlyValue: 450,
-    incidentCost: 500000,
-    typicalDeliveryWeeks: 6,
-    riskReductionRate: "95%",
-  },
-  {
-    id: "healthcare",
-    name: "Hospital & Healthcare",
-    hourlyValue: 950,
-    incidentCost: 2000000,
-    typicalDeliveryWeeks: 10,
-    riskReductionRate: "99%",
-  },
-  {
-    id: "enterprise",
-    name: "Corporate ERP & SaaS",
-    hourlyValue: 700,
-    incidentCost: 800000,
-    typicalDeliveryWeeks: 6,
-    riskReductionRate: "88%",
-  },
-];
+const INDUSTRIES_MAP: Record<"en" | "hi" | "or", IndustryConfig[]> = {
+  en: [
+    {
+      id: "industrial",
+      name: "Heavy Industry & Mining",
+      hourlyValue: 850,
+      incidentCost: 1500000,
+      typicalDeliveryWeeks: 8,
+      riskReductionRate: "92%",
+    },
+    {
+      id: "education",
+      name: "Universities & Colleges",
+      hourlyValue: 450,
+      incidentCost: 500000,
+      typicalDeliveryWeeks: 6,
+      riskReductionRate: "95%",
+    },
+    {
+      id: "healthcare",
+      name: "Hospital & Healthcare",
+      hourlyValue: 950,
+      incidentCost: 2000000,
+      typicalDeliveryWeeks: 10,
+      riskReductionRate: "99%",
+    },
+    {
+      id: "enterprise",
+      name: "Corporate ERP & SaaS",
+      hourlyValue: 700,
+      incidentCost: 800000,
+      typicalDeliveryWeeks: 6,
+      riskReductionRate: "88%",
+    },
+  ],
+  hi: [
+    {
+      id: "industrial",
+      name: "भारी उद्योग एवं खनन",
+      hourlyValue: 850,
+      incidentCost: 1500000,
+      typicalDeliveryWeeks: 8,
+      riskReductionRate: "92%",
+    },
+    {
+      id: "education",
+      name: "विश्वविद्यालय एवं कॉलेज",
+      hourlyValue: 450,
+      incidentCost: 500000,
+      typicalDeliveryWeeks: 6,
+      riskReductionRate: "95%",
+    },
+    {
+      id: "healthcare",
+      name: "अस्पताल एवं स्वास्थ्य सेवा",
+      hourlyValue: 950,
+      incidentCost: 2000000,
+      typicalDeliveryWeeks: 10,
+      riskReductionRate: "99%",
+    },
+    {
+      id: "enterprise",
+      name: "कॉर्पोरेट ईआरपी एवं सास",
+      hourlyValue: 700,
+      incidentCost: 800000,
+      typicalDeliveryWeeks: 6,
+      riskReductionRate: "88%",
+    },
+  ],
+  or: [
+    {
+      id: "industrial",
+      name: "ଭାରୀ ଶିଳ୍ପ ଓ ଖଣି",
+      hourlyValue: 850,
+      incidentCost: 1500000,
+      typicalDeliveryWeeks: 8,
+      riskReductionRate: "୯୨%",
+    },
+    {
+      id: "education",
+      name: "କଲେଜ ଓ ବିଶ୍ୱବିଦ୍ୟାଳୟ",
+      hourlyValue: 450,
+      incidentCost: 500000,
+      typicalDeliveryWeeks: 6,
+      riskReductionRate: "୯୫%",
+    },
+    {
+      id: "healthcare",
+      name: "ଡାକ୍ତରଖାନା ଓ ସ୍ୱାସ୍ଥ୍ୟସେବା",
+      hourlyValue: 950,
+      incidentCost: 2000000,
+      typicalDeliveryWeeks: 10,
+      riskReductionRate: "୯୯%",
+    },
+    {
+      id: "enterprise",
+      name: "କର୍ପୋରେଟ୍ ERP ଓ SaaS",
+      hourlyValue: 700,
+      incidentCost: 800000,
+      typicalDeliveryWeeks: 6,
+      riskReductionRate: "୮୮%",
+    },
+  ],
+};
 
 export function RoiCalculator() {
   const [selectedIndustry, setSelectedIndustry] = useState<string>("industrial");
@@ -69,8 +136,10 @@ export function RoiCalculator() {
   const [solutionTier, setSolutionTier] = useState<"standard" | "immersive" | "enterprise">(
     "immersive"
   );
+  const { lang, t } = useLanguage();
 
-  const ind = INDUSTRIES.find((i) => i.id === selectedIndustry) || INDUSTRIES[0];
+  const industries = INDUSTRIES_MAP[lang] || INDUSTRIES_MAP.en;
+  const ind = industries.find((i) => i.id === selectedIndustry) || industries[0];
 
   // Calculations
   const tierMultiplier = solutionTier === "standard" ? 1 : solutionTier === "immersive" ? 1.4 : 1.8;
@@ -94,9 +163,9 @@ export function RoiCalculator() {
       <Container className="relative">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="Interactive ROI & Scope Engine"
-            title="Calculate Your Institutional Impact & Time Saved"
-            description="Estimate deployment speed, operational efficiency, and capital savings powered by Virtoy's pre-architected modules."
+            eyebrow={t("roi_badge")}
+            title={t("roi_title")}
+            description={t("roi_desc")}
           />
         </div>
 
@@ -107,16 +176,26 @@ export function RoiCalculator() {
             <SpotlightCard enableTilt={false} className="p-6 sm:p-8">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
                 <Sliders className="h-4 w-4" />
-                <span>Configure Institutional Parameters</span>
+                <span>
+                  {lang === "hi"
+                    ? "संस्थागत पैरामीटर कॉन्फ़िगर करें"
+                    : lang === "or"
+                    ? "ସାଂସ୍ଥାନିକ ମାନଦଣ୍ଡ କନଫିଗର୍ କରନ୍ତୁ"
+                    : "Configure Institutional Parameters"}
+                </span>
               </div>
 
               {/* 1. Industry Selector */}
               <div className="mt-6">
                 <label className="text-xs font-semibold text-foreground">
-                  Select Industry Domain:
+                  {lang === "hi"
+                    ? "उद्योग क्षेत्र चुनें:"
+                    : lang === "or"
+                    ? "ଶିଳ୍ପ କ୍ଷେତ୍ର ଚୟନ କରନ୍ତୁ:"
+                    : "Select Industry Domain:"}
                 </label>
                 <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                  {INDUSTRIES.map((industry) => (
+                  {industries.map((industry) => (
                     <button
                       key={industry.id}
                       onClick={() => setSelectedIndustry(industry.id)}
@@ -138,10 +217,14 @@ export function RoiCalculator() {
                 <div className="flex items-center justify-between">
                   <label htmlFor="team-slider" className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
                     <Users className="h-4 w-4 text-primary" />
-                    Target Users / Daily Personnel:
+                    {lang === "hi"
+                      ? "लक्षित उपयोगकर्ता / दैनिक कर्मचारी:"
+                      : lang === "or"
+                      ? "ଲକ୍ଷିତ ୟୁଜର୍ / ଦୈନିକ କର୍ମଚାରୀ:"
+                      : "Target Users / Daily Personnel:"}
                   </label>
                   <span className="font-mono text-sm font-bold text-primary">
-                    {teamSize.toLocaleString()} Users
+                    {teamSize.toLocaleString()} {lang === "hi" ? "उपयोगकर्ता" : lang === "or" ? "ୟୁଜର୍" : "Users"}
                   </span>
                 </div>
                 <input
@@ -165,7 +248,11 @@ export function RoiCalculator() {
               {/* 3. Solution Tier Selector */}
               <div className="mt-8">
                 <label className="text-xs font-semibold text-foreground">
-                  Target Technical Stack &amp; Scope:
+                  {lang === "hi"
+                    ? "तकनीकी स्टैक एवं समाधान स्तर:"
+                    : lang === "or"
+                    ? "ବୈଷୟିକ ଷ୍ଟାକ୍ ଓ ସମାଧାନ ସ୍ତର:"
+                    : "Target Technical Stack & Scope:"}
                 </label>
                 <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
                   <button
@@ -176,8 +263,12 @@ export function RoiCalculator() {
                         : "border-border bg-surface text-muted hover:text-foreground"
                     }`}
                   >
-                    <p className="font-bold text-foreground">Web &amp; Cloud ERP</p>
-                    <p className="mt-1 text-[11px] text-muted">Core databases, portals &amp; APIs</p>
+                    <p className="font-bold text-foreground">
+                      {lang === "hi" ? "वेब एवं क्लाउड ईआरपी" : lang === "or" ? "ୱେବ୍ ଓ କ୍ଲାଉଡ୍ ERP" : "Web & Cloud ERP"}
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted">
+                      {lang === "hi" ? "कोर डेटाबेस एवं पोर्टल्स" : lang === "or" ? "କୋର୍ ଡାଟାବେସ୍ ଓ ପୋର୍ଟାଲ୍" : "Core databases & portals"}
+                    </p>
                   </button>
 
                   <button
@@ -188,8 +279,12 @@ export function RoiCalculator() {
                         : "border-border bg-surface text-muted hover:text-foreground"
                     }`}
                   >
-                    <p className="font-bold text-foreground">6-DOF AR/VR Simulation</p>
-                    <p className="mt-1 text-[11px] text-muted">Physics hazmat drills &amp; XR modules</p>
+                    <p className="font-bold text-foreground">
+                      {lang === "hi" ? "6-DoF वीआर सिमुलेशन" : lang === "or" ? "6-DoF VR ସିମ୍ୟୁଲେସନ୍" : "6-DOF AR/VR Simulation"}
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted">
+                      {lang === "hi" ? "फिजिक्स ड्रिल्स एवं एक्सआर" : lang === "or" ? "ଫିଜିକ୍ସ ଡ୍ରିଲ୍ ଓ XR ମଡ୍ୟୁଲ୍" : "Physics hazmat & XR"}
+                    </p>
                   </button>
 
                   <button
@@ -200,8 +295,12 @@ export function RoiCalculator() {
                         : "border-border bg-surface text-muted hover:text-foreground"
                     }`}
                   >
-                    <p className="font-bold text-foreground">Full Ecosystem</p>
-                    <p className="mt-1 text-[11px] text-muted">Web + Mobile + VR + IoT Sync</p>
+                    <p className="font-bold text-foreground">
+                      {lang === "hi" ? "पूर्ण इकोसिस्टम" : lang === "or" ? "ସମ୍ପୂର୍ଣ୍ଣ ଇକୋସିଷ୍ଟମ୍" : "Full Ecosystem"}
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted">
+                      {lang === "hi" ? "वेब + मोबाइल + वीआर + आईओटी" : lang === "or" ? "ୱେବ୍ + ମୋବାଇଲ୍ + VR" : "Web + Mobile + VR + IoT Sync"}
+                    </p>
                   </button>
                 </div>
               </div>
@@ -220,10 +319,10 @@ export function RoiCalculator() {
               <div>
                 <div className="flex items-center justify-between border-b border-border/80 pb-4">
                   <span className="font-mono text-xs font-bold uppercase tracking-wider text-muted">
-                    Projected Delivery &amp; ROI
+                    {lang === "hi" ? "अनुमानित डिलीवरी एवं आरओआई" : lang === "or" ? "ଆନୁମାନିକ ଡେଲିଭରି ଓ ROI" : "Projected Delivery & ROI"}
                   </span>
                   <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600">
-                    Calculated in Real-Time
+                    {lang === "hi" ? "रीयल-टाइम गणना" : lang === "or" ? "ରିଅଲ୍-ଟାଇମ୍ ଗଣନା" : "Calculated in Real-Time"}
                   </span>
                 </div>
 
@@ -233,12 +332,14 @@ export function RoiCalculator() {
                     <Clock className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted">Estimated Production Sprint</p>
+                    <p className="text-xs font-medium text-muted">
+                      {lang === "hi" ? "अनुमानित उत्पादन समयसीमा" : lang === "or" ? "ଆନୁମାନିକ ପ୍ରଡକ୍ସନ୍ ସମୟସୀମା" : "Estimated Production Sprint"}
+                    </p>
                     <p className="font-mono text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                      {deliveryWeeks} – {deliveryWeeks + 2} Weeks
+                      {deliveryWeeks} – {deliveryWeeks + 2} {lang === "hi" ? "सप्ताह" : lang === "or" ? "ସପ୍ତାହ" : "Weeks"}
                     </p>
                     <p className="text-[11px] text-muted">
-                      Full staging deployment with user acceptance testing.
+                      {lang === "hi" ? "उपयोगकर्ता परीक्षण के साथ पूर्ण परिनियोजन।" : lang === "or" ? "ୟୁଜର୍ ଟେଷ୍ଟିଂ ସହ ସମ୍ପୂର୍ଣ୍ଣ ନିୟୋଜନ।" : "Full staging deployment with acceptance testing."}
                     </p>
                   </div>
                 </div>
@@ -249,12 +350,14 @@ export function RoiCalculator() {
                     <TrendingUp className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted">Annual Operational Hours Saved</p>
+                    <p className="text-xs font-medium text-muted">
+                      {lang === "hi" ? "वार्षिक बचाए गए कार्य घंटे" : lang === "or" ? "ବାର୍ଷିକ ସଞ୍ଚିତ କାର୍ଯ୍ୟ ଘଣ୍ଟା" : "Annual Operational Hours Saved"}
+                    </p>
                     <p className="font-mono text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-                      {annualHoursSaved.toLocaleString()}+ Hours
+                      {annualHoursSaved.toLocaleString()}+ {lang === "hi" ? "घंटे" : lang === "or" ? "ଘଣ୍ଟା" : "Hours"}
                     </p>
                     <p className="text-[11px] text-muted">
-                      Est. productivity gain equivalent to ₹{annualEfficiencyValue} Lakhs/yr.
+                      {lang === "hi" ? `अनुमानित उत्पादकता लाभ ₹${annualEfficiencyValue} लाख/वर्ष।` : lang === "or" ? `ଆନୁମାନିକ ଉତ୍ପାଦନ ଲାଭ ₹${annualEfficiencyValue} ଲକ୍ଷ/ବର୍ଷ।` : `Est. productivity gain ₹${annualEfficiencyValue} Lakhs/yr.`}
                     </p>
                   </div>
                 </div>
@@ -265,12 +368,14 @@ export function RoiCalculator() {
                     <ShieldAlert className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted">Safety &amp; Compliance Accuracy</p>
+                    <p className="text-xs font-medium text-muted">
+                      {lang === "hi" ? "सुरक्षा एवं अनुपालन सटीकता" : lang === "or" ? "ସୁରକ୍ଷା ଓ ଅନୁପାଳନ ସଠିକତା" : "Safety & Compliance Accuracy"}
+                    </p>
                     <p className="font-mono text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                      {incidentMitigationPercent} Retention
+                      {incidentMitigationPercent} {lang === "hi" ? "स्मरण" : lang === "or" ? "ସ୍ମରଣ" : "Retention"}
                     </p>
                     <p className="text-[11px] text-muted">
-                      Zero physical incident risk during training drills.
+                      {lang === "hi" ? "प्रशिक्षण अभ्यास के दौरान शून्य शारीरिक दुर्घटना जोखिम।" : lang === "or" ? "ତାଲିମ ସମୟରେ ଶୂନ୍ୟ ଶାରୀରିକ ଦୁର୍ଘଟଣା ବିପଦ।" : "Zero physical incident risk during training drills."}
                     </p>
                   </div>
                 </div>
@@ -284,11 +389,19 @@ export function RoiCalculator() {
                   )}%20(${teamSize}%20users)&tier=${solutionTier}`}
                   className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-primary/25 transition hover:bg-primary-hover hover:shadow-xl hover:shadow-primary/30"
                 >
-                  Request Technical Blueprint &amp; Proposal
+                  {lang === "hi"
+                    ? "तकनीकी प्रस्ताव एवं ब्लूप्रिंट प्राप्त करें"
+                    : lang === "or"
+                    ? "ବୈଷୟିକ ପ୍ରସ୍ତାବ ଓ ବ୍ଲୁପ୍ରିଣ୍ଟ ପ୍ରାପ୍ତ କରନ୍ତୁ"
+                    : "Request Technical Blueprint & Proposal"}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
                 <p className="mt-2 text-center text-[10px] text-muted">
-                  Includes fixed milestone quote, full architecture diagram &amp; SLA terms.
+                  {lang === "hi"
+                    ? "निश्चित माइलस्टोन कोट, पूर्ण आर्किटेक्चर आरेख और एसएलए शर्तें शामिल हैं।"
+                    : lang === "or"
+                    ? "ନିର୍ଦ୍ଦିଷ୍ଟ ମାଇଲଷ୍ଟୋନ୍ କୋଟ୍, ଆର୍କିଟେକ୍ଚର ଡାଇଗ୍ରାମ୍ ଓ SLA ସର୍ତ୍ତ ଅନ୍ତର୍ଭୁକ୍ତ।"
+                    : "Includes fixed milestone quote, full architecture diagram & SLA terms."}
                 </p>
               </div>
             </div>

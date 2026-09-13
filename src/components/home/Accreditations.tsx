@@ -1,16 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import { ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { accreditations } from "@/data/site";
+import { useLanguage } from "@/lib/translations";
 
 /**
- * Migrated from the old homepage's scrolling logo strip. The old site shows
- * these 5 marks with no heading; a neutral heading is used here for
- * accessibility and scannability. Each mark keeps its own official colours on a
- * white tile — none are recoloured or filtered.
+ * Migrated from the old homepage's scrolling logo strip.
+ * Localized badge and heading based on active language.
  */
 export function Accreditations() {
+  const { t } = useLanguage();
+
   return (
     <section className="relative overflow-hidden border-t border-border py-20">
       <div
@@ -23,11 +26,14 @@ export function Accreditations() {
           <div className="mx-auto max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Recognised &amp; registered
+              {t("accred_badge")}
             </span>
             <h2 className="mt-5 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-              Accreditations &amp; recognition
+              {t("accred_title")}
             </h2>
+            <p className="mt-3 text-sm text-muted">
+              {t("accred_desc")}
+            </p>
           </div>
         </Reveal>
 

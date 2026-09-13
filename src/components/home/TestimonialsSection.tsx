@@ -8,11 +8,13 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { testimonials } from "@/data/testimonials";
+import { useLanguage } from "@/lib/translations";
 
 export function TestimonialsSection() {
   const quotes = testimonials.filter((t) => t.quote);
   const excellentReviews = testimonials.filter((t) => !t.quote);
   const [activeQuote, setActiveQuote] = useState(0);
+  const { lang, t } = useLanguage();
 
   const current = quotes[activeQuote];
 
@@ -31,16 +33,20 @@ export function TestimonialsSection() {
       <Container className="relative">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="Executive trust"
-            title="Trusted by safety leaders & industry heads"
-            description="Direct feedback from operational and safety executives whose daily workflows depend on Virtoy software."
+            eyebrow={t("test_badge")}
+            title={t("test_title")}
+            description={t("test_desc")}
           />
           <Reveal delay={0.1}>
             <Link
               href="/testimonials"
               className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-3 text-sm font-semibold shadow-sm transition hover:border-primary/50 hover:text-primary"
             >
-              All reviews &amp; ratings
+              {lang === "hi"
+                ? "सभी समीक्षाएं और रेटिंग्स"
+                : lang === "or"
+                ? "ସମସ୍ତ ସମୀକ୍ଷା ଓ ରେଟିଂ"
+                : "All reviews & ratings"}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </Reveal>
@@ -61,12 +67,22 @@ export function TestimonialsSection() {
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                     ))}
-                    <span className="ml-2 text-xs font-semibold text-foreground">Verified Assessment</span>
+                    <span className="ml-2 text-xs font-semibold text-foreground">
+                      {lang === "hi"
+                        ? "प्रमाणित मूल्यांकन"
+                        : lang === "or"
+                        ? "ପ୍ରମାଣିତ ମୂଲ୍ୟାଙ୍କନ"
+                        : "Verified Assessment"}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-semibold text-primary">
                     <ShieldCheck className="h-3.5 w-3.5" />
-                    Client Endorsement
+                    {lang === "hi"
+                      ? "क्लाइंट पुष्टि"
+                      : lang === "or"
+                      ? "ଗ୍ରାହକ ସ୍ୱୀକୃତି"
+                      : "Client Endorsement"}
                   </div>
                 </div>
 
@@ -124,10 +140,20 @@ export function TestimonialsSection() {
               <div>
                 <div className="flex items-center gap-2">
                   <UserCheck className="h-5 w-5 text-primary" />
-                  <h3 className="text-base font-semibold tracking-tight text-foreground">Verified Client Ratings</h3>
+                  <h3 className="text-base font-semibold tracking-tight text-foreground">
+                    {lang === "hi"
+                      ? "प्रमाणित क्लाइंट रेटिंग्स"
+                      : lang === "or"
+                      ? "ପ୍ରମାଣିତ ଗ୍ରାହକ ରେଟିଂ"
+                      : "Verified Client Ratings"}
+                  </h3>
                 </div>
                 <p className="mt-2 text-xs leading-relaxed text-muted">
-                  Client representatives and department administrators rate Virtoy Technologies with consistent excellence.
+                  {lang === "hi"
+                    ? "क्लाइंट प्रतिनिधि और विभागाध्यक्ष विर्टॉय टेक्नोलॉजीज को निरंतर 5-स्टार रेटिंग देते हैं।"
+                    : lang === "or"
+                    ? "ଗ୍ରାହକ ପ୍ରତିନିଧି ଏବଂ ବିଭାଗୀୟ ମୁଖ୍ୟମାନେ ଭର୍ଚ୍ଚୋଏ ଟେକ୍ନୋଲୋଜିଜ୍‌କୁ ନିରନ୍ତର ୫-ଷ୍ଟାର୍ ରେଟିଂ ପ୍ରଦାନ କରନ୍ତି।"
+                    : "Client representatives and department administrators rate Virtoy Technologies with consistent excellence."}
                 </p>
 
                 <div className="mt-6 grid grid-cols-2 gap-3">
@@ -140,7 +166,9 @@ export function TestimonialsSection() {
                         {item.name}
                       </span>
                       <div className="mt-2 flex items-center justify-between">
-                        <span className="text-[11px] font-medium text-muted">Rating:</span>
+                        <span className="text-[11px] font-medium text-muted">
+                          {lang === "hi" ? "रेटिंग:" : lang === "or" ? "ରେଟିଂ:" : "Rating:"}
+                        </span>
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                           {item.rating}
                         </span>
@@ -152,10 +180,18 @@ export function TestimonialsSection() {
 
               <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-center">
                 <p className="text-xs font-semibold text-primary">
-                  100% Authentic Client Feedback
+                  {lang === "hi"
+                    ? "100% प्रामाणिक क्लाइंट फीडबैक"
+                    : lang === "or"
+                    ? "୧୦୦% ପ୍ରାମାଣିକ ଗ୍ରାହକ ମତାମତ"
+                    : "100% Authentic Client Feedback"}
                 </p>
                 <p className="mt-1 text-[11px] text-muted">
-                  All reviews sourced directly from institutional deployments across Eastern India.
+                  {lang === "hi"
+                    ? "पूर्वी भारत और यूएई में संस्थागत परिनियोजन से सीधे प्राप्त समीक्षाएं।"
+                    : lang === "or"
+                    ? "ପୂର୍ବ ଭାରତ ଓ ୟୁଏଇର ସାଂସ୍ଥାନିକ ପ୍ରକଳ୍ପରୁ ସିଧାସଳଖ ସଂଗୃହୀତ ମତାମତ।"
+                    : "All reviews sourced directly from institutional deployments across Eastern India and the UAE."}
                 </p>
               </div>
             </div>

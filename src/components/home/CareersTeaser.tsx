@@ -1,9 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Briefcase } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
+import { useLanguage } from "@/lib/translations";
 
 export function CareersTeaser() {
+  const { lang, t } = useLanguage();
+
   return (
     <section className="relative overflow-hidden border-t border-border py-24">
       <Container>
@@ -18,15 +23,15 @@ export function CareersTeaser() {
             <div className="relative max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur-sm">
                 <Briefcase className="h-3.5 w-3.5" />
-                Join Our Engineering Force
+                {t("careers_badge")}
               </div>
 
               <h2 className="mt-5 text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-5xl">
-                Explore career opportunities at Virtoy Technologies
+                {t("careers_title")}
               </h2>
               
               <p className="mt-4 text-base leading-relaxed text-white/90 sm:text-lg">
-                High-impact projects, structured career acceleration, health coverage, and an engineering-first culture — build the next generation of software with us.
+                {t("careers_desc")}
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -38,7 +43,7 @@ export function CareersTeaser() {
                     aria-hidden="true"
                     className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-primary/10 to-transparent transition-transform duration-700 group-hover:translate-x-full"
                   />
-                  <span className="relative">View Open Positions</span>
+                  <span className="relative">{t("careers_btn")}</span>
                   <ArrowRight className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
               </div>
