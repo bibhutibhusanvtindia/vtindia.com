@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Menu, Phone, X, Globe } from "lucide-react";
+import { ChevronDown, Menu, Phone, X, Globe, Sparkles } from "lucide-react";
 import { clsx } from "clsx";
 import { companyLinks, productLinks, serviceLinks, topLevelLinks } from "@/data/nav";
 import { Logo } from "@/components/ui/Logo";
@@ -185,6 +185,13 @@ export function Header() {
 
             <CommandPalette />
             <SoundToggle />
+            <Link
+              href="/admin"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-muted transition hover:border-primary hover:text-primary hover:scale-105"
+              title="Open AI Executive Command Center"
+            >
+              <Sparkles className="h-4 w-4 text-indigo-500" />
+            </Link>
 
             <a
               href={`tel:+91${site.phones[0].number}`}
@@ -227,6 +234,13 @@ export function Header() {
 
             <CommandPalette />
             <SoundToggle />
+            <Link
+              href="/admin"
+              className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-border bg-surface text-muted"
+              title="Open AI Executive Command Center"
+            >
+              <Sparkles className="h-4 w-4 text-indigo-500" />
+            </Link>
             <button
               className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
               onClick={() => setMobileOpen((v) => !v)}

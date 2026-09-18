@@ -55,6 +55,17 @@ export function CommandPalette() {
   const allItems: CommandItem[] = useMemo(() => {
     const items: CommandItem[] = [
       {
+        id: "action-admin",
+        category: "Actions",
+        title: "Open AI Executive Command Center",
+        subtitle: "Single-screen financial telemetry, AI Chief of Staff & B2B Growth Platform",
+        icon: Sparkles,
+        action: () => {
+          router.push("/admin");
+          setIsOpen(false);
+        },
+      },
+      {
         id: "action-roi",
         category: "Actions",
         title: "Calculate Institutional Scope & ROI",
