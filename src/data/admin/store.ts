@@ -11,6 +11,9 @@ import {
   ProofVaultItem,
   SubscriptionItem,
   AuditLog,
+  PipelineDeal,
+  OutreachTemplate,
+  DealStage,
 } from "./types";
 import {
   INITIAL_EMPLOYEES,
@@ -22,18 +25,23 @@ import {
   INITIAL_PROOF_VAULT,
   INITIAL_SUBSCRIPTIONS,
   INITIAL_AUDIT_LOGS,
+  INITIAL_PIPELINE_DEALS,
+  INITIAL_OUTREACH_TEMPLATES,
 } from "./initialData";
 
 const STORAGE_KEYS = {
-  CURRENT_USER: "vt_admin_current_user_v1",
-  FINANCIALS: "vt_admin_financials_v1",
-  PROJECTS: "vt_admin_projects_v1",
-  ATTENTION: "vt_admin_attention_v1",
-  LEADS: "vt_admin_leads_v1",
-  PROSPECTS: "vt_admin_prospects_v1",
-  VAULT: "vt_admin_vault_v1",
-  SUBSCRIPTIONS: "vt_admin_subscriptions_v1",
-  AUDIT_LOGS: "vt_admin_audit_logs_v1",
+  CURRENT_USER: "vt_admin_current_user_v2",
+  FINANCIALS: "vt_admin_financials_v2",
+  PROJECTS: "vt_admin_projects_v2",
+  ATTENTION: "vt_admin_attention_v2",
+  LEADS: "vt_admin_leads_v2",
+  PROSPECTS: "vt_admin_prospects_v2",
+  VAULT: "vt_admin_vault_v2",
+  SUBSCRIPTIONS: "vt_admin_subscriptions_v2",
+  AUDIT_LOGS: "vt_admin_audit_logs_v2",
+  DEALS: "vt_admin_deals_v2",
+  ACTIVE_TAB: "vt_admin_active_tab_v2",
+  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v2",
 };
 
 export function useAdminStore() {
@@ -48,6 +56,11 @@ export function useAdminStore() {
   const [proofVault, setProofVault] = useState<ProofVaultItem[]>(INITIAL_PROOF_VAULT);
   const [subscriptions, setSubscriptions] = useState<SubscriptionItem[]>(INITIAL_SUBSCRIPTIONS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
+  const [pipelineDeals, setPipelineDeals] = useState<PipelineDeal[]>(INITIAL_PIPELINE_DEALS);
+  const [outreachTemplates, setOutreachTemplates] = useState<OutreachTemplate[]>(INITIAL_OUTREACH_TEMPLATES);
+  const [activeTab, setActiveTabState] = useState<string>("dashboard");
+  const [sidebarCollapsed, setSidebarCollapsedState] = useState<boolean>(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState<boolean>(false);
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -57,6 +70,12 @@ export function useAdminStore() {
         const found = INITIAL_EMPLOYEES.find((e) => e.id === savedUser);
         if (found) setCurrentEmployeeState(found);
       }
+
+      const savedTab = localStorage.getItem(STORAGE_KEYS.ACTIVE_TAB);
+      if (savedTab) setActiveTabState(savedTab);
+
+      const savedCollapsed = localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED);
+      if (savedCollapsed) setSidebarCollapsedState(savedCollapsed === "true");
 
       const savedLeads = localStorage.getItem(STORAGE_KEYS.LEADS);
       if (savedLeads) setSocialLeads(JSON.parse(savedLeads));
@@ -75,10 +94,31 @@ export function useAdminStore() {
 
       const savedAttention = localStorage.getItem(STORAGE_KEYS.ATTENTION);
       if (savedAttention) setAttentionItems(JSON.parse(savedAttention));
+
+      const savedDeals = localStorage.getItem(STORAGE_KEYS.DEALS);
+      if (savedDeals) setPipelineDeals(JSON.parse(savedDeals));
     } catch {
       // fallback to initial data if parse fails
     }
     setIsHydrated(true);
+  }, []);
+
+  const setActiveTab = useCallback((tab: string) => {
+    setActiveTabState(tab);
+    setMobileDrawerOpen(false);
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_TAB, tab);
+    } catch {}
+  }, []);
+
+  const setSidebarCollapsed = useCallback((collapsed: boolean | ((prev: boolean) => boolean)) => {
+    setSidebarCollapsedState((prev) => {
+      const val = typeof collapsed === "function" ? collapsed(prev) : collapsed;
+      try {
+        localStorage.setItem(STORAGE_KEYS.SIDEBAR_COLLAPSED, String(val));
+      } catch {}
+      return val;
+    });
   }, []);
 
   const addAuditLog = useCallback(
@@ -223,6 +263,39 @@ export function useAdminStore() {
     [addAuditLog]
   );
 
+  const updateDealStage = useCallback(
+    (dealId: string, newStage: DealStage) => {
+      setPipelineDeals((prev) => {
+        const updated = prev.map((d) => (d.id === dealId ? { ...d, stage: newStage, lastActivity: "Just now" } : d));
+        try {
+          localStorage.setItem(STORAGE_KEYS.DEALS, JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+      addAuditLog("Updated Deal Pipeline Stage", "Deal Matrix", `Moved deal #${dealId} to stage '${newStage}'`);
+    },
+    [addAuditLog]
+  );
+
+  const addDeal = useCallback(
+    (deal: Omit<PipelineDeal, "id" | "lastActivity">) => {
+      const newDeal: PipelineDeal = {
+        ...deal,
+        id: `deal-${Date.now()}`,
+        lastActivity: "Just now",
+      };
+      setPipelineDeals((prev) => {
+        const updated = [newDeal, ...prev];
+        try {
+          localStorage.setItem(STORAGE_KEYS.DEALS, JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+      addAuditLog("Created New Pipeline Deal", "Deal Matrix", `Added ${newDeal.title} (${newDeal.company})`);
+    },
+    [addAuditLog]
+  );
+
   const resetToDefaultData = useCallback(() => {
     localStorage.clear();
     setCurrentEmployeeState(INITIAL_EMPLOYEES[0]);
@@ -234,6 +307,9 @@ export function useAdminStore() {
     setProofVault(INITIAL_PROOF_VAULT);
     setSubscriptions(INITIAL_SUBSCRIPTIONS);
     setAuditLogs(INITIAL_AUDIT_LOGS);
+    setPipelineDeals(INITIAL_PIPELINE_DEALS);
+    setOutreachTemplates(INITIAL_OUTREACH_TEMPLATES);
+    setActiveTabState("dashboard");
     addAuditLog("Reset Store Data", "System Administration", "Restored all initial seed records.");
   }, [addAuditLog]);
 
@@ -249,6 +325,14 @@ export function useAdminStore() {
     proofVault,
     subscriptions,
     auditLogs,
+    pipelineDeals,
+    outreachTemplates,
+    activeTab,
+    sidebarCollapsed,
+    mobileDrawerOpen,
+    setActiveTab,
+    setSidebarCollapsed,
+    setMobileDrawerOpen,
     setCurrentEmployee,
     updateLeadStatus,
     updateLeadSuggestedReply,
@@ -257,6 +341,8 @@ export function useAdminStore() {
     addProofVaultItem,
     updateSubscriptionSeats,
     resolveAttentionItem,
+    updateDealStage,
+    addDeal,
     addAuditLog,
     resetToDefaultData,
   };

@@ -150,3 +150,37 @@ export interface ExecutiveBriefingData {
   topWins: { client: string; deal: string; value: string; rep: string }[];
   weeklyFocus: string[];
 }
+
+export type DealStage = "discovery" | "scoping" | "proposal" | "negotiation" | "won" | "lost";
+
+export interface PipelineDeal {
+  id: string;
+  title: string;
+  company: string;
+  sector: string;
+  location: string;
+  stage: DealStage;
+  dealValue: number; // in INR e.g. 1500000 (₹15L)
+  winProbability: number; // 0-100%
+  leadRep: string;
+  aiHealthScore: number; // 0-100
+  aiBottleneck: string;
+  aiNextBestAction: string;
+  expectedClose: string;
+  lastActivity: string;
+}
+
+export type OutreachChannel = "whatsapp" | "linkedin" | "email" | "cold_call";
+
+export interface OutreachTemplate {
+  id: string;
+  title: string;
+  sector: string;
+  targetRole: string;
+  channel: OutreachChannel;
+  hook: string;
+  body: string;
+  callToAction: string;
+  suggestedFollowUpDays: number;
+}
+

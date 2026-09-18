@@ -8,18 +8,23 @@ export function Avatar({
   src,
   alt = "Avatar",
   fallback,
+  name,
   className,
   size = "default",
 }: {
   src?: string;
   alt?: string;
   fallback?: string;
+  name?: string;
   className?: string;
-  size?: "sm" | "default" | "lg" | "xl";
+  size?: "xs" | "sm" | "default" | "lg" | "xl";
 }) {
   const [error, setError] = React.useState(false);
 
+  const initials = fallback || (name ? name.split(" ").map((n) => n[0]).join("").slice(0, 2) : alt.slice(0, 2));
+
   const sizeStyles = {
+    xs: "h-6 w-6 text-[9px]",
     sm: "h-7 w-7 text-[10px]",
     default: "h-9 w-9 text-xs",
     lg: "h-11 w-11 text-sm",
@@ -44,7 +49,7 @@ export function Avatar({
           onError={() => setError(true)}
         />
       ) : (
-        <span className="select-none uppercase text-primary font-bold">{fallback || alt.slice(0, 2)}</span>
+        <span className="select-none uppercase text-primary font-bold">{initials}</span>
       )}
     </div>
   );

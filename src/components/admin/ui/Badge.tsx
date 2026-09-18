@@ -4,22 +4,23 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "success" | "warning" | "destructive" | "outline" | "indigo" | "amber" | "cyan" | "emerald";
+  variant?: "default" | "secondary" | "success" | "warning" | "destructive" | "outline" | "indigo" | "amber" | "cyan" | "emerald" | "brand";
   size?: "default" | "sm" | "xs";
 }
 
 export function Badge({ className, variant = "default", size = "default", ...props }: BadgeProps) {
   const variantStyles = {
-    default: "bg-primary/10 text-primary border-primary/20",
-    secondary: "bg-surface-muted text-foreground border-border",
-    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    destructive: "bg-destructive/10 text-destructive border-destructive/20",
-    outline: "bg-transparent text-foreground border-border",
-    indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
-    amber: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30",
-    cyan: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
+    default: "bg-[#F0186C]/15 text-[#FF4D8D] border-[#F0186C]/30",
+    brand: "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white border-transparent shadow-sm shadow-[#F0186C]/25",
+    secondary: "bg-[#1F101A] text-slate-300 border-[#3D1E30]",
+    success: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+    emerald: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+    warning: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+    destructive: "bg-rose-500/15 text-rose-400 border-rose-500/30",
+    outline: "bg-transparent text-slate-300 border-[#3D1E30]",
+    indigo: "bg-[#F0186C]/15 text-[#FF4D8D] border-[#F0186C]/30",
+    amber: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+    cyan: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
   }[variant];
 
   const sizeStyles = {

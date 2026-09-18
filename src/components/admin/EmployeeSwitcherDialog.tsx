@@ -32,7 +32,6 @@ export function EmployeeSwitcherDialog({
   };
 
   const handleConfirm = () => {
-    // Check PIN or allow executive 1-click bypass
     if (pinInput.trim() && pinInput.trim() !== selectedEmp.pin) {
       setErrorMsg("Incorrect PIN. Please check your credentials.");
       return;
@@ -41,9 +40,9 @@ export function EmployeeSwitcherDialog({
     onOpenChange(false);
   };
 
-  const roleBadges: Record<string, { label: string; variant: "default" | "success" | "warning" | "indigo" | "secondary" }> = {
-    ceo: { label: "Chief Executive", variant: "indigo" },
-    cofounder: { label: "Co-Founder", variant: "indigo" },
+  const roleBadges: Record<string, { label: string; variant: "default" | "success" | "warning" | "indigo" | "secondary" | "brand" }> = {
+    ceo: { label: "Chief Executive", variant: "brand" },
+    cofounder: { label: "Co-Founder", variant: "brand" },
     coo: { label: "Chief Operations", variant: "success" },
     consultant: { label: "Sr. Consultant", variant: "warning" },
     tech_lead: { label: "Tech Pod Lead", variant: "default" },
@@ -53,15 +52,15 @@ export function EmployeeSwitcherDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl bg-[#0E060C] border-[#3D1E30] text-slate-100 shadow-2xl">
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Users className="h-4 w-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#D6135F]/20 text-[#FF4D8D]">
+              <Users className="h-5 w-5" />
             </div>
             <div>
-              <DialogTitle>Switch Employee Profile</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base font-bold text-white">Switch Employee Profile</DialogTitle>
+              <DialogDescription className="text-xs text-rose-200/60">
                 Select your verified Virtoy Technologies employee identity to access role-specific workflows and action audits.
               </DialogDescription>
             </div>
@@ -79,32 +78,32 @@ export function EmployeeSwitcherDialog({
               <div
                 key={emp.id}
                 onClick={() => handleSwitch(emp)}
-                className={`group relative flex items-start gap-3 rounded-2xl border p-3.5 cursor-pointer transition-all ${
+                className={`group relative flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${
                   isSelected
-                    ? "border-primary bg-primary/[0.04] shadow-sm ring-1 ring-primary"
-                    : "border-border/80 bg-surface hover:border-border hover:bg-surface-muted/60"
+                    ? "border-[#F0186C] bg-[#220E1C] shadow-lg shadow-[#F0186C]/10 ring-1 ring-[#F0186C]"
+                    : "border-[#2D1625] bg-[#140810] hover:border-[#F0186C]/40 hover:bg-[#1A0B16]"
                 }`}
               >
                 <Avatar src={emp.avatar} alt={emp.name} fallback={emp.name} size="default" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <h4 className="text-xs font-bold text-foreground truncate">{emp.name}</h4>
+                    <h4 className="text-xs font-bold text-slate-100 truncate group-hover:text-[#FF4D8D]">{emp.name}</h4>
                     {isCurrent && (
-                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      <span className="text-[10px] font-semibold text-emerald-400">
                         Active
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-muted truncate">{emp.title}</p>
+                  <p className="text-[11px] text-slate-400 truncate">{emp.title}</p>
                   <div className="mt-2 flex items-center justify-between">
                     <Badge variant={badge.variant} size="xs">
                       {badge.label}
                     </Badge>
-                    <span className="font-mono text-[10px] text-muted">PIN: {emp.pin}</span>
+                    <span className="font-mono text-[10px] text-rose-300/60">PIN: {emp.pin}</span>
                   </div>
                 </div>
                 {isSelected && (
-                  <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
+                  <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white">
                     <Check className="h-3 w-3" />
                   </div>
                 )}
@@ -114,15 +113,15 @@ export function EmployeeSwitcherDialog({
         </div>
 
         {/* Selected Profile Action Card */}
-        <div className="mt-5 rounded-2xl border border-border/90 bg-surface-muted/60 p-4">
+        <div className="mt-4 rounded-xl border border-[#3D1E30] bg-[#160A13] p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <Avatar src={selectedEmp.avatar} alt={selectedEmp.name} size="sm" />
               <div>
-                <p className="text-xs font-bold text-foreground">
-                  Switching to: <span className="text-primary">{selectedEmp.name}</span>
+                <p className="text-xs font-bold text-white">
+                  Switching to: <span className="text-[#FF4D8D]">{selectedEmp.name}</span>
                 </p>
-                <p className="text-[11px] text-muted">Department: {selectedEmp.department} · Role: {selectedEmp.role.toUpperCase()}</p>
+                <p className="text-[11px] text-slate-400">Department: {selectedEmp.department} · Role: {selectedEmp.role.toUpperCase()}</p>
               </div>
             </div>
 
@@ -136,7 +135,7 @@ export function EmployeeSwitcherDialog({
               </Button>
             </div>
           </div>
-          {errorMsg && <p className="mt-2 text-xs font-medium text-destructive">{errorMsg}</p>}
+          {errorMsg && <p className="mt-2 text-xs font-medium text-rose-400">{errorMsg}</p>}
         </div>
       </DialogContent>
     </Dialog>
