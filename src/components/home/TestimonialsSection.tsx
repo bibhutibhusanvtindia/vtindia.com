@@ -7,16 +7,92 @@ import { ArrowRight, ChevronLeft, ChevronRight, Quote, ShieldCheck, Star, UserCh
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { testimonials } from "@/data/testimonials";
 import { useLanguage } from "@/lib/translations";
 
-export function TestimonialsSection() {
-  const quotes = testimonials.filter((t) => t.quote);
-  const excellentReviews = testimonials.filter((t) => !t.quote);
-  const [activeQuote, setActiveQuote] = useState(0);
-  const { lang, t } = useLanguage();
+export interface LocalizedTestimonial {
+  name: string;
+  role?: string;
+  quote?: string;
+  rating: string;
+}
 
-  const current = quotes[activeQuote];
+const TESTIMONIALS_MAP: Record<"en" | "hi" | "or", LocalizedTestimonial[]> = {
+  en: [
+    {
+      name: "Akash Mohapatra",
+      role: "Safety Manager",
+      quote:
+        "We are very happy to introduce the Safety Mobile App in our Plant. This is a very unique concept and all the incidents and near miss conditions can be displayed in our mobile at any moment. Thank you team Virtoy for providing us your valuable service.",
+      rating: "Quote",
+    },
+    {
+      name: "Asit Mishra",
+      role: "Safety Manager",
+      quote:
+        "Safety affects everyone in every industry. Workplace injuries and illnesses significantly impact employers' profits, workers' health and insurance costs. Accidents are preventable with safety protocols, proper training and safety products. Thanks to Virtoy Technologies Pvt. Ltd. for all the support.",
+      rating: "Quote",
+    },
+    { name: "Manoj Behera", rating: "Excellent" },
+    { name: "Mamata Sahu", rating: "Excellent" },
+    { name: "Purnima Rath", rating: "Excellent" },
+    { name: "Ajay Sahu", rating: "Excellent" },
+    { name: "Rajshree Dhal", rating: "Excellent" },
+    { name: "Barsha Behera", rating: "Excellent" },
+  ],
+  hi: [
+    {
+      name: "Akash Mohapatra",
+      role: "सुरक्षा प्रबंधक",
+      quote:
+        "हम अपने प्लांट में सेफ्टी मोबाइल ऐप पेश करके बेहद खुश हैं। यह एक बहुत ही अनूठी अवधारणा है और सभी घटनाएं और नियर-मिस स्थितियां किसी भी समय हमारे मोबाइल में प्रदर्शित की जा सकती हैं। हमें यह मूल्यवान सेवा प्रदान करने के लिए विर्टॉय टीम को धन्यवाद।",
+      rating: "Quote",
+    },
+    {
+      name: "Asit Mishra",
+      role: "सुरक्षा प्रबंधक",
+      quote:
+        "सुरक्षा हर उद्योग में हर किसी को प्रभावित करती है। कार्यस्थल की चोटें कर्मचारियों के स्वास्थ्य और कंपनियों को प्रभावित करती हैं। सुरक्षा प्रोटोकॉल और उचित प्रशिक्षण से दुर्घटनाओं को रोका जा सकता है। विर्टॉय टेक्नोलॉजीज को उनके संपूर्ण सहयोग के लिए धन्यवाद।",
+      rating: "Quote",
+    },
+    { name: "Manoj Behera", rating: "उत्कृष्ट" },
+    { name: "Mamata Sahu", rating: "उत्कृष्ट" },
+    { name: "Purnima Rath", rating: "उत्कृष्ट" },
+    { name: "Ajay Sahu", rating: "उत्कृष्ट" },
+    { name: "Rajshree Dhal", rating: "उत्कृष्ट" },
+    { name: "Barsha Behera", rating: "उत्कृष्ट" },
+  ],
+  or: [
+    {
+      name: "Akash Mohapatra",
+      role: "ନିରାପତ୍ତା ପ୍ରବନ୍ଧକ (Safety Manager)",
+      quote:
+        "ଆମ ପ୍ଲାଣ୍ଟରେ ସେଫ୍ଟି ମୋବାଇଲ୍ ଆପ୍ ବ୍ୟବହାର କରି ଆମେ ଅତ୍ୟନ୍ତ ଖୁସି। ଏହା ଏକ ଅନନ୍ୟ ଧାରଣା ଏବଂ ସମସ୍ତ ଦୁର୍ଘଟଣା ତଥା ନିରାପତ୍ତା ସମ୍ବନ୍ଧୀୟ ତଥ୍ୟ ଯେକୌଣସି ସମୟରେ ମୋବାଇଲ୍‌ରେ ଉପଲବ୍ଧ ହେଉଛି। ଉତ୍କୃଷ୍ଟ ସେବା ପାଇଁ ଭର୍ଚ୍ଚୋଏ ଟିମ୍‌କୁ ଅଶେଷ ଧନ୍ୟବାଦ।",
+      rating: "Quote",
+    },
+    {
+      name: "Asit Mishra",
+      role: "ନିରାପତ୍ତା ପ୍ରବନ୍ଧକ (Safety Manager)",
+      quote:
+        "ନିରାପତ୍ତା ସମସ୍ତ ଶିଳ୍ପରେ ଅତ୍ୟନ୍ତ ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ। ସୁରକ୍ଷା ନିୟମାବଳୀ, ଉପଯୁକ୍ତ ପ୍ରଶିକ୍ଷଣ ଏବଂ ସଫ୍ଟୱେର୍ ମାଧ୍ୟମରେ ଦୁର୍ଘଟଣା ରୋକାଯାଇପାରିବ। ସମସ୍ତ ସହାୟତା ପାଇଁ ଭର୍ଚ୍ଚୋଏ ଟେକ୍ନୋଲୋଜିଜ୍‌କୁ ଧନ୍ୟବାଦ।",
+      rating: "Quote",
+    },
+    { name: "Manoj Behera", rating: "ଉତ୍କୃଷ୍ଟ" },
+    { name: "Mamata Sahu", rating: "ଉତ୍କୃଷ୍ଟ" },
+    { name: "Purnima Rath", rating: "ଉତ୍କୃଷ୍ଟ" },
+    { name: "Ajay Sahu", rating: "ଉତ୍କୃଷ୍ଟ" },
+    { name: "Rajshree Dhal", rating: "ଉତ୍କୃଷ୍ଟ" },
+    { name: "Barsha Behera", rating: "ଉତ୍କୃଷ୍ଟ" },
+  ],
+};
+
+export function TestimonialsSection() {
+  const { lang, t } = useLanguage();
+  const currentTestimonials = TESTIMONIALS_MAP[lang] || TESTIMONIALS_MAP.en;
+  const quotes = currentTestimonials.filter((item) => item.quote);
+  const excellentReviews = currentTestimonials.filter((item) => !item.quote);
+  const [activeQuote, setActiveQuote] = useState(0);
+
+  const current = quotes[activeQuote] || quotes[0];
 
   return (
     <section className="relative overflow-hidden border-t border-border bg-background py-24">
@@ -91,7 +167,7 @@ export function TestimonialsSection() {
                   <div className="min-h-[140px]">
                     <AnimatePresence mode="wait">
                       <motion.p
-                        key={activeQuote}
+                        key={`${activeQuote}-${lang}`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}

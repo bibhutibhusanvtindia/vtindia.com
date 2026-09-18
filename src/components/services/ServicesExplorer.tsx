@@ -1,22 +1,23 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, Sparkles, Code2, Globe, ShieldCheck, Zap } from "lucide-react";
+import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { Icon } from "@/lib/icons";
-import { services } from "@/data/services";
+import { getLocalizedServices } from "@/data/localizedServices";
+import { useLanguage } from "@/lib/translations";
 
 export function ServicesExplorer() {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const { lang, t } = useLanguage();
+  const localizedServices = getLocalizedServices(lang);
 
   return (
     <section className="py-16 sm:py-20">
       <Container>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, i) => (
+          {localizedServices.map((service, i) => (
             <Reveal key={service.slug} delay={(i % 3) * 0.07}>
               <Link href={`/services/${service.slug}`} className="block h-full">
                 <SpotlightCard
@@ -56,7 +57,7 @@ export function ServicesExplorer() {
 
                   <div className="mt-8 flex items-center justify-between border-t border-border/70 pt-4">
                     <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
-                      Consultation &amp; Roadmap
+                      {t("services_consultation")}
                       <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </span>
                   </div>

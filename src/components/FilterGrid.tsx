@@ -3,14 +3,35 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { ExternalLink, Search, Sparkles, Building2 } from "lucide-react";
+import { ExternalLink, Search, Building2 } from "lucide-react";
 import { clsx } from "clsx";
 import type { ClientEntry } from "@/data/portfolio";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { useLanguage } from "@/lib/translations";
 
 export function FilterGrid({ items, categories }: { items: ClientEntry[]; categories: readonly string[] }) {
+  const { t } = useLanguage();
   const [active, setActive] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case "All":
+        return t("clients_cat_all");
+      case "Educational Institutions":
+        return t("clients_cat_edu");
+      case "Healthcare Providers":
+        return t("clients_cat_health");
+      case "Hotels & Hospitality":
+        return t("clients_cat_hotel");
+      case "Industrial & Corporate":
+        return t("clients_cat_ind");
+      case "Government & Associations":
+        return t("clients_cat_gov");
+      default:
+        return category;
+    }
+  };
 
   const visible = useMemo(() => {
     let result = active === "All" ? items : items.filter((item) => item.category === active);
@@ -51,7 +72,7 @@ export function FilterGrid({ items, categories }: { items: ClientEntry[]; catego
                   : "bg-surface-muted text-muted hover:bg-surface-muted/80 hover:text-foreground",
               )}
             >
-              {category}
+              {getCategoryLabel(category)}
               <span className={clsx("ml-1.5 font-mono text-[11px]", active === category ? "text-white/90" : "text-muted/70")}>
                 {countFor(category)}
               </span>
@@ -64,7 +85,7 @@ export function FilterGrid({ items, categories }: { items: ClientEntry[]; catego
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <input
             type="text"
-            placeholder="Search 84+ client organizations..."
+            placeholder={t("clients_search_ph")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-xl border border-border bg-surface-muted/50 py-2 pl-10 pr-4 text-xs font-medium text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -74,7 +95,7 @@ export function FilterGrid({ items, categories }: { items: ClientEntry[]; catego
 
       <div className="mt-6 flex items-center justify-between text-xs text-muted">
         <span>
-          Showing <strong className="text-foreground">{visible.length}</strong> of {items.length} verified partner organizations
+          {t("products_showing")} <strong className="text-foreground">{visible.length}</strong> {t("products_of")} {items.length} {t("clients_verified_partners")}
         </span>
         {(active !== "All" || searchQuery) && (
           <button
@@ -84,7 +105,7 @@ export function FilterGrid({ items, categories }: { items: ClientEntry[]; catego
             }}
             className="font-semibold text-primary hover:underline"
           >
-            Reset filter &amp; search
+            {t("clients_reset")}
           </button>
         )}
       </div>
@@ -124,7 +145,7 @@ export function FilterGrid({ items, categories }: { items: ClientEntry[]; catego
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-semibold text-muted">
-                          {item.category}
+                          {getCategoryLabel(item.category)}
                         </span>
                         <h3 className="mt-2 text-sm font-bold tracking-tight text-foreground">{item.name}</h3>
                         {item.location ? <p className="mt-1 text-xs text-muted">{item.location}</p> : null}
@@ -140,11 +161,11 @@ export function FilterGrid({ items, categories }: { items: ClientEntry[]; catego
 
                 {item.linkStatus === "unavailable" ? (
                   <p className="mt-3 border-t border-border/70 pt-2 text-[10px] text-muted">
-                    Private enterprise intranet deployment
+                    {t("clients_private_deployment")}
                   </p>
                 ) : isLinked ? (
                   <div className="mt-4 border-t border-border/70 pt-2 text-[11px] font-semibold text-primary">
-                    Visit portal &rarr;
+                    {t("clients_visit_portal")}
                   </div>
                 ) : null}
               </SpotlightCard>
@@ -175,11 +196,10 @@ export function FilterGrid({ items, categories }: { items: ClientEntry[]; catego
 
       {visible.length === 0 ? (
         <div className="mt-12 rounded-2xl border border-border/80 bg-surface p-12 text-center">
-          <p className="text-base font-semibold text-foreground">No organizations matching your search</p>
-          <p className="mt-1 text-xs text-muted">Try clearing your search query or selecting a different category.</p>
+          <p className="text-base font-semibold text-foreground">{t("clients_no_match")}</p>
+          <p className="mt-1 text-xs text-muted">{t("clients_no_match_sub")}</p>
         </div>
       ) : null}
     </div>
   );
 }
-

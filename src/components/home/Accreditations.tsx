@@ -4,15 +4,35 @@ import Image from "next/image";
 import { ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { accreditations } from "@/data/site";
 import { useLanguage } from "@/lib/translations";
 
-/**
- * Migrated from the old homepage's scrolling logo strip.
- * Localized badge and heading based on active language.
- */
+const ACCREDITATIONS_MAP = {
+  en: [
+    { name: "ISO 9001 Certified", image: "/images/partners/partner1.png" },
+    { name: "OCAC Odisha", image: "/images/partners/partner2.png" },
+    { name: "MSME Govt of India", image: "/images/partners/partner3.png" },
+    { name: "Startup India", image: "/images/partners/partner4.png" },
+    { name: "Startup Odisha", image: "/images/partners/partner5.png" },
+  ],
+  hi: [
+    { name: "आईएसओ 9001 प्रमाणित", image: "/images/partners/partner1.png" },
+    { name: "ओसीएसी ओडिशा", image: "/images/partners/partner2.png" },
+    { name: "एमएसएमई भारत सरकार", image: "/images/partners/partner3.png" },
+    { name: "स्टार्टअप इंडिया", image: "/images/partners/partner4.png" },
+    { name: "स्टार्टअप ओडिशा", image: "/images/partners/partner5.png" },
+  ],
+  or: [
+    { name: "ISO 9001 ପ୍ରମାଣିତ", image: "/images/partners/partner1.png" },
+    { name: "OCAC ଓଡ଼ିଶା", image: "/images/partners/partner2.png" },
+    { name: "MSME ଭାରତ ସରକାର", image: "/images/partners/partner3.png" },
+    { name: "ଷ୍ଟାର୍ଟଅପ୍ ଇଣ୍ଡିଆ", image: "/images/partners/partner4.png" },
+    { name: "ଷ୍ଟାର୍ଟଅପ୍ ଓଡ଼ିଶା", image: "/images/partners/partner5.png" },
+  ],
+};
+
 export function Accreditations() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const items = ACCREDITATIONS_MAP[lang] || ACCREDITATIONS_MAP.en;
 
   return (
     <section className="relative overflow-hidden border-t border-border py-20">
@@ -39,7 +59,7 @@ export function Accreditations() {
 
         <Reveal delay={0.1}>
           <ul className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {accreditations.map((item) => (
+            {items.map((item) => (
               <li
                 key={item.name}
                 className="group relative flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-5 transition-all duration-400 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10"
@@ -58,7 +78,7 @@ export function Accreditations() {
                   />
                 </div>
                 <p className="text-center text-[11px] font-medium leading-tight text-muted">
-                  {item.name.split("—")[0].trim()}
+                  {item.name}
                 </p>
               </li>
             ))}

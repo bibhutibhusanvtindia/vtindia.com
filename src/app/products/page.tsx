@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PageHero } from "@/components/ui/PageHero";
-import { ProductsExplorer } from "@/components/products/ProductsExplorer";
+import { ProductsContent } from "@/components/products/ProductsContent";
 
 export const metadata: Metadata = {
   title: "Proprietary Software Products & IP Engines",
@@ -10,17 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ProductsPage() {
-  return (
-    <>
-      <PageHero
-        eyebrow="Proprietary Product Ecosystem"
-        title="Field-Tested Software Systems & Spatial Engines"
-        description="16 production software systems spanning industrial safety, enterprise ERP, hospital healthcare, and immersive AR/VR simulation — ready for custom enterprise deployment."
-        breadcrumb={[{ label: "Products" }]}
-      />
-
-      <ProductsExplorer />
-    </>
-  );
+  return <ProductsContent />;
 }
-

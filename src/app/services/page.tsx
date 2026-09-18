@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { PageHero } from "@/components/ui/PageHero";
-import { ServicesExplorer } from "@/components/services/ServicesExplorer";
+import { ServicesContent } from "@/components/services/ServicesContent";
 
 export const metadata: Metadata = {
   title: "Enterprise IT & Software Engineering Services",
@@ -10,17 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ServicesPage() {
-  return (
-    <>
-      <PageHero
-        eyebrow="Engineering Service Lines"
-        title="Enterprise Capabilities Architected for Scale"
-        description="Eight specialized service lines delivered by IIT alumni engineering pods, refined over a decade of production execution across Eastern India, the UAE and the UK."
-        breadcrumb={[{ label: "Services" }]}
-      />
-
-      <ServicesExplorer />
-    </>
-  );
+  return <ServicesContent />;
 }
-

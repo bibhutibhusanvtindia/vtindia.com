@@ -5,13 +5,15 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Container } from "@/components/ui/Container";
 import { site } from "@/data/site";
-import { services } from "@/data/services";
-import { products } from "@/data/products";
+import { getLocalizedServices } from "@/data/localizedServices";
+import { getLocalizedProducts } from "@/data/localizedProducts";
 import { FacebookIcon, LinkedinIcon, XIcon, YoutubeIcon } from "@/lib/social-icons";
 import { useLanguage } from "@/lib/translations";
 
 export function Footer() {
   const { lang, t } = useLanguage();
+  const localizedServices = getLocalizedServices(lang);
+  const localizedProducts = getLocalizedProducts(lang);
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-surface-muted">
@@ -57,7 +59,7 @@ export function Footer() {
         <div>
           <p className="text-sm font-semibold">{t("nav_services")}</p>
           <ul className="mt-4 space-y-2">
-            {services.slice(0, 6).map((s) => (
+            {localizedServices.slice(0, 6).map((s) => (
               <li key={s.slug}>
                 <Link href={`/services/${s.slug}`} className="text-sm text-muted transition hover:text-foreground">
                   {s.name}
@@ -70,7 +72,7 @@ export function Footer() {
         <div>
           <p className="text-sm font-semibold">{t("nav_products")}</p>
           <ul className="mt-4 space-y-2">
-            {products.slice(0, 6).map((p) => (
+            {localizedProducts.slice(0, 6).map((p) => (
               <li key={p.slug}>
                 <Link href={`/products/${p.slug}`} className="text-sm text-muted transition hover:text-foreground">
                   {p.name}

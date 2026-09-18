@@ -2,27 +2,30 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Search, Sparkles, Filter, CheckCircle2 } from "lucide-react";
+import { ArrowUpRight, Search } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { Icon } from "@/lib/icons";
-import { products, type Product } from "@/data/products";
-
-const CATEGORIES = [
-  { id: "all", label: "All Products" },
-  { id: "safety", label: "Industrial & Safety" },
-  { id: "erp", label: "Enterprise & ERP" },
-  { id: "spatial", label: "AR/VR & Spatial" },
-  { id: "specialized", label: "Healthcare & Portals" },
-];
+import { getLocalizedProducts } from "@/data/localizedProducts";
+import { useLanguage } from "@/lib/translations";
 
 export function ProductsExplorer() {
+  const { lang, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const filteredProducts = products.filter((p) => {
-    // Search match
+  const categories = [
+    { id: "all", label: t("products_cat_all") },
+    { id: "safety", label: t("products_cat_safety") },
+    { id: "erp", label: t("products_cat_erp") },
+    { id: "spatial", label: t("products_cat_spatial") },
+    { id: "specialized", label: t("products_cat_specialized") },
+  ];
+
+  const localizedProducts = getLocalizedProducts(lang);
+
+  const filteredProducts = localizedProducts.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -63,7 +66,7 @@ export function ProductsExplorer() {
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/80 bg-surface p-4 shadow-sm backdrop-blur-sm sm:p-5">
           {/* Category Chips */}
           <div className="flex flex-wrap items-center gap-2">
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
@@ -83,7 +86,7 @@ export function ProductsExplorer() {
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
               type="text"
-              placeholder="Search 16 systems..."
+              placeholder={t("products_search_ph")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-xl border border-border bg-surface-muted/50 py-2 pl-10 pr-4 text-xs font-medium text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -94,10 +97,11 @@ export function ProductsExplorer() {
         {/* Results Count */}
         <div className="mt-6 flex items-center justify-between text-xs text-muted">
           <span>
-            Showing <strong className="text-foreground">{filteredProducts.length}</strong> of{" "}
-            {products.length} proprietary software systems
+            {t("products_showing")}{" "}
+            <strong className="text-foreground">{filteredProducts.length}</strong> {t("products_of")}{" "}
+            {localizedProducts.length} {t("products_software_systems")}
           </span>
-          {selectedCategory !== "all" && (
+          {(selectedCategory !== "all" || searchQuery.length > 0) && (
             <button
               onClick={() => {
                 setSelectedCategory("all");
@@ -105,7 +109,7 @@ export function ProductsExplorer() {
               }}
               className="font-semibold text-primary hover:underline"
             >
-              Reset filters
+              {t("products_reset_filters")}
             </button>
           )}
         </div>
@@ -125,7 +129,7 @@ export function ProductsExplorer() {
                         <Icon name={product.icon} className="h-5 w-5" />
                       </div>
                       <span className="rounded-full border border-border/80 bg-surface-muted px-2.5 py-0.5 font-mono text-[10px] font-bold text-muted group-hover:text-primary">
-                        IP ENGINE
+                        {t("products_ip_engine")}
                       </span>
                     </div>
 
@@ -139,9 +143,9 @@ export function ProductsExplorer() {
                     {product.usedBy && product.usedBy.length > 0 && (
                       <div className="mt-5 border-t border-border/70 pt-3.5">
                         <p className="text-[11px] font-semibold text-muted">
-                          <span className="text-foreground">Live Deployments: </span>
+                          <span className="text-foreground">{t("products_live_deployments")} </span>
                           {product.usedBy.slice(0, 2).join(", ")}
-                          {product.usedBy.length > 2 ? ` +${product.usedBy.length - 2} more` : ""}
+                          {product.usedBy.length > 2 ? ` +${product.usedBy.length - 2} ${t("products_more")}` : ""}
                         </p>
                       </div>
                     )}
@@ -149,7 +153,7 @@ export function ProductsExplorer() {
 
                   <div className="mt-6 flex items-center justify-between border-t border-border/70 pt-4">
                     <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
-                      Explore Architecture Specs
+                      {t("products_explore_specs")}
                       <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </span>
                   </div>
