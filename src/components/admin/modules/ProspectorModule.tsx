@@ -112,18 +112,18 @@ export function ProspectorModule({
   return (
     <div className="space-y-6">
       {/* Module Header */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-[#3D1E30] bg-gradient-to-r from-[#1C0915] via-[#12060E] to-[#2B0E1E] p-5 shadow-2xl sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-rose-200/70 bg-gradient-to-r from-rose-50/90 via-pink-50/50 to-rose-100/50 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D6135F]/20 text-[#FF4D8D]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-100 text-[#D6135F] shadow-sm">
               <MapPin className="h-4 w-4" />
             </span>
-            <h2 className="text-xl font-black tracking-tight text-white">AI B2B Maps Prospector &amp; Lead Engine</h2>
+            <h2 className="text-xl font-bold tracking-tight text-slate-900">AI B2B Maps Prospector &amp; Lead Engine</h2>
             <Badge variant="brand" size="xs">
               Live Geo-Discovery
             </Badge>
           </div>
-          <p className="text-xs text-rose-200/60">
+          <p className="text-xs text-slate-600">
             Locate high-value commercial enterprises, diagnose tech &amp; digital gaps, and generate customized cold-call pitches.
           </p>
         </div>
@@ -131,7 +131,7 @@ export function ProspectorModule({
         <Button
           onClick={handleSimulateScan}
           disabled={isScanning}
-          className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white gap-1.5 shadow-md shadow-[#F0186C]/25 font-bold"
+          className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white gap-1.5 shadow-sm shadow-[#F0186C]/25 font-bold"
         >
           <Sparkles className={`h-3.5 w-3.5 ${isScanning ? "animate-spin" : ""}`} />
           <span>{isScanning ? "AI Scouting Geo-Nodes..." : "AI Scout New Enterprises"}</span>
@@ -139,14 +139,14 @@ export function ProspectorModule({
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#3D1E30] bg-[#12070E] p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-2.5 flex-1">
           {/* City Selector */}
           <div className="w-48">
             <Select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="bg-[#1A0B16] border-[#3D1E30] text-rose-100 text-xs"
+              className="bg-white border-slate-200 text-slate-800 text-xs"
             >
               {CITIES.map((c) => (
                 <option key={c} value={c}>{c}</option>
@@ -159,7 +159,7 @@ export function ProspectorModule({
             <Select
               value={selectedSector}
               onChange={(e) => setSelectedSector(e.target.value)}
-              className="bg-[#1A0B16] border-[#3D1E30] text-rose-100 text-xs"
+              className="bg-white border-slate-200 text-slate-800 text-xs"
             >
               {SECTORS.map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -169,20 +169,20 @@ export function ProspectorModule({
 
           {/* Search Input */}
           <div className="relative w-56">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-rose-400/60" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <Input
               type="text"
               placeholder="Search companies, leads..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 bg-[#1A0B16] border-[#3D1E30] text-rose-100 text-xs placeholder:text-rose-300/40"
+              className="pl-8 bg-white border-slate-200 text-slate-800 text-xs placeholder:text-slate-400"
             />
           </div>
         </div>
 
-        <div className="text-xs text-rose-300/70">
+        <div className="text-xs text-slate-500">
           <span>
-            Found <strong className="text-white">{filteredProspects.length}</strong> Target Enterprises
+            Found <strong className="text-slate-900">{filteredProspects.length}</strong> Target Enterprises
           </span>
         </div>
       </div>
@@ -199,19 +199,19 @@ export function ProspectorModule({
                 <div
                   key={prosp.id}
                   onClick={() => setActiveProspectId(prosp.id)}
-                  className={`group relative flex flex-col gap-2 rounded-2xl border p-4 cursor-pointer transition-all ${
+                  className={`group relative flex flex-col gap-2 rounded-2xl border p-4 cursor-pointer transition-all shadow-sm ${
                     isSelected
-                      ? "border-[#F0186C] bg-[#1E0C18] shadow-lg shadow-[#F0186C]/10 ring-1 ring-[#F0186C]"
-                      : "border-[#2D1625] bg-[#12070E] hover:border-[#F0186C]/40 hover:bg-[#1A0B16]"
+                      ? "border-[#F0186C] bg-rose-50/60 ring-1 ring-[#F0186C]"
+                      : "border-slate-200/80 bg-white hover:border-rose-300 hover:bg-rose-50/30"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h4 className="text-xs font-bold text-rose-100 group-hover:text-[#FF4D8D] transition-colors">
+                      <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#D6135F] transition-colors">
                         {prosp.companyName}
                       </h4>
-                      <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-                        <MapPin className="h-3 w-3 shrink-0 text-[#FF4D8D]" />
+                      <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-500">
+                        <MapPin className="h-3 w-3 shrink-0 text-[#D6135F]" />
                         <span>{prosp.location}</span>
                       </div>
                     </div>
@@ -222,22 +222,22 @@ export function ProspectorModule({
                   </div>
 
                   {/* Decision Maker */}
-                  <div className="flex items-center justify-between text-[11px] border-t border-[#2A1322] pt-2 text-slate-400">
+                  <div className="flex items-center justify-between text-[11px] border-t border-slate-100 pt-2 text-slate-600">
                     <span>
-                      <strong className="text-rose-100">{prosp.contactPerson}</strong> ({prosp.role})
+                      <strong className="text-slate-900">{prosp.contactPerson}</strong> ({prosp.role})
                     </span>
-                    <span className="font-mono font-bold text-emerald-400">
+                    <span className="font-mono font-bold text-emerald-700">
                       {prosp.estimatedDealValue}
                     </span>
                   </div>
 
                   {/* Tech gaps count */}
-                  <div className="flex items-center justify-between text-[10px] text-slate-400">
-                    <span className="flex items-center gap-1 text-amber-400 font-semibold">
+                  <div className="flex items-center justify-between text-[10px] text-slate-500">
+                    <span className="flex items-center gap-1 text-amber-700 font-semibold">
                       <AlertCircle className="h-3 w-3" />
                       {prosp.techGaps.length} Tech Gaps Diagnosed
                     </span>
-                    <Badge variant="outline" size="xs" className="capitalize border-[#3D1E30] text-rose-200">
+                    <Badge variant="outline" size="xs" className="capitalize border-slate-200 text-slate-700">
                       {prosp.status.replace("_", " ")}
                     </Badge>
                   </div>
@@ -249,22 +249,22 @@ export function ProspectorModule({
 
         {/* Right Column: Deep Tech Gap Diagnosis & Pitch Engine */}
         {activeProspect ? (
-          <Card className="border-[#3D1E30] bg-[#10070D]/95 shadow-2xl">
-            <CardHeader className="flex flex-row items-start justify-between pb-3 border-b border-[#2A1322]">
+          <Card className="border-slate-200/80 bg-white shadow-sm">
+            <CardHeader className="flex flex-row items-start justify-between pb-3 border-b border-slate-100">
               <div>
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-base text-white">{activeProspect.companyName}</CardTitle>
+                  <CardTitle className="text-base text-slate-900">{activeProspect.companyName}</CardTitle>
                   <Badge variant="brand" size="xs">
                     {activeProspect.category}
                   </Badge>
                 </div>
-                <CardDescription className="flex items-center gap-3 mt-1 text-xs text-rose-200/60">
+                <CardDescription className="flex items-center gap-3 mt-1 text-xs text-slate-500">
                   <span>📍 {activeProspect.location}</span>
                   <a
                     href={activeProspect.website}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 text-[#FF4D8D] hover:underline font-semibold"
+                    className="flex items-center gap-1 text-[#D6135F] hover:underline font-semibold"
                   >
                     <Globe className="h-3 w-3" />
                     Visit Website
@@ -278,7 +278,7 @@ export function ProspectorModule({
                 <Select
                   value={activeProspect.status}
                   onChange={(e) => onUpdateStatus(activeProspect.id, e.target.value as ProspectItem["status"])}
-                  className="bg-[#1A0B16] border-[#3D1E30] text-rose-100 text-xs"
+                  className="bg-white border-slate-200 text-slate-800 text-xs"
                 >
                   <option value="discovered">🔍 Discovered</option>
                   <option value="contacted">📞 Contacted</option>
@@ -290,21 +290,21 @@ export function ProspectorModule({
 
             <CardContent className="pt-5 space-y-5">
               {/* Verified Decision Maker Contact Card */}
-              <div className="grid grid-cols-2 gap-3 rounded-2xl border border-[#2D1625] bg-[#160A13] p-3.5 text-xs">
+              <div className="grid grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5 text-xs">
                 <div>
-                  <div className="text-[10px] text-rose-300/70 uppercase font-bold tracking-wider">Primary Contact</div>
-                  <div className="font-bold text-white mt-0.5">{activeProspect.contactPerson}</div>
-                  <div className="text-[11px] text-slate-400">{activeProspect.role}</div>
+                  <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Primary Contact</div>
+                  <div className="font-bold text-slate-900 mt-0.5">{activeProspect.contactPerson}</div>
+                  <div className="text-[11px] text-slate-600">{activeProspect.role}</div>
                 </div>
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-rose-100 font-medium">
-                    <Phone className="h-3.5 w-3.5 text-[#FF4D8D]" />
+                  <div className="flex items-center gap-2 text-slate-800 font-medium">
+                    <Phone className="h-3.5 w-3.5 text-[#D6135F]" />
                     <a href={`tel:${activeProspect.phone}`} className="hover:underline">
                       {activeProspect.phone}
                     </a>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <Mail className="h-3.5 w-3.5 text-[#FF4D8D]" />
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Mail className="h-3.5 w-3.5 text-[#D6135F]" />
                     <a href={`mailto:${activeProspect.email}`} className="hover:underline truncate">
                       {activeProspect.email}
                     </a>
@@ -314,17 +314,17 @@ export function ProspectorModule({
 
               {/* AI Diagnosed Technical Gaps */}
               <div>
-                <label className="text-[11px] font-bold text-rose-300/70 uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertCircle className="h-3.5 w-3.5 text-amber-400" />
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
                   <span>AI Diagnosed Architecture &amp; Operational Gaps</span>
                 </label>
                 <div className="mt-2 space-y-1.5">
                   {activeProspect.techGaps.map((gap, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-2.5 text-xs text-rose-50"
+                      className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50/70 p-2.5 text-xs text-amber-950"
                     >
-                      <span className="font-mono text-[10px] font-bold text-amber-400 mt-0.5">0{idx + 1}</span>
+                      <span className="font-mono text-[10px] font-bold text-amber-700 mt-0.5">0{idx + 1}</span>
                       <span>{gap}</span>
                     </div>
                   ))}
@@ -333,32 +333,33 @@ export function ProspectorModule({
 
               {/* Tailored Value Proposition Pitch */}
               <div>
-                <label className="text-[11px] font-bold text-rose-300/70 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5 text-[#FF4D8D]" />
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-[#D6135F]" />
                   <span>Personalized Executive Value Pitch</span>
                 </label>
-                <div className="mt-1.5 rounded-2xl border border-[#2D1625] bg-[#160A13] p-3.5 text-xs leading-relaxed text-rose-100">
+                <div className="mt-1.5 rounded-2xl border border-rose-100 bg-rose-50/50 p-3.5 text-xs leading-relaxed text-slate-800">
                   {activeProspect.customPitch}
                 </div>
               </div>
 
               {/* Ready Cold-Call Script Box */}
-              <div className="rounded-2xl border border-[#3D1E30] bg-[#160A13] p-4 space-y-2.5">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#FF4D8D]">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#D6135F]">
                     <span>📞 60-Second Cold-Call Telephone Script</span>
                   </div>
                   <Button
                     variant="outline"
                     size="xs"
                     onClick={() => handleCopy(activeProspect.coldCallScript, activeProspect.id)}
+                    className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                   >
-                    {copiedId === activeProspect.id ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                    {copiedId === activeProspect.id ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
                     <span>{copiedId === activeProspect.id ? "Script Copied" : "Copy Script"}</span>
                   </Button>
                 </div>
 
-                <div className="rounded-xl border border-[#2D1625] bg-[#10070D] p-3 text-xs leading-relaxed text-rose-50 whitespace-pre-wrap font-sans">
+                <div className="rounded-xl border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-800 whitespace-pre-wrap font-sans">
                   &ldquo;{activeProspect.coldCallScript}&rdquo;
                 </div>
               </div>

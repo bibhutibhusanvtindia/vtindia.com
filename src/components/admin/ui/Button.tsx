@@ -11,15 +11,15 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => {
     const variantStyles = {
-      default: "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white hover:brightness-110 shadow-md shadow-[#F0186C]/25 active:scale-[0.98]",
-      brand: "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white hover:brightness-110 shadow-md shadow-[#F0186C]/25 active:scale-[0.98]",
-      secondary: "bg-[#22121D] text-slate-200 border border-[#3D1E30] hover:bg-[#2E1827] active:scale-[0.98]",
-      outline: "border border-[#3D1E30] bg-[#160A12] text-slate-200 hover:border-[#F0186C]/50 hover:bg-[#24101D] hover:text-white active:scale-[0.98]",
-      ghost: "text-slate-300 hover:bg-[#24101D] hover:text-white active:scale-[0.98]",
-      destructive: "bg-rose-600 text-white hover:bg-rose-700 shadow-sm active:scale-[0.98]",
-      link: "text-[#FF4D8D] underline-offset-4 hover:underline p-0 h-auto",
-      emerald: "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:scale-[0.98]",
-      indigo: "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white hover:brightness-110 shadow-md shadow-[#F0186C]/25 active:scale-[0.98]",
+      default: "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white hover:brightness-105 shadow-sm active:scale-[0.98]",
+      brand: "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white hover:brightness-105 shadow-sm active:scale-[0.98]",
+      secondary: "bg-slate-100 text-slate-800 border border-slate-200 hover:bg-slate-200 active:scale-[0.98]",
+      outline: "border border-slate-200 bg-white text-slate-700 hover:border-rose-300 hover:bg-rose-50/50 hover:text-[#D6135F] active:scale-[0.98]",
+      ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98]",
+      destructive: "bg-rose-600 text-white hover:bg-rose-700 shadow-xs active:scale-[0.98]",
+      link: "text-[#D6135F] underline-offset-4 hover:underline p-0 h-auto font-medium",
+      emerald: "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs active:scale-[0.98]",
+      indigo: "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white hover:brightness-105 shadow-sm active:scale-[0.98]",
     }[variant];
 
     const sizeStyles = {

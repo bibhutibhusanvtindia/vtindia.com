@@ -25,11 +25,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { PipelineDeal, DealStage } from "@/data/admin/types";
 
 const STAGES: { id: DealStage; label: string; color: string; bg: string }[] = [
-  { id: "discovery", label: "1. Discovery & Qualify", color: "text-blue-400", bg: "border-blue-500/30 bg-blue-950/20" },
-  { id: "scoping", label: "2. Scoping & Gap Analysis", color: "text-purple-400", bg: "border-purple-500/30 bg-purple-950/20" },
-  { id: "proposal", label: "3. Tech Architecture & Proposal", color: "text-amber-400", bg: "border-amber-500/30 bg-amber-950/20" },
-  { id: "negotiation", label: "4. Security & Negotiation", color: "text-[#FF4D8D]", bg: "border-[#F0186C]/30 bg-[#240C1B]/20" },
-  { id: "won", label: "5. Closed / Contract Won 🎉", color: "text-emerald-400", bg: "border-emerald-500/30 bg-emerald-950/20" },
+  { id: "discovery", label: "1. Discovery & Qualify", color: "text-blue-700", bg: "border-blue-200 bg-blue-50/40" },
+  { id: "scoping", label: "2. Scoping & Gap Analysis", color: "text-purple-700", bg: "border-purple-200 bg-purple-50/40" },
+  { id: "proposal", label: "3. Tech Architecture & Proposal", color: "text-amber-800", bg: "border-amber-200 bg-amber-50/40" },
+  { id: "negotiation", label: "4. Security & Negotiation", color: "text-[#D6135F]", bg: "border-rose-200 bg-rose-50/40" },
+  { id: "won", label: "5. Closed / Contract Won 🎉", color: "text-emerald-700", bg: "border-emerald-200 bg-emerald-50/40" },
 ];
 
 export function PipelineDealMatrixModule({
@@ -100,18 +100,18 @@ export function PipelineDealMatrixModule({
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-[#3D1E30] bg-gradient-to-r from-[#1C0915] via-[#12060E] to-[#2B0E1E] p-5 shadow-2xl sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-rose-200/80 bg-gradient-to-r from-rose-50/80 via-pink-50/50 to-rose-100/50 p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D6135F]/20 text-[#FF4D8D]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D6135F]/10 text-[#D6135F]">
               <Briefcase className="h-4 w-4" />
             </span>
-            <h2 className="text-xl font-black tracking-tight text-white">B2B Deal Pipeline & Growth Matrix</h2>
+            <h2 className="text-xl font-black tracking-tight text-slate-900">B2B Deal Pipeline &amp; Growth Matrix</h2>
             <Badge variant="brand" size="sm">
               6 Active Deals
             </Badge>
           </div>
-          <p className="text-xs text-rose-200/60">
+          <p className="text-xs text-slate-600">
             Real-time visual CRM forecasting, AI deal health diagnostics, and automated stage progression.
           </p>
         </div>
@@ -120,7 +120,7 @@ export function PipelineDealMatrixModule({
           <Select
             value={sectorFilter}
             onChange={(e) => setSectorFilter(e.target.value)}
-            className="w-44 text-xs bg-[#160A12] border-[#3D1E30] text-rose-100"
+            className="w-44 text-xs bg-white border-slate-200 text-slate-800"
           >
             <option value="all">All B2B Sectors</option>
             <option value="Logistics & Supply Chain">Logistics & Supply Chain</option>
@@ -133,41 +133,41 @@ export function PipelineDealMatrixModule({
 
           <Dialog open={isNewDialogOpen} onOpenChange={setIsNewDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white gap-1.5 shadow-md shadow-[#F0186C]/25">
+              <Button size="sm" className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white gap-1.5 shadow-sm">
                 <Plus className="h-3.5 w-3.5" />
                 Add New Deal
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md bg-[#0E060C] border-[#3D1E30] text-slate-100">
+            <DialogContent className="max-w-md bg-white border-slate-200 text-slate-900 shadow-xl">
               <DialogHeader>
-                <DialogTitle className="text-white">Create B2B Pipeline Deal</DialogTitle>
-                <DialogDescription className="text-rose-200/60 text-xs">
+                <DialogTitle className="text-slate-900">Create B2B Pipeline Deal</DialogTitle>
+                <DialogDescription className="text-slate-500 text-xs">
                   Register a high-value enterprise prospect into the revenue pipeline matrix.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-3 py-2 text-xs">
                 <div>
-                  <label className="text-[11px] font-semibold text-rose-200">Project / Scope Title</label>
+                  <label className="text-[11px] font-semibold text-slate-700">Project / Scope Title</label>
                   <Input
                     placeholder="e.g. 6-DoF VR Crane Hazard Training Suite"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="mt-1 bg-[#160A12] border-[#3D1E30]"
+                    className="mt-1 bg-white border-slate-200"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-rose-200">Target Enterprise / Client</label>
+                  <label className="text-[11px] font-semibold text-slate-700">Target Enterprise / Client</label>
                   <Input
                     placeholder="e.g. JSW Steel / Kalinga Port"
                     value={newCompany}
                     onChange={(e) => setNewCompany(e.target.value)}
-                    className="mt-1 bg-[#160A12] border-[#3D1E30]"
+                    className="mt-1 bg-white border-slate-200"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[11px] font-semibold text-rose-200">Sector</label>
-                    <Select value={newSector} onChange={(e) => setNewSector(e.target.value)} className="mt-1 bg-[#160A12] border-[#3D1E30]">
+                    <label className="text-[11px] font-semibold text-slate-700">Sector</label>
+                    <Select value={newSector} onChange={(e) => setNewSector(e.target.value)} className="mt-1 bg-white border-slate-200">
                       <option value="Heavy Steel & Mining">Heavy Steel & Mining</option>
                       <option value="Logistics & Supply Chain">Logistics & Supply Chain</option>
                       <option value="Hospitals & Healthcare">Hospitals & Healthcare</option>
@@ -177,30 +177,30 @@ export function PipelineDealMatrixModule({
                     </Select>
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-rose-200">Estimated Value (₹ INR)</label>
+                    <label className="text-[11px] font-semibold text-slate-700">Estimated Value (₹ INR)</label>
                     <Input
                       type="number"
                       placeholder="850000"
                       value={newValue}
                       onChange={(e) => setNewValue(e.target.value)}
-                      className="mt-1 bg-[#160A12] border-[#3D1E30]"
+                      className="mt-1 bg-white border-slate-200"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[11px] font-semibold text-rose-200">Win Probability (%)</label>
+                    <label className="text-[11px] font-semibold text-slate-700">Win Probability (%)</label>
                     <Input
                       type="number"
                       placeholder="65"
                       value={newProb}
                       onChange={(e) => setNewProb(e.target.value)}
-                      className="mt-1 bg-[#160A12] border-[#3D1E30]"
+                      className="mt-1 bg-white border-slate-200"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-rose-200">Lead Account Rep</label>
-                    <Select value={newRep} onChange={(e) => setNewRep(e.target.value)} className="mt-1 bg-[#160A12] border-[#3D1E30]">
+                    <label className="text-[11px] font-semibold text-slate-700">Lead Account Rep</label>
+                    <Select value={newRep} onChange={(e) => setNewRep(e.target.value)} className="mt-1 bg-white border-slate-200">
                       <option value="Ashwin Yadav">Ashwin Yadav</option>
                       <option value="Rakesh Panda">Rakesh Panda</option>
                       <option value="Niranjan Sahu">Niranjan Sahu</option>
@@ -209,12 +209,12 @@ export function PipelineDealMatrixModule({
                   </div>
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-rose-200">Current Key Bottleneck / Question</label>
+                  <label className="text-[11px] font-semibold text-slate-700">Current Key Bottleneck / Question</label>
                   <Input
                     placeholder="e.g. Awaiting board budget approval on Phase 1"
                     value={newBottleneck}
                     onChange={(e) => setNewBottleneck(e.target.value)}
-                    className="mt-1 bg-[#160A12] border-[#3D1E30]"
+                    className="mt-1 bg-white border-slate-200"
                   />
                 </div>
               </div>
@@ -233,50 +233,50 @@ export function PipelineDealMatrixModule({
 
       {/* KPI Value Counters */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-[#2D1625] bg-[#12070E]/80 shadow-md">
+        <Card className="border-slate-200/80 bg-white shadow-xs">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs text-rose-300/70">Total Pipeline Value</CardDescription>
-            <CardTitle className="text-2xl font-black text-white font-mono">
+            <CardDescription className="text-xs text-slate-500">Total Pipeline Value</CardDescription>
+            <CardTitle className="text-2xl font-black text-slate-900 font-mono">
               ₹{(totalPipeline / 100000).toFixed(1)} Lakh
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 pt-0 text-[11px] text-emerald-400 font-medium">
+          <CardContent className="p-4 pt-0 text-[11px] text-emerald-600 font-medium">
             Across {deals.length} active enterprise deals
           </CardContent>
         </Card>
 
-        <Card className="border-[#2D1625] bg-[#12070E]/80 shadow-md">
+        <Card className="border-slate-200/80 bg-white shadow-xs">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs text-rose-300/70">Weighted Forecast</CardDescription>
-            <CardTitle className="text-2xl font-black text-[#FF4D8D] font-mono">
+            <CardDescription className="text-xs text-slate-500">Weighted Forecast</CardDescription>
+            <CardTitle className="text-2xl font-black text-[#D6135F] font-mono">
               ₹{(weightedPipeline / 100000).toFixed(1)} Lakh
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 pt-0 text-[11px] text-slate-400">
+          <CardContent className="p-4 pt-0 text-[11px] text-slate-500">
             Probability-adjusted expected close
           </CardContent>
         </Card>
 
-        <Card className="border-[#2D1625] bg-[#12070E]/80 shadow-md">
+        <Card className="border-slate-200/80 bg-white shadow-xs">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs text-rose-300/70">Avg AI Health Score</CardDescription>
-            <CardTitle className="text-2xl font-black text-emerald-400 font-mono">
+            <CardDescription className="text-xs text-slate-500">Avg AI Health Score</CardDescription>
+            <CardTitle className="text-2xl font-black text-emerald-600 font-mono">
               85.8 / 100
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 pt-0 text-[11px] text-emerald-400/90">
-            High conversion velocity & engagement
+          <CardContent className="p-4 pt-0 text-[11px] text-emerald-600/90 font-medium">
+            High conversion velocity &amp; engagement
           </CardContent>
         </Card>
 
-        <Card className="border-[#2D1625] bg-[#12070E]/80 shadow-md">
+        <Card className="border-slate-200/80 bg-white shadow-xs">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs text-rose-300/70">Avg Deal Cycle Time</CardDescription>
-            <CardTitle className="text-2xl font-black text-amber-400 font-mono">
+            <CardDescription className="text-xs text-slate-500">Avg Deal Cycle Time</CardDescription>
+            <CardTitle className="text-2xl font-black text-amber-600 font-mono">
               18.4 Days
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 pt-0 text-[11px] text-slate-400">
+          <CardContent className="p-4 pt-0 text-[11px] text-slate-500">
             Discovery to contract signing
           </CardContent>
         </Card>
@@ -289,16 +289,16 @@ export function PipelineDealMatrixModule({
           const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
 
           return (
-            <div key={stage.id} className="flex flex-col rounded-2xl border border-[#2D1625] bg-[#10070D]/90 p-3 min-h-[450px]">
+            <div key={stage.id} className="flex flex-col rounded-2xl border border-slate-200/80 bg-slate-50/70 p-3 min-h-[450px]">
               {/* Column Header */}
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#2A1322]">
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
                 <div className="space-y-0.5">
                   <span className={`text-xs font-bold tracking-tight ${stage.color}`}>{stage.label}</span>
-                  <p className="text-[10px] text-slate-400 font-mono">
+                  <p className="text-[10px] text-slate-500 font-mono">
                     ₹{(stageValue / 100000).toFixed(1)}L • {stageDeals.length} deals
                   </p>
                 </div>
-                <Badge variant="outline" size="xs" className="border-[#3D1E30] text-rose-200">
+                <Badge variant="outline" size="xs" className="border-slate-200 bg-white text-slate-600">
                   {stageDeals.length}
                 </Badge>
               </div>
@@ -312,44 +312,44 @@ export function PipelineDealMatrixModule({
                     <div
                       key={deal.id}
                       onClick={() => setSelectedDeal(deal)}
-                      className="group relative cursor-pointer rounded-xl border border-[#2D1625] bg-[#160A13] p-3.5 transition-all hover:border-[#F0186C]/50 hover:bg-[#1E0C18] hover:shadow-lg hover:shadow-[#F0186C]/10"
+                      className="group relative cursor-pointer rounded-xl border border-slate-200 bg-white p-3.5 transition-all hover:border-rose-300 hover:bg-rose-50/30 hover:shadow-sm"
                     >
                       {/* Top Row: Company & Value */}
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <span className="text-[10px] font-semibold text-[#FF4D8D] uppercase tracking-wider">
+                          <span className="text-[10px] font-semibold text-[#D6135F] uppercase tracking-wider">
                             {deal.sector}
                           </span>
-                          <h4 className="text-xs font-bold text-rose-100 line-clamp-1 group-hover:text-[#FF4D8D]">
+                          <h4 className="text-xs font-bold text-slate-900 line-clamp-1 group-hover:text-[#D6135F]">
                             {deal.company}
                           </h4>
                         </div>
-                        <span className="rounded-lg bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-400 font-mono shrink-0">
+                        <span className="rounded-lg bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 font-mono shrink-0">
                           ₹{(deal.dealValue / 100000).toFixed(1)}L
                         </span>
                       </div>
 
                       {/* Scope Title */}
-                      <p className="mt-1.5 text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
+                      <p className="mt-1.5 text-[11px] text-slate-600 line-clamp-2 leading-relaxed">
                         {deal.title}
                       </p>
 
                       {/* AI Health Metric & Win Probability */}
-                      <div className="mt-3 flex items-center justify-between border-t border-[#2A1322] pt-2 text-[10px]">
-                        <div className="flex items-center gap-1 text-slate-400">
-                          <Sparkles className="h-3 w-3 text-amber-400" />
+                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px]">
+                        <div className="flex items-center gap-1 text-slate-500">
+                          <Sparkles className="h-3 w-3 text-amber-500" />
                           <span>AI Health:</span>
-                          <span className="font-bold text-emerald-400 font-mono">{deal.aiHealthScore}%</span>
+                          <span className="font-bold text-emerald-600 font-mono">{deal.aiHealthScore}%</span>
                         </div>
-                        <div className="flex items-center gap-1 font-mono text-slate-400">
+                        <div className="flex items-center gap-1 font-mono text-slate-500">
                           <span>Win Prob:</span>
-                          <span className="font-bold text-[#FF4D8D]">{deal.winProbability}%</span>
+                          <span className="font-bold text-[#D6135F]">{deal.winProbability}%</span>
                         </div>
                       </div>
 
                       {/* Rep & Next Stage Action */}
                       <div className="mt-2.5 flex items-center justify-between pt-1">
-                        <span className="text-[10px] text-slate-400 truncate max-w-[100px]">
+                        <span className="text-[10px] text-slate-500 truncate max-w-[100px]">
                           👤 {deal.leadRep.split(" ")[0]}
                         </span>
 
@@ -361,7 +361,7 @@ export function PipelineDealMatrixModule({
                               e.stopPropagation();
                               onUpdateDealStage(deal.id, nextStage);
                             }}
-                            className="h-6 text-[10px] text-[#FF4D8D] hover:text-white hover:bg-[#2B0E1E] p-1 px-1.5 gap-0.5"
+                            className="h-6 text-[10px] text-[#D6135F] hover:text-[#F0186C] hover:bg-rose-50 p-1 px-1.5 gap-0.5 font-semibold"
                           >
                             Advance
                             <ChevronRight className="h-3 w-3" />
@@ -373,8 +373,8 @@ export function PipelineDealMatrixModule({
                 })}
 
                 {stageDeals.length === 0 && (
-                  <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-dashed border-[#2D1625] p-4 text-center">
-                    <p className="text-[11px] text-slate-500">No deals in this stage</p>
+                  <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 p-4 text-center">
+                    <p className="text-[11px] text-slate-400">No deals in this stage</p>
                   </div>
                 )}
               </div>
@@ -385,29 +385,29 @@ export function PipelineDealMatrixModule({
 
       {/* Deal Detail Inspection Drawer / Modal */}
       {selectedDeal && (
-        <Card className="border-[#F0186C]/40 bg-[#0E060C] p-5 shadow-2xl">
+        <Card className="border-rose-200 bg-white p-5 shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <Badge variant="brand" size="sm">
                   {selectedDeal.sector}
                 </Badge>
-                <Badge variant="outline" size="sm" className="border-[#3D1E30] text-rose-200">
+                <Badge variant="outline" size="sm" className="border-slate-200 text-slate-700">
                   📍 {selectedDeal.location}
                 </Badge>
                 <Badge variant="success" size="sm">
                   Win Probability: {selectedDeal.winProbability}%
                 </Badge>
               </div>
-              <h3 className="text-lg font-bold text-white mt-1.5">{selectedDeal.title}</h3>
-              <p className="text-xs text-rose-200/60">
-                Target Enterprise: <strong className="text-rose-100">{selectedDeal.company}</strong> • Managed by{" "}
-                <strong className="text-rose-100">{selectedDeal.leadRep}</strong>
+              <h3 className="text-lg font-bold text-slate-900 mt-1.5">{selectedDeal.title}</h3>
+              <p className="text-xs text-slate-500">
+                Target Enterprise: <strong className="text-slate-800">{selectedDeal.company}</strong> • Managed by{" "}
+                <strong className="text-slate-800">{selectedDeal.leadRep}</strong>
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xl font-black text-emerald-400 font-mono">
+              <span className="text-xl font-black text-emerald-600 font-mono">
                 ₹{(selectedDeal.dealValue / 100000).toFixed(1)} Lakh
               </span>
               <Button size="sm" variant="outline" onClick={() => setSelectedDeal(null)}>
@@ -416,32 +416,32 @@ export function PipelineDealMatrixModule({
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[#2A1322] pt-4">
-            <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-3.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
-                <AlertCircle className="h-3.5 w-3.5" />
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+            <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-3.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800">
+                <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
                 Current Bottleneck / Risk
               </div>
-              <p className="mt-1 text-xs text-slate-300 leading-relaxed">{selectedDeal.aiBottleneck}</p>
+              <p className="mt-1 text-xs text-slate-700 leading-relaxed">{selectedDeal.aiBottleneck}</p>
             </div>
 
-            <div className="rounded-xl border border-[#F0186C]/20 bg-[#240C1B]/20 p-3.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#FF4D8D]">
+            <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-3.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#D6135F]">
                 <Sparkles className="h-3.5 w-3.5" />
                 AI Recommended Next Best Action
               </div>
-              <p className="mt-1 text-xs text-slate-300 leading-relaxed">{selectedDeal.aiNextBestAction}</p>
+              <p className="mt-1 text-xs text-slate-700 leading-relaxed">{selectedDeal.aiNextBestAction}</p>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#2A1322] pt-3 text-xs">
-            <div className="flex items-center gap-2 text-slate-400">
-              <Calendar className="h-3.5 w-3.5 text-rose-400" />
-              <span>Target Close Date: <strong className="text-rose-100">{selectedDeal.expectedClose}</strong></span>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs">
+            <div className="flex items-center gap-2 text-slate-500">
+              <Calendar className="h-3.5 w-3.5 text-rose-500" />
+              <span>Target Close Date: <strong className="text-slate-800">{selectedDeal.expectedClose}</strong></span>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400">Move to Stage:</span>
+              <span className="text-[11px] text-slate-500">Move to Stage:</span>
               {STAGES.map((s) => (
                 <Button
                   key={s.id}
@@ -452,7 +452,7 @@ export function PipelineDealMatrixModule({
                     setSelectedDeal({ ...selectedDeal, stage: s.id });
                   }}
                   className={`text-[10px] ${
-                    selectedDeal.stage === s.id ? "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white" : "border-[#3D1E30] text-rose-200"
+                    selectedDeal.stage === s.id ? "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white" : "border-slate-200 text-slate-700"
                   }`}
                 >
                   {s.label.split(". ")[1]}

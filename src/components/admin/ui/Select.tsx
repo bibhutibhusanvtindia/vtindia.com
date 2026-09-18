@@ -16,20 +16,20 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           className={cn(
-            "flex h-9 w-full appearance-none rounded-xl border border-border bg-surface-muted/60 px-3 py-1 pr-8 text-xs font-medium text-foreground shadow-sm transition-colors focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+            "flex h-9 w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-1 pr-8 text-xs font-medium text-slate-800 shadow-xs transition-colors focus-visible:outline-none focus-visible:border-[#F0186C] focus-visible:ring-1 focus-visible:ring-[#F0186C]/30 disabled:cursor-not-allowed disabled:opacity-50",
             className
           )}
           {...props}
         >
           {options
             ? options.map((opt) => (
-                <option key={opt.value} value={opt.value} className="bg-surface text-foreground">
+                <option key={opt.value} value={opt.value} className="bg-white text-slate-900">
                   {opt.label}
                 </option>
               ))
             : children}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
       </div>
     );
   }

@@ -71,9 +71,9 @@ export function CommandCenterShell() {
 
   if (!isHydrated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400 text-xs">
+      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] text-slate-600 text-xs">
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#F0186C] border-t-transparent" />
           <span>Initializing Virtoy Executive Command Engine...</span>
         </div>
       </div>
@@ -81,7 +81,7 @@ export function CommandCenterShell() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-600 selection:text-white flex antialiased">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 selection:bg-[#F0186C] selection:text-white flex antialiased">
       {/* 1. Left Sidebar Navigation */}
       <AdminSidebar
         activeTab={activeTab}

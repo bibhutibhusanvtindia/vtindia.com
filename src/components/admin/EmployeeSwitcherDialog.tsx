@@ -52,15 +52,15 @@ export function EmployeeSwitcherDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-[#0E060C] border-[#3D1E30] text-slate-100 shadow-2xl">
+      <DialogContent className="max-w-2xl bg-white border-slate-200 text-slate-900 shadow-2xl">
         <DialogHeader>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#D6135F]/20 text-[#FF4D8D]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#D6135F]/10 text-[#D6135F]">
               <Users className="h-5 w-5" />
             </div>
             <div>
-              <DialogTitle className="text-base font-bold text-white">Switch Employee Profile</DialogTitle>
-              <DialogDescription className="text-xs text-rose-200/60">
+              <DialogTitle className="text-base font-bold text-slate-900">Switch Employee Profile</DialogTitle>
+              <DialogDescription className="text-xs text-slate-500">
                 Select your verified Virtoy Technologies employee identity to access role-specific workflows and action audits.
               </DialogDescription>
             </div>
@@ -80,30 +80,30 @@ export function EmployeeSwitcherDialog({
                 onClick={() => handleSwitch(emp)}
                 className={`group relative flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${
                   isSelected
-                    ? "border-[#F0186C] bg-[#220E1C] shadow-lg shadow-[#F0186C]/10 ring-1 ring-[#F0186C]"
-                    : "border-[#2D1625] bg-[#140810] hover:border-[#F0186C]/40 hover:bg-[#1A0B16]"
+                    ? "border-[#F0186C] bg-rose-50/60 shadow-sm ring-1 ring-[#F0186C]"
+                    : "border-slate-200 bg-slate-50/70 hover:border-rose-300 hover:bg-rose-50/30"
                 }`}
               >
                 <Avatar src={emp.avatar} alt={emp.name} fallback={emp.name} size="default" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <h4 className="text-xs font-bold text-slate-100 truncate group-hover:text-[#FF4D8D]">{emp.name}</h4>
+                    <h4 className="text-xs font-bold text-slate-800 truncate group-hover:text-[#D6135F]">{emp.name}</h4>
                     {isCurrent && (
-                      <span className="text-[10px] font-semibold text-emerald-400">
+                      <span className="text-[10px] font-semibold text-emerald-600">
                         Active
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-400 truncate">{emp.title}</p>
+                  <p className="text-[11px] text-slate-500 truncate">{emp.title}</p>
                   <div className="mt-2 flex items-center justify-between">
                     <Badge variant={badge.variant} size="xs">
                       {badge.label}
                     </Badge>
-                    <span className="font-mono text-[10px] text-rose-300/60">PIN: {emp.pin}</span>
+                    <span className="font-mono text-[10px] text-slate-400">PIN: {emp.pin}</span>
                   </div>
                 </div>
                 {isSelected && (
-                  <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white">
+                  <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white shadow-xs">
                     <Check className="h-3 w-3" />
                   </div>
                 )}
@@ -113,15 +113,15 @@ export function EmployeeSwitcherDialog({
         </div>
 
         {/* Selected Profile Action Card */}
-        <div className="mt-4 rounded-xl border border-[#3D1E30] bg-[#160A13] p-4">
+        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <Avatar src={selectedEmp.avatar} alt={selectedEmp.name} size="sm" />
               <div>
-                <p className="text-xs font-bold text-white">
-                  Switching to: <span className="text-[#FF4D8D]">{selectedEmp.name}</span>
+                <p className="text-xs font-bold text-slate-900">
+                  Switching to: <span className="text-[#D6135F]">{selectedEmp.name}</span>
                 </p>
-                <p className="text-[11px] text-slate-400">Department: {selectedEmp.department} · Role: {selectedEmp.role.toUpperCase()}</p>
+                <p className="text-[11px] text-slate-500">Department: {selectedEmp.department} · Role: {selectedEmp.role.toUpperCase()}</p>
               </div>
             </div>
 
@@ -135,7 +135,7 @@ export function EmployeeSwitcherDialog({
               </Button>
             </div>
           </div>
-          {errorMsg && <p className="mt-2 text-xs font-medium text-rose-400">{errorMsg}</p>}
+          {errorMsg && <p className="mt-2 text-xs font-medium text-rose-600">{errorMsg}</p>}
         </div>
       </DialogContent>
     </Dialog>

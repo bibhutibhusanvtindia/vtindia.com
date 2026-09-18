@@ -14,7 +14,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className
       <input
         type={type}
         className={cn(
-          "flex h-9 w-full rounded-xl border border-border bg-surface-muted/60 px-3 py-1 text-xs text-foreground shadow-sm transition-colors file:border-0 file:bg-transparent file:text-xs file:font-medium placeholder:text-muted focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-9 w-full rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs text-slate-800 shadow-xs transition-colors file:border-0 file:bg-transparent file:text-xs file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:border-[#F0186C] focus-visible:ring-1 focus-visible:ring-[#F0186C]/30 disabled:cursor-not-allowed disabled:opacity-50",
           Icon && "pl-9",
           className
         )}
@@ -31,7 +31,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
     return (
       <textarea
         className={cn(
-          "flex min-h-[70px] w-full rounded-xl border border-border bg-surface-muted/60 px-3 py-2 text-xs text-foreground shadow-sm placeholder:text-muted focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+          "flex min-h-[70px] w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 shadow-xs placeholder:text-slate-400 focus-visible:outline-none focus-visible:border-[#F0186C] focus-visible:ring-1 focus-visible:ring-[#F0186C]/30 disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
         ref={ref}

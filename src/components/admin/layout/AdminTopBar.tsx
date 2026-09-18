@@ -62,14 +62,14 @@ export function AdminTopBar({
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-[#2A1322] bg-[#0C060A]/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8 shadow-sm">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur-xl sm:px-6 lg:px-8 shadow-xs">
       {/* Left: Mobile Menu + Search / Command Bar */}
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="sm"
           onClick={onOpenMobileSidebar}
-          className="flex h-9 w-9 p-0 text-slate-400 hover:bg-[#1E0C18] hover:text-[#FF4D8D] lg:hidden"
+          className="flex h-9 w-9 p-0 text-slate-500 hover:bg-slate-100 hover:text-slate-800 lg:hidden"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -77,11 +77,11 @@ export function AdminTopBar({
         {/* Global Search / Command Bar Trigger */}
         <button
           onClick={() => onSelectTab("chief-of-staff")}
-          className="hidden sm:flex items-center gap-2 rounded-xl border border-[#2D1625] bg-[#140810] px-3.5 py-1.5 text-xs text-slate-400 hover:border-[#F0186C]/40 hover:bg-[#1C0B17] transition-colors shadow-inner"
+          className="hidden sm:flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-1.5 text-xs text-slate-600 hover:border-[#F0186C]/40 hover:bg-slate-100 transition-colors shadow-xs"
         >
-          <Search className="h-3.5 w-3.5 text-rose-400/60" />
+          <Search className="h-3.5 w-3.5 text-slate-400" />
           <span>Ask AI Chief of Staff or search commands...</span>
-          <kbd className="ml-4 rounded-md bg-[#25101F] px-1.5 py-0.5 text-[10px] font-mono text-rose-300 border border-[#3D1E30]">
+          <kbd className="ml-4 rounded-md bg-white px-1.5 py-0.5 text-[10px] font-mono text-slate-500 border border-slate-200 shadow-xs">
             Ctrl+K
           </kbd>
         </button>
@@ -90,12 +90,12 @@ export function AdminTopBar({
       {/* Right: Telemetry + Quick Actions + Notifications + Profile */}
       <div className="flex items-center gap-3">
         {/* Live IST Telemetry */}
-        <div className="hidden md:flex items-center gap-2 rounded-full border border-[#2D1625] bg-[#140810] px-3 py-1 text-xs">
+        <div className="hidden md:flex items-center gap-2 rounded-full border border-rose-100 bg-rose-50/60 px-3 py-1 text-xs">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F0186C] opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F0186C]" />
           </span>
-          <span className="text-[11px] font-mono font-semibold text-rose-200">
+          <span className="text-[11px] font-mono font-semibold text-slate-800">
             {timeStr ? `${timeStr} IST` : "Live Systems"}
           </span>
         </div>
@@ -104,9 +104,9 @@ export function AdminTopBar({
         <Button
           size="sm"
           onClick={() => onSelectTab("chief-of-staff")}
-          className="hidden sm:inline-flex bg-gradient-to-r from-[#D6135F] to-[#F0186C] hover:brightness-110 text-white text-xs gap-1.5 shadow-md shadow-[#F0186C]/25"
+          className="hidden sm:inline-flex bg-gradient-to-r from-[#D6135F] to-[#F0186C] hover:brightness-105 text-white text-xs gap-1.5 shadow-sm font-semibold"
         >
-          <Sparkles className="h-3.5 w-3.5 text-rose-200" />
+          <Sparkles className="h-3.5 w-3.5 text-rose-100" />
           <span>Ask AI</span>
         </Button>
 
@@ -116,7 +116,7 @@ export function AdminTopBar({
             variant="ghost"
             size="sm"
             onClick={() => setNotificationsOpen((prev) => !prev)}
-            className="relative h-9 w-9 p-0 text-slate-400 hover:bg-[#1E0C18] hover:text-[#FF4D8D]"
+            className="relative h-9 w-9 p-0 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
             title="Attention Alerts"
           >
             <Bell className="h-4 w-4" />
@@ -129,11 +129,11 @@ export function AdminTopBar({
 
           {/* Notifications Dropdown Card */}
           {notificationsOpen && (
-            <div className="absolute right-0 top-11 z-50 w-80 sm:w-96 rounded-2xl border border-[#3D1E30] bg-[#10070D] p-4 shadow-2xl backdrop-blur-2xl">
-              <div className="flex items-center justify-between border-b border-[#2A1322] pb-2.5">
+            <div className="absolute right-0 top-11 z-50 w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div className="flex items-center gap-1.5">
-                  <AlertTriangle className="h-4 w-4 text-amber-400" />
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                  <AlertTriangle className="h-4 w-4 text-amber-500" />
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                     Executive Attention Items
                   </h4>
                 </div>
@@ -146,10 +146,10 @@ export function AdminTopBar({
                 {attentionItems.map((item) => (
                   <div
                     key={item.id}
-                    className="rounded-xl border border-[#2D1625] bg-[#160A13] p-2.5 transition-colors hover:border-[#F0186C]/40"
+                    className="rounded-xl border border-slate-100 bg-slate-50/70 p-2.5 transition-colors hover:border-rose-200"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <span className="font-semibold text-rose-100 text-[11px] leading-tight">
+                      <span className="font-semibold text-slate-900 text-[11px] leading-tight">
                         {item.title}
                       </span>
                       <Badge
@@ -160,7 +160,7 @@ export function AdminTopBar({
                         {item.severity}
                       </Badge>
                     </div>
-                    <p className="mt-1 text-[10px] text-slate-400 leading-relaxed">
+                    <p className="mt-1 text-[10px] text-slate-600 leading-relaxed">
                       {item.description}
                     </p>
                     <div className="mt-2 flex items-center justify-between pt-1">
@@ -171,7 +171,7 @@ export function AdminTopBar({
                           setNotificationsOpen(false);
                           onSelectTab(item.actionModule || "dashboard");
                         }}
-                        className="h-5 text-[10px] text-[#FF4D8D] hover:text-white p-0"
+                        className="h-5 text-[10px] text-[#D6135F] hover:text-[#F0186C] p-0 font-semibold"
                       >
                         {item.actionLabel} →
                       </Button>
@@ -179,7 +179,7 @@ export function AdminTopBar({
                         size="xs"
                         variant="ghost"
                         onClick={() => onResolveAttentionItem(item.id)}
-                        className="h-5 text-[10px] text-slate-400 hover:text-emerald-400 p-0"
+                        className="h-5 text-[10px] text-slate-500 hover:text-emerald-600 p-0"
                       >
                         Mark Done
                       </Button>
@@ -201,14 +201,14 @@ export function AdminTopBar({
         {/* Role Switcher Pill */}
         <button
           onClick={onOpenEmployeeSwitcher}
-          className="flex items-center gap-2 rounded-xl border border-[#2D1625] bg-[#140810] p-1.5 pr-3 hover:border-[#F0186C]/40 hover:bg-[#1C0B17] transition-colors"
+          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 p-1.5 pr-3 hover:border-rose-200 hover:bg-rose-50/40 transition-colors"
         >
           <Avatar name={currentEmployee.name} src={currentEmployee.avatar} size="xs" />
           <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-bold text-slate-200 leading-none">
+            <span className="text-xs font-bold text-slate-800 leading-none">
               {currentEmployee.name.split(" ")[0]} {currentEmployee.name.split(" ")[1]?.[0]}.
             </span>
-            <span className="text-[9px] font-mono text-[#FF4D8D] uppercase font-bold leading-none mt-0.5">
+            <span className="text-[9px] font-mono text-[#D6135F] uppercase font-bold leading-none mt-0.5">
               {currentEmployee.role}
             </span>
           </div>
