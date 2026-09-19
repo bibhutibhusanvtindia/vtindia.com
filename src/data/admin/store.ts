@@ -30,18 +30,18 @@ import {
 } from "./initialData";
 
 const STORAGE_KEYS = {
-  CURRENT_USER: "vt_admin_current_user_v2",
-  FINANCIALS: "vt_admin_financials_v2",
-  PROJECTS: "vt_admin_projects_v2",
-  ATTENTION: "vt_admin_attention_v2",
-  LEADS: "vt_admin_leads_v2",
-  PROSPECTS: "vt_admin_prospects_v2",
-  VAULT: "vt_admin_vault_v2",
-  SUBSCRIPTIONS: "vt_admin_subscriptions_v2",
-  AUDIT_LOGS: "vt_admin_audit_logs_v2",
-  DEALS: "vt_admin_deals_v2",
-  ACTIVE_TAB: "vt_admin_active_tab_v2",
-  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v2",
+  CURRENT_USER: "vt_admin_current_user_v3",
+  FINANCIALS: "vt_admin_financials_v3",
+  PROJECTS: "vt_admin_projects_v3",
+  ATTENTION: "vt_admin_attention_v3",
+  LEADS: "vt_admin_leads_v3",
+  PROSPECTS: "vt_admin_prospects_v3",
+  VAULT: "vt_admin_vault_v3",
+  SUBSCRIPTIONS: "vt_admin_subscriptions_v3",
+  AUDIT_LOGS: "vt_admin_audit_logs_v3",
+  DEALS: "vt_admin_deals_v3",
+  ACTIVE_TAB: "vt_admin_active_tab_v3",
+  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v3",
 };
 
 export function useAdminStore() {

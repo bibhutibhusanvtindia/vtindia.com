@@ -121,12 +121,12 @@ export function AdminTopBar({
             variant="ghost"
             size="sm"
             onClick={() => {
-              if (window.confirm("Are you sure you want to reset all mock data to fresh initial seed records?")) {
+              if (window.confirm("Are you sure you want to refresh all workspace records to initial operational data?")) {
                 onResetData();
               }
             }}
             className="hidden sm:inline-flex h-9 w-9 p-0 text-slate-500 hover:bg-pink-50 hover:text-[#D6135F] rounded-xl transition-colors"
-            title="Reset Mock Data"
+            title="Refresh Operational Data"
           >
             <RefreshCw className="h-4 w-4" />
           </Button>

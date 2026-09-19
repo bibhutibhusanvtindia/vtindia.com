@@ -82,7 +82,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
     department: "Engineering",
     avatar: "/images/team/Mr_Ashwin.png",
     pin: "6666",
-    phone: "+91 9123456780",
+    phone: "+91 9861802325",
     status: "online",
   },
   {
@@ -94,7 +94,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
     department: "Engineering",
     avatar: "/images/team/Mr_Ajay.png",
     pin: "7777",
-    phone: "+91 9658234567",
+    phone: "+91 9437012345",
     status: "in_meeting",
   },
   {
@@ -105,7 +105,7 @@ export const INITIAL_EMPLOYEES: Employee[] = [
     title: "Enterprise Growth & Sales Executive",
     department: "Growth & Sales",
     pin: "8888",
-    phone: "+91 9853123456",
+    phone: "+91 9861802326",
     status: "online",
   },
 ];
