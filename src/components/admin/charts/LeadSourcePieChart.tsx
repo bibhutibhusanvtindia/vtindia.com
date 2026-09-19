@@ -19,61 +19,46 @@ interface ChannelData {
   speed: string;
 }
 
-const CHANNEL_DATA: ChannelData[] = [
-  {
-    platform: "whatsapp",
-    label: "WhatsApp Business API",
-    count: 9,
-    percentage: 38,
-    color: "#25D366", // WhatsApp Green
-    dealVolume: "₹34.5L",
-    avgScore: 94,
-    speed: "< 5 mins",
-  },
-  {
-    platform: "instagram",
-    label: "Instagram Reels & DM",
-    count: 7,
-    percentage: 28,
-    color: "#F0186C", // Virtoy Pink / IG
-    dealVolume: "₹28.0L",
-    avgScore: 91,
-    speed: "12 mins",
-  },
-  {
-    platform: "youtube",
-    label: "YouTube Case Studies",
-    count: 4,
-    percentage: 18,
-    color: "#EF4444", // YouTube Red
-    dealVolume: "₹16.2L",
-    avgScore: 89,
-    speed: "25 mins",
-  },
-  {
-    platform: "linkedin",
-    label: "LinkedIn B2B Inbound",
-    count: 3,
-    percentage: 11,
-    color: "#0A66C2", // LinkedIn Blue
-    dealVolume: "₹12.0L",
-    avgScore: 88,
-    speed: "30 mins",
-  },
-  {
-    platform: "twitter",
-    label: "Twitter (X) Mentions",
-    count: 1,
-    percentage: 5,
-    color: "#0284C7", // Sky Blue
-    dealVolume: "₹5.5L",
-    avgScore: 85,
-    speed: "1 hour",
-  },
-];
+const PLATFORM_CONFIGS: Record<string, { label: string; color: string; speed: string }> = {
+  whatsapp: { label: "WhatsApp Business", color: "#25D366", speed: "< 5 mins" },
+  instagram: { label: "Instagram DM / Reels", color: "#F0186C", speed: "12 mins" },
+  youtube: { label: "YouTube Inquiries", color: "#EF4444", speed: "25 mins" },
+  twitter: { label: "Twitter (X) Mentions", color: "#0284C7", speed: "40 mins" },
+  facebook: { label: "Facebook Leads", color: "#1877F2", speed: "30 mins" },
+};
 
-export function LeadSourcePieChart({ leads }: LeadSourcePieChartProps) {
+export function LeadSourcePieChart({ leads = [] }: LeadSourcePieChartProps) {
   const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(0);
+
+  const channelData: ChannelData[] = React.useMemo(() => {
+    if (!leads || leads.length === 0) return [];
+
+    const total = leads.length;
+    const map = new Map<string, { count: number; totalScore: number }>();
+
+    leads.forEach((l) => {
+      const p = l.platform || "whatsapp";
+      const existing = map.get(p) || { count: 0, totalScore: 0 };
+      existing.count += 1;
+      existing.totalScore += l.qualificationScore || 90;
+      map.set(p, existing);
+    });
+
+    return Array.from(map.entries()).map(([plat, data]) => {
+      const cfg = PLATFORM_CONFIGS[plat] || { label: plat, color: "#F0186C", speed: "15 mins" };
+      const pct = (data.count / total) * 100;
+      return {
+        platform: plat,
+        label: cfg.label,
+        count: data.count,
+        percentage: Math.round(pct),
+        color: cfg.color,
+        dealVolume: `${data.count} Leads`,
+        avgScore: Math.round(data.totalScore / data.count),
+        speed: cfg.speed,
+      };
+    });
+  }, [leads]);
 
   const size = 220;
   const center = size / 2;
@@ -82,7 +67,7 @@ export function LeadSourcePieChart({ leads }: LeadSourcePieChartProps) {
 
   let accumulatedAngle = -90;
 
-  const slices = CHANNEL_DATA.map((ch, index) => {
+  const slices = channelData.map((ch, index) => {
     const angle = (ch.percentage / 100) * 360;
     const startAngle = accumulatedAngle;
     const endAngle = accumulatedAngle + angle;
@@ -112,18 +97,13 @@ export function LeadSourcePieChart({ leads }: LeadSourcePieChartProps) {
       `A ${activeRadius} ${activeRadius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
       `L ${x3} ${y3}`,
       `A ${activeInnerRadius} ${activeInnerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4}`,
-      `Z`,
+      "Z",
     ].join(" ");
 
-    return {
-      ...ch,
-      index,
-      pathData,
-      isHovered,
-    };
+    return { ...ch, pathData, isHovered };
   });
 
-  const activeChannel = hoveredIndex !== null ? CHANNEL_DATA[hoveredIndex] : null;
+  const activeChannel = hoveredIndex !== null && channelData[hoveredIndex] ? channelData[hoveredIndex] : channelData[0];
 
   return (
     <div className="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">
@@ -134,98 +114,85 @@ export function LeadSourcePieChart({ leads }: LeadSourcePieChartProps) {
             <MessageSquare className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900">Inbound Lead Channels &amp; Share</h3>
-            <p className="text-xs text-slate-500">Source attribution of incoming enterprise inquiries</p>
+            <h3 className="text-base font-bold text-slate-900">Omnichannel Lead Distribution</h3>
+            <p className="text-xs text-slate-500">Inbound volume across WhatsApp, Instagram, YouTube &amp; Social</p>
           </div>
         </div>
 
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
-          <Flame className="h-3.5 w-3.5 text-[#F0186C]" />
-          24 Inbound Leads / Mo
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+            {leads.length} Inbound Inquiries
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center pt-4">
-        {/* SVG Donut */}
-        <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-          <svg viewBox={`0 0 ${size} ${size}`} className="w-48 h-48 sm:w-52 sm:h-52 overflow-visible select-none">
-            {slices.map((slice) => (
-              <path
-                key={slice.platform}
-                d={slice.pathData}
-                fill={slice.color}
-                stroke="#FFFFFF"
-                strokeWidth="2"
-                className="cursor-pointer transition-all duration-300 hover:opacity-95"
-                onMouseEnter={() => setHoveredIndex(slice.index)}
-              />
-            ))}
-
-            <g className="pointer-events-none select-none">
-              <circle cx={center} cy={center} r={innerRadius - 4} fill="#FFFFFF" />
-              <text
-                x={center}
-                y={center - 8}
-                textAnchor="middle"
-                className="fill-slate-600 text-[9px] font-extrabold uppercase"
-              >
-                Top Source
-              </text>
-              <text
-                x={center}
-                y={center + 10}
-                textAnchor="middle"
-                className="fill-slate-900 text-sm font-black font-mono"
-              >
-                {activeChannel ? `${activeChannel.percentage}%` : "38%"}
-              </text>
-              <text
-                x={center}
-                y={center + 24}
-                textAnchor="middle"
-                className="fill-[#D6135F] text-[9px] font-bold"
-              >
-                {activeChannel ? activeChannel.dealVolume : "WhatsApp"}
-              </text>
-            </g>
-          </svg>
+      {channelData.length === 0 ? (
+        <div className="py-12 flex flex-col items-center justify-center text-center space-y-2">
+          <MessageSquare className="h-10 w-10 text-pink-300 mx-auto" />
+          <h4 className="text-sm font-bold text-slate-800">No Inbound Social Leads Yet</h4>
+          <p className="text-xs text-slate-500 max-w-sm">
+            Inbound inquiries from WhatsApp, Instagram, or Web forms will be categorized and analyzed here automatically.
+          </p>
         </div>
-
-        {/* Channel Breakdown list */}
-        <div className="md:col-span-7 space-y-2">
-          {CHANNEL_DATA.map((item, idx) => {
-            const isHovered = hoveredIndex === idx;
-
-            return (
-              <div
-                key={item.platform}
-                onMouseEnter={() => setHoveredIndex(idx)}
-                className={`flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer ${
-                  isHovered
-                    ? "bg-pink-50/70 border-pink-200 shadow-xs"
-                    : "bg-slate-50/50 border-slate-100 hover:bg-pink-50/30"
-                }`}
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span
-                    className="h-3 w-3 rounded-full shrink-0"
-                    style={{ backgroundColor: item.color }}
+      ) : (
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.4fr] items-center">
+          {/* SVG Donut Chart */}
+          <div className="relative flex flex-col items-center justify-center">
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+              <g>
+                {slices.map((slice, index) => (
+                  <path
+                    key={slice.platform}
+                    d={slice.pathData}
+                    fill={slice.color}
+                    className="cursor-pointer transition-all duration-200"
+                    stroke="#FFFFFF"
+                    strokeWidth="2"
+                    onMouseEnter={() => setHoveredIndex(index)}
                   />
-                  <div className="min-w-0">
-                    <span className="text-xs font-bold text-slate-900 block truncate">{item.label}</span>
-                    <span className="text-[10px] text-slate-500">{item.count} inquiries · Avg Score {item.avgScore}</span>
+                ))}
+              </g>
+
+              {/* Center Label */}
+              <g className="pointer-events-none">
+                <text x={center} y={center - 8} textAnchor="middle" className="fill-slate-400 text-[10px] font-bold uppercase">
+                  Top Channel
+                </text>
+                <text x={center} y={center + 12} textAnchor="middle" className="fill-slate-900 text-sm font-black">
+                  {activeChannel ? `${activeChannel.percentage}%` : "0%"}
+                </text>
+              </g>
+            </svg>
+          </div>
+
+          {/* Breakdown cards */}
+          <div className="space-y-2.5">
+            {channelData.map((ch, index) => {
+              const isHovered = hoveredIndex === index;
+              return (
+                <div
+                  key={ch.platform}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  className={`flex items-center justify-between rounded-2xl border p-3 cursor-pointer transition-all ${
+                    isHovered
+                      ? "border-[#F0186C] bg-pink-50/40 shadow-xs"
+                      : "border-pink-100/70 bg-white hover:border-pink-200"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: ch.color }} />
+                    <span className="text-xs font-bold text-slate-900">{ch.label}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="font-mono font-bold text-slate-700">{ch.count} Leads</span>
+                    <span className="font-bold text-[#D6135F]">{ch.percentage}%</span>
                   </div>
                 </div>
-
-                <div className="text-right shrink-0">
-                  <span className="text-xs font-black text-slate-900 font-mono block">{item.dealVolume}</span>
-                  <span className="text-[10px] font-bold text-slate-500">{item.percentage}% share</span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

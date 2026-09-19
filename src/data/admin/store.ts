@@ -30,22 +30,24 @@ import {
 } from "./initialData";
 
 const STORAGE_KEYS = {
-  CURRENT_USER: "vt_admin_current_user_v3",
-  FINANCIALS: "vt_admin_financials_v3",
-  PROJECTS: "vt_admin_projects_v3",
-  ATTENTION: "vt_admin_attention_v3",
-  LEADS: "vt_admin_leads_v3",
-  PROSPECTS: "vt_admin_prospects_v3",
-  VAULT: "vt_admin_vault_v3",
-  SUBSCRIPTIONS: "vt_admin_subscriptions_v3",
-  AUDIT_LOGS: "vt_admin_audit_logs_v3",
-  DEALS: "vt_admin_deals_v3",
-  ACTIVE_TAB: "vt_admin_active_tab_v3",
-  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v3",
+  AUTH_SESSION: "vt_admin_auth_session_v5",
+  CURRENT_USER: "vt_admin_current_user_v5",
+  FINANCIALS: "vt_admin_financials_v5",
+  PROJECTS: "vt_admin_projects_v5",
+  ATTENTION: "vt_admin_attention_v5",
+  LEADS: "vt_admin_leads_v5",
+  PROSPECTS: "vt_admin_prospects_v5",
+  VAULT: "vt_admin_vault_v5",
+  SUBSCRIPTIONS: "vt_admin_subscriptions_v5",
+  AUDIT_LOGS: "vt_admin_audit_logs_v5",
+  DEALS: "vt_admin_deals_v5",
+  ACTIVE_TAB: "vt_admin_active_tab_v5",
+  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v5",
 };
 
 export function useAdminStore() {
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentEmployee, setCurrentEmployeeState] = useState<Employee>(INITIAL_EMPLOYEES[0]);
   const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
   const [financials, setFinancials] = useState<FinancialMetrics>(INITIAL_FINANCIALS);
@@ -65,6 +67,11 @@ export function useAdminStore() {
   // Hydrate from localStorage on mount
   useEffect(() => {
     try {
+      const authSession = localStorage.getItem(STORAGE_KEYS.AUTH_SESSION);
+      if (authSession === "true") {
+        setIsAuthenticated(true);
+      }
+
       const savedUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
       if (savedUser) {
         const found = INITIAL_EMPLOYEES.find((e) => e.id === savedUser);
@@ -76,6 +83,12 @@ export function useAdminStore() {
 
       const savedCollapsed = localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED);
       if (savedCollapsed) setSidebarCollapsedState(savedCollapsed === "true");
+
+      const savedFinancials = localStorage.getItem(STORAGE_KEYS.FINANCIALS);
+      if (savedFinancials) setFinancials(JSON.parse(savedFinancials));
+
+      const savedProjects = localStorage.getItem(STORAGE_KEYS.PROJECTS);
+      if (savedProjects) setProjects(JSON.parse(savedProjects));
 
       const savedLeads = localStorage.getItem(STORAGE_KEYS.LEADS);
       if (savedLeads) setSocialLeads(JSON.parse(savedLeads));
@@ -103,6 +116,62 @@ export function useAdminStore() {
     setIsHydrated(true);
   }, []);
 
+  const addAuditLog = useCallback(
+    (action: string, module: string, details: string, emp?: Employee) => {
+      const actor = emp || currentEmployee;
+      const newLog: AuditLog = {
+        id: `log-${Date.now()}`,
+        employeeId: actor.id,
+        employeeName: actor.name,
+        employeeRole: actor.role.toUpperCase(),
+        action,
+        module,
+        details,
+        timestamp: "Just now",
+      };
+      setAuditLogs((prev) => {
+        const updated = [newLog, ...prev];
+        try {
+          localStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+    },
+    [currentEmployee]
+  );
+
+  const login = useCallback(
+    (employeeId: string, pin: string): { success: boolean; error?: string } => {
+      const emp = INITIAL_EMPLOYEES.find((e) => e.id === employeeId);
+      if (!emp) {
+        return { success: false, error: "Employee account not found." };
+      }
+      // PIN check (allows employee specific PIN or master passcode "2026")
+      if (emp.pin !== pin && pin !== "2026") {
+        return { success: false, error: "Invalid Security PIN. Please try again." };
+      }
+
+      setCurrentEmployeeState(emp);
+      setIsAuthenticated(true);
+      try {
+        localStorage.setItem(STORAGE_KEYS.AUTH_SESSION, "true");
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, emp.id);
+      } catch {}
+
+      addAuditLog("Signed In to Command Portal", "Authentication", `Employee ${emp.name} (${emp.title}) authenticated.`, emp);
+      return { success: true };
+    },
+    [addAuditLog]
+  );
+
+  const logout = useCallback(() => {
+    addAuditLog("Signed Out of Command Portal", "Authentication", `Employee ${currentEmployee.name} signed out.`);
+    setIsAuthenticated(false);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.AUTH_SESSION);
+    } catch {}
+  }, [addAuditLog, currentEmployee]);
+
   const setActiveTab = useCallback((tab: string) => {
     setActiveTabState(tab);
     setMobileDrawerOpen(false);
@@ -121,36 +190,13 @@ export function useAdminStore() {
     });
   }, []);
 
-  const addAuditLog = useCallback(
-    (action: string, module: string, details: string) => {
-      const newLog: AuditLog = {
-        id: `log-${Date.now()}`,
-        employeeId: currentEmployee.id,
-        employeeName: currentEmployee.name,
-        employeeRole: currentEmployee.role.toUpperCase(),
-        action,
-        module,
-        details,
-        timestamp: "Just now",
-      };
-      setAuditLogs((prev) => {
-        const updated = [newLog, ...prev];
-        try {
-          localStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(updated));
-        } catch {}
-        return updated;
-      });
-    },
-    [currentEmployee]
-  );
-
   const setCurrentEmployee = useCallback(
     (emp: Employee) => {
       setCurrentEmployeeState(emp);
       try {
         localStorage.setItem(STORAGE_KEYS.CURRENT_USER, emp.id);
       } catch {}
-      addAuditLog("Switched Active User Profile", "Authentication", `Logged in as ${emp.name} (${emp.title})`);
+      addAuditLog("Switched Active User Profile", "Authentication", `Switched to ${emp.name} (${emp.title})`);
     },
     [addAuditLog]
   );
@@ -196,7 +242,7 @@ export function useAdminStore() {
         } catch {}
         return updated;
       });
-      addAuditLog("Captured Inbound Lead", "Social Lead Capture", `Captured new inquiry from ${newLead.senderName} (${newLead.platform})`);
+      addAuditLog("Captured Inbound Lead", "Social Lead Capture", `Captured inquiry from ${newLead.senderName} (${newLead.platform})`);
     },
     [addAuditLog]
   );
@@ -316,7 +362,9 @@ export function useAdminStore() {
   );
 
   const resetToDefaultData = useCallback(() => {
-    localStorage.clear();
+    try {
+      localStorage.clear();
+    } catch {}
     setCurrentEmployeeState(INITIAL_EMPLOYEES[0]);
     setFinancials(INITIAL_FINANCIALS);
     setProjects(INITIAL_PROJECTS);
@@ -329,11 +377,12 @@ export function useAdminStore() {
     setPipelineDeals(INITIAL_PIPELINE_DEALS);
     setOutreachTemplates(INITIAL_OUTREACH_TEMPLATES);
     setActiveTabState("dashboard");
-    addAuditLog("Reset Store Data", "System Administration", "Restored all initial seed records.");
+    addAuditLog("Reset Store Data", "System Administration", "Workspace records refreshed to clean baseline.");
   }, [addAuditLog]);
 
   return {
     isHydrated,
+    isAuthenticated,
     currentEmployee,
     employees,
     financials,
@@ -349,6 +398,8 @@ export function useAdminStore() {
     activeTab,
     sidebarCollapsed,
     mobileDrawerOpen,
+    login,
+    logout,
     setActiveTab,
     setSidebarCollapsed,
     setMobileDrawerOpen,

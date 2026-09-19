@@ -267,20 +267,20 @@ export function PipelineDealMatrixModule({
         <div className="rounded-3xl border border-pink-100 bg-white p-5 shadow-xs hover:border-pink-300 hover:shadow-md transition-all">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Avg AI Health Score</span>
           <div className="text-3xl font-black text-emerald-700 font-mono mt-1">
-            85.8 / 100
+            {deals.length > 0 ? (deals.reduce((sum, d) => sum + d.aiHealthScore, 0) / deals.length).toFixed(1) : "100"} / 100
           </div>
           <p className="mt-1 text-[11px] text-emerald-700 font-bold">
-            High conversion velocity &amp; engagement
+            Conversion velocity &amp; engagement
           </p>
         </div>
 
         <div className="rounded-3xl border border-pink-100 bg-white p-5 shadow-xs hover:border-pink-300 hover:shadow-md transition-all">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Avg Deal Cycle Time</span>
-          <div className="text-3xl font-black text-amber-700 font-mono mt-1">
-            18.4 Days
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Active Deals Count</span>
+          <div className="text-3xl font-black text-slate-900 font-mono mt-1">
+            {deals.length} {deals.length === 1 ? "Deal" : "Deals"}
           </div>
           <p className="mt-1 text-[11px] text-slate-500">
-            Discovery to contract signing
+            Across {deals.length > 0 ? new Set(deals.map((d) => d.sector)).size : 0} commercial sectors
           </p>
         </div>
       </div>

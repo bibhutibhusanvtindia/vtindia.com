@@ -210,46 +210,54 @@ export function ProofVaultModule({
           </div>
 
           <div className="space-y-3 max-h-[620px] overflow-y-auto pr-1">
-            {vaultItems.map((item) => {
-              const isSelected = activeItem?.id === item.id;
-              const cfg = typeConfig[item.type];
-              const Icon = cfg.icon;
+            {vaultItems.length === 0 ? (
+              <div className="rounded-3xl border-2 border-dashed border-pink-200 bg-white p-8 text-center space-y-3">
+                <ShieldCheck className="h-8 w-8 text-[#D6135F] mx-auto opacity-50" />
+                <p className="text-sm font-bold text-slate-800">No verified deal proofs logged</p>
+                <p className="text-xs text-slate-500">Upload WhatsApp chat confirmations, audio recordings, or signed meeting notes.</p>
+              </div>
+            ) : (
+              vaultItems.map((item) => {
+                const isSelected = activeItem?.id === item.id;
+                const cfg = typeConfig[item.type];
+                const Icon = cfg.icon;
 
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => setActiveItemId(item.id)}
-                  className={`group relative flex flex-col gap-2.5 rounded-3xl border p-4 cursor-pointer transition-all shadow-xs ${
-                    isSelected
-                      ? "border-[#F0186C] bg-gradient-to-br from-[#FFF8FA] to-pink-50/50 ring-2 ring-[#F0186C]/40 shadow-sm"
-                      : "border-pink-100 bg-white hover:border-pink-300 hover:bg-pink-50/30 hover:-translate-y-0.5"
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-start gap-2.5">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${cfg.color} shadow-2xs`}>
-                        <Icon className="h-4 w-4" />
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => setActiveItemId(item.id)}
+                    className={`group relative flex flex-col gap-2.5 rounded-3xl border p-4 cursor-pointer transition-all shadow-xs ${
+                      isSelected
+                        ? "border-[#F0186C] bg-gradient-to-br from-[#FFF8FA] to-pink-50/50 ring-2 ring-[#F0186C]/40 shadow-sm"
+                        : "border-pink-100 bg-white hover:border-pink-300 hover:bg-pink-50/30 hover:-translate-y-0.5"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2.5">
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${cfg.color} shadow-2xs`}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#D6135F] transition-colors">
+                            {item.clientName}
+                          </h4>
+                          <p className="text-[11px] text-slate-500 line-clamp-1 font-medium">{item.dealTitle}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#D6135F] transition-colors">
-                          {item.clientName}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 line-clamp-1 font-medium">{item.dealTitle}</p>
-                      </div>
+
+                      <span className="font-mono font-black text-xs text-emerald-700 shrink-0 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                        {item.dealValue}
+                      </span>
                     </div>
 
-                    <span className="font-mono font-black text-xs text-emerald-700 shrink-0 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-                      {item.dealValue}
-                    </span>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 border-t border-pink-100/70 pt-2 font-medium">
+                      <span>Uploaded by: <strong className="text-slate-800">{item.uploadedBy}</strong></span>
+                      <span>{item.timestamp}</span>
+                    </div>
                   </div>
-
-                  <div className="flex items-center justify-between text-[10px] text-slate-500 border-t border-pink-100/70 pt-2 font-medium">
-                    <span>Uploaded by: <strong className="text-slate-800">{item.uploadedBy}</strong></span>
-                    <span>{item.timestamp}</span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 
@@ -298,70 +306,102 @@ export function ProofVaultModule({
                 <span className="font-mono text-[10px] text-[#D6135F] font-bold">{activeItem.timestamp}</span>
               </div>
 
-              {/* AI Key Takeaways */}
+              {/* Key Client Takeaways */}
               <div>
                 <label className="text-[11px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                   <Sparkles className="h-4 w-4 text-[#D6135F]" />
-                  <span>AI Extracted Key Discussion Takeaways</span>
+                  <span>Verified Executive Takeaways</span>
                 </label>
-                <div className="mt-2 space-y-2">
+                <div className="mt-2 space-y-1.5">
                   {activeItem.takeaways.map((takeaway, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-2.5 rounded-2xl border border-pink-100 bg-pink-50/20 p-3.5 text-xs leading-relaxed text-slate-800 font-medium"
+                      className="flex items-start gap-2.5 rounded-2xl border border-pink-100 bg-pink-50/30 p-3 text-xs text-slate-800 font-medium"
                     >
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#F0186C] mt-1.5 shrink-0" />
                       <span>{takeaway}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Commitments & Agreed Timelines */}
-              {activeItem.commitments && activeItem.commitments.length > 0 && (
-                <div>
-                  <label className="text-[11px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                    <span>Agreed Client &amp; Company Commitments</span>
-                  </label>
-                  <div className="mt-2 space-y-1.5">
-                    {activeItem.commitments.map((com, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs text-emerald-950 font-bold"
-                      >
-                        • {com}
-                      </div>
-                    ))}
+              {/* Commitments & Objections */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4 space-y-2">
+                  <div className="text-[11px] font-black text-emerald-900 uppercase flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    <span>Firm Commitments</span>
                   </div>
+                  <ul className="space-y-1.5 text-xs text-slate-700 font-medium">
+                    {activeItem.commitments.map((comm, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-emerald-600 font-bold">&bull;</span>
+                        <span>{comm}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              )}
 
-              {/* Action Items Grid */}
-              {activeItem.actionItems && activeItem.actionItems.length > 0 && (
-                <div>
-                  <label className="text-[11px] font-black text-slate-700 uppercase tracking-wider">
-                    Follow-Up Action Items &amp; Assigned Reps
-                  </label>
-                  <div className="mt-2 space-y-2">
-                    {activeItem.actionItems.map((act, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-2xl border border-pink-100 bg-white p-3.5 text-xs shadow-2xs"
-                      >
-                        <span className="font-bold text-slate-900">{act.task}</span>
-                        <div className="flex items-center gap-3 text-slate-500 text-[11px]">
-                          <span className="text-[#D6135F] font-bold">{act.assignedTo}</span>
-                          <span className="font-mono text-slate-600 font-medium">Due: {act.due}</span>
-                        </div>
-                      </div>
-                    ))}
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4 space-y-2">
+                  <div className="text-[11px] font-black text-amber-900 uppercase flex items-center gap-1.5">
+                    <MessageSquare className="h-4 w-4 text-amber-600" />
+                    <span>Objections / Concerns</span>
                   </div>
+                  <ul className="space-y-1.5 text-xs text-slate-700 font-medium">
+                    {activeItem.objections && activeItem.objections.length > 0 ? (
+                      activeItem.objections.map((obj, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <span className="text-amber-600 font-bold">&bull;</span>
+                          <span>{obj}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-slate-400 italic">No blockers logged during this touchpoint.</li>
+                    )}
+                  </ul>
                 </div>
-              )}
+              </div>
+
+              {/* Action Items */}
+              <div>
+                <label className="text-[11px] font-black text-slate-700 uppercase tracking-wider">
+                  Next Step Action Items
+                </label>
+                <div className="mt-2 space-y-2">
+                  {activeItem.actionItems.map((action, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between rounded-2xl border border-pink-100 bg-white p-3 text-xs shadow-2xs"
+                    >
+                      <div className="font-semibold text-slate-900">{action.task}</div>
+                      <div className="flex items-center gap-2 text-[11px] shrink-0 font-medium">
+                        <span className="rounded-md bg-pink-50 px-2 py-0.5 font-bold text-[#D6135F] border border-pink-200">
+                          {action.assignedTo}
+                        </span>
+                        <span className="text-slate-500 font-mono">Due {action.due}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="rounded-3xl border border-pink-100 bg-white p-12 flex flex-col items-center justify-center text-center space-y-3 shadow-sm">
+            <UploadCloud className="h-12 w-12 text-pink-300 mx-auto" />
+            <h3 className="text-base font-bold text-slate-800">Discussion &amp; Proof Vault Empty</h3>
+            <p className="text-xs text-slate-500 max-w-sm">
+              Keep critical client commitments, WhatsApp approvals, and objection logs securely preserved for audit review.
+            </p>
+            <Button
+              onClick={() => setIsUploadOpen(true)}
+              className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white font-bold rounded-xl text-xs gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Upload First Deal Proof</span>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

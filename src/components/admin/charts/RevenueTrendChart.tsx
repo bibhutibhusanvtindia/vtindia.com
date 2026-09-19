@@ -9,18 +9,32 @@ interface RevenueTrendChartProps {
 }
 
 export function RevenueTrendChart({ financials }: RevenueTrendChartProps) {
-  const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(5); // Default to current month (Sep)
-  const [activeView, setActiveView] = React.useState<"trend" | "target" | "mom">("trend");
+  const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(5);
+  const [activeView, setActiveView] = React.useState<"trend" | "mom">("trend");
 
-  const monthlyData = [
-    { month: "Apr", actual: 16.5, target: 18.0, growth: 12.4, deals: 4, fullActual: "₹16,50,000" },
-    { month: "May", actual: 18.2, target: 20.0, growth: 10.3, deals: 6, fullActual: "₹18,20,000" },
-    { month: "Jun", actual: 19.8, target: 22.0, growth: 8.8, deals: 7, fullActual: "₹19,80,000" },
-    { month: "Jul", actual: 21.4, target: 24.0, growth: 8.1, deals: 8, fullActual: "₹21,40,000" },
-    { month: "Aug", actual: 23.1, target: 26.0, growth: 7.9, deals: 10, fullActual: "₹23,10,000" },
-    { month: "Sep", actual: 24.8, target: 30.0, growth: 18.4, deals: 12, fullActual: "₹24,80,000", isCurrent: true },
-    { month: "Oct (Proj)", actual: 28.5, target: 32.0, growth: 14.9, deals: 15, fullActual: "₹28,50,000", isProjected: true },
-  ];
+  // Derive dynamic monthly data from financials
+  const monthlyData = React.useMemo(() => {
+    const raw = financials.revenueByMonth || [];
+    if (raw.length === 0) {
+      return [
+        { month: "Apr", actual: 0, target: 0, growth: 0, deals: 0, fullActual: "₹0" },
+        { month: "May", actual: 0, target: 0, growth: 0, deals: 0, fullActual: "₹0" },
+        { month: "Jun", actual: 0, target: 0, growth: 0, deals: 0, fullActual: "₹0" },
+        { month: "Jul", actual: 0, target: 0, growth: 0, deals: 0, fullActual: "₹0" },
+        { month: "Aug", actual: 0, target: 0, growth: 0, deals: 0, fullActual: "₹0" },
+        { month: "Sep", actual: 0, target: 0, growth: 0, deals: 0, fullActual: "₹0", isCurrent: true },
+      ];
+    }
+    return raw.map((item, idx) => ({
+      month: item.month,
+      actual: item.actual,
+      target: item.target,
+      growth: idx === 0 ? 0 : item.actual > 0 ? 10.0 : 0,
+      deals: 0,
+      fullActual: `₹${(item.actual * 100000).toLocaleString("en-IN")}`,
+      isCurrent: idx === raw.length - 1,
+    }));
+  }, [financials]);
 
   // SVG Chart dimensions and coordinates
   const width = 640;
@@ -30,8 +44,8 @@ export function RevenueTrendChart({ financials }: RevenueTrendChartProps) {
   const chartWidth = width - paddingX * 2;
   const chartHeight = height - paddingY * 2;
 
-  const minVal = 12;
-  const maxVal = 34;
+  const maxVal = Math.max(30, ...monthlyData.map((d) => Math.max(d.actual, d.target)));
+  const minVal = 0;
 
   const getX = (index: number) => paddingX + (index / (monthlyData.length - 1)) * chartWidth;
   const getY = (val: number) => height - paddingY - ((val - minVal) / (maxVal - minVal)) * chartHeight;
@@ -63,7 +77,12 @@ export function RevenueTrendChart({ financials }: RevenueTrendChartProps) {
   const targetLinePath = generateSmoothPath(targetPoints);
   const areaPath = `${actualLinePath} L ${actualPoints[actualPoints.length - 1].x},${height - paddingY} L ${actualPoints[0].x},${height - paddingY} Z`;
 
-  const activePoint = hoveredIndex !== null ? monthlyData[hoveredIndex] : monthlyData[5];
+  const activePoint = hoveredIndex !== null && monthlyData[hoveredIndex] ? monthlyData[hoveredIndex] : monthlyData[monthlyData.length - 1];
+
+  const totalActualSum = monthlyData.reduce((acc, m) => acc + m.actual, 0);
+  const currentActualDisplay = financials.monthlyRevenue > 0 ? `₹${(financials.monthlyRevenue / 100000).toFixed(2)}L` : "₹0";
+  const currentTargetDisplay = financials.targetRevenue > 0 ? `₹${(financials.targetRevenue / 100000).toFixed(2)}L` : "₹0";
+  const sixMonthTotalDisplay = totalActualSum > 0 ? (totalActualSum >= 100 ? `₹${(totalActualSum / 100).toFixed(3)} Cr` : `₹${totalActualSum.toFixed(1)}L`) : "₹0";
 
   return (
     <div className="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">
@@ -106,192 +125,96 @@ export function RevenueTrendChart({ financials }: RevenueTrendChartProps) {
         </div>
       </div>
 
-      {/* KPI highlight pills */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 py-4">
-        <div className="rounded-2xl border border-pink-100 bg-gradient-to-br from-white to-[#FFF5F8] p-3">
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Sep Revenue</span>
-          <div className="text-lg font-black text-slate-900 font-mono">₹24.80L</div>
-          <div className="flex items-center text-[11px] font-bold text-emerald-600">
-            <ArrowUpRight className="h-3 w-3 mr-0.5" /> +18.4% MoM
+      {/* Metric Summaries */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 py-4 border-b border-pink-100/60">
+        <div className="rounded-2xl bg-pink-50/40 p-3 border border-pink-100">
+          <div className="text-[10px] font-bold uppercase text-slate-500">Current Revenue</div>
+          <div className="mt-0.5 text-base font-black font-mono text-slate-900">{currentActualDisplay}</div>
+          <div className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5">
+            <ArrowUpRight className="h-3 w-3" />
+            <span>+{financials.momGrowth}% MoM</span>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-pink-100 bg-white p-3">
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Sep Target</span>
-          <div className="text-lg font-black text-slate-900 font-mono">₹30.00L</div>
-          <div className="text-[11px] font-semibold text-slate-500">82.7% Attainment</div>
+        <div className="rounded-2xl bg-pink-50/40 p-3 border border-pink-100">
+          <div className="text-[10px] font-bold uppercase text-slate-500">Milestone Target</div>
+          <div className="mt-0.5 text-base font-black font-mono text-slate-900">{currentTargetDisplay}</div>
+          <div className="text-[10px] text-slate-500 font-medium">Target Baseline</div>
         </div>
 
-        <div className="rounded-2xl border border-pink-100 bg-white p-3">
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">6-Month Total</span>
-          <div className="text-lg font-black text-slate-900 font-mono">₹1.238 Cr</div>
-          <div className="text-[11px] font-semibold text-[#D6135F]">47 Deployments</div>
+        <div className="rounded-2xl bg-pink-50/40 p-3 border border-pink-100">
+          <div className="text-[10px] font-bold uppercase text-slate-500">6-Month Total</div>
+          <div className="mt-0.5 text-base font-black font-mono text-slate-900">{sixMonthTotalDisplay}</div>
+          <div className="text-[10px] text-slate-500 font-medium">{financials.activeProjectsCount} Deployments</div>
         </div>
 
-        <div className="rounded-2xl border border-pink-100 bg-gradient-to-br from-pink-50/50 to-rose-100/40 p-3 border-dashed">
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#D6135F]">Oct Forecast</span>
-          <div className="text-lg font-black text-[#D6135F] font-mono">₹28.50L</div>
-          <div className="flex items-center text-[11px] font-bold text-[#D6135F]">
-            <Sparkles className="h-3 w-3 mr-1" /> High Confidence
-          </div>
+        <div className="rounded-2xl bg-pink-50/40 p-3 border border-pink-100">
+          <div className="text-[10px] font-bold uppercase text-slate-500">Collection Velocity</div>
+          <div className="mt-0.5 text-base font-black font-mono text-emerald-700">{financials.collectionVelocity}%</div>
+          <div className="text-[10px] font-bold text-slate-500">On-Time Clearance</div>
         </div>
       </div>
 
-      {/* SVG Interactive Area Graph */}
-      <div className="relative pt-2">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
+      {/* SVG Chart Area */}
+      <div className="mt-4 relative">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-56 overflow-visible">
           <defs>
-            {/* Soft pink gradient for area fill */}
-            <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#F0186C" stopOpacity="0.32" />
-              <stop offset="60%" stopColor="#FF4D8D" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="#FFF5F8" stopOpacity="0.0" />
+            {/* Gradient Fill for Area */}
+            <linearGradient id="actualAreaGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#F0186C" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#F0186C" stopOpacity="0.0" />
             </linearGradient>
 
-            {/* Target line gradient */}
+            {/* Target Line Gradient */}
             <linearGradient id="targetGradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#94A3B8" />
-              <stop offset="100%" stopColor="#CBD5E1" />
+              <stop offset="100%" stopColor="#64748B" />
             </linearGradient>
-
-            {/* Glow filter */}
-            <filter id="pinkGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
 
-          {/* Horizontal Grid lines */}
-          {[15, 20, 25, 30].map((val) => {
+          {/* Grid lines */}
+          {[0, 10, 20, 30].map((val) => {
             const y = getY(val);
             return (
-              <g key={val}>
-                <line
-                  x1={paddingX}
-                  y1={y}
-                  x2={width - paddingX}
-                  y2={y}
-                  stroke="#F1F5F9"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 4"
-                />
-                <text
-                  x={paddingX - 10}
-                  y={y + 4}
-                  textAnchor="end"
-                  className="fill-slate-600 text-[10px] font-bold font-mono"
-                >
+              <g key={val} className="text-slate-300">
+                <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="#F1F5F9" strokeDasharray="4 4" strokeWidth="1" />
+                <text x={paddingX - 10} y={y + 3} textAnchor="end" className="text-[9px] fill-slate-400 font-mono">
                   ₹{val}L
                 </text>
               </g>
             );
           })}
 
-          {/* Area under curve */}
-          <path d={areaPath} fill="url(#revenueGradient)" />
+          {/* Target line (Dashed) */}
+          <path d={targetLinePath} fill="none" stroke="url(#targetGradient)" strokeWidth="2" strokeDasharray="5 5" className="opacity-60" />
 
-          {/* Target trajectory dashed line */}
-          <path
-            d={targetLinePath}
-            fill="none"
-            stroke="#94A3B8"
-            strokeWidth="2"
-            strokeDasharray="6 6"
-            opacity="0.8"
-          />
+          {/* Actual Line Gradient Area */}
+          <path d={areaPath} fill="url(#actualAreaGradient)" />
 
-          {/* Actual revenue main line */}
-          <path
-            d={actualLinePath}
-            fill="none"
-            stroke="#F0186C"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            filter="url(#pinkGlow)"
-          />
-
-          {/* Hover Column guide */}
-          {hoveredIndex !== null && (
-            <line
-              x1={getX(hoveredIndex)}
-              y1={paddingY}
-              x2={getX(hoveredIndex)}
-              y2={height - paddingY}
-              stroke="#F0186C"
-              strokeWidth="1.5"
-              strokeDasharray="3 3"
-              opacity="0.5"
-            />
-          )}
+          {/* Actual Line (Solid Pink) */}
+          <path d={actualLinePath} fill="none" stroke="#F0186C" strokeWidth="3.5" strokeLinecap="round" />
 
           {/* Data Points */}
           {monthlyData.map((d, i) => {
-            const x = getX(i);
-            const yActual = getY(d.actual);
+            const pt = actualPoints[i];
             const isHovered = hoveredIndex === i;
-
             return (
-              <g
-                key={d.month}
-                className="cursor-pointer transition-all duration-200"
-                onMouseEnter={() => setHoveredIndex(i)}
-                onClick={() => setHoveredIndex(i)}
-              >
-                {/* Target node dot */}
-                <circle cx={x} cy={getY(d.target)} r="3" fill="#94A3B8" opacity="0.6" />
-
-                {/* Actual node pulse halo when hovered or current */}
-                {(isHovered || d.isCurrent) && (
-                  <circle
-                    cx={x}
-                    cy={yActual}
-                    r={isHovered ? "9" : "6"}
-                    fill="#F0186C"
-                    opacity="0.25"
-                    className="animate-pulse"
-                  />
-                )}
-
-                {/* Actual node dot */}
+              <g key={d.month} className="cursor-pointer" onMouseEnter={() => setHoveredIndex(i)}>
                 <circle
-                  cx={x}
-                  cy={yActual}
-                  r={isHovered ? "5.5" : "4"}
-                  fill={d.isProjected ? "#FFF" : "#F0186C"}
-                  stroke={d.isProjected ? "#F0186C" : "#FFF"}
-                  strokeWidth="2.5"
+                  cx={pt.x}
+                  cy={pt.y}
+                  r={isHovered ? 7 : 4}
+                  fill="#FFFFFF"
+                  stroke="#F0186C"
+                  strokeWidth={isHovered ? 3.5 : 2.5}
                   className="transition-all duration-200"
                 />
-
-                {/* Value Label above point on hover or key points */}
+                {/* X-axis labels */}
                 <text
-                  x={x}
-                  y={yActual - 10}
+                  x={pt.x}
+                  y={height - 8}
                   textAnchor="middle"
-                  className={`text-[10px] font-mono font-bold transition-all ${
-                    isHovered
-                      ? "fill-[#D6135F] text-[11px] font-black"
-                      : d.isCurrent
-                      ? "fill-slate-900"
-                      : "fill-slate-500"
-                  }`}
-                >
-                  ₹{d.actual}L
-                </text>
-
-                {/* Month label along bottom axis */}
-                <text
-                  x={x}
-                  y={height - paddingY + 16}
-                  textAnchor="middle"
-                  className={`text-[10px] font-bold transition-colors ${
-                    isHovered
-                      ? "fill-[#F0186C] font-black"
-                      : d.isCurrent
-                      ? "fill-slate-900"
-                      : "fill-slate-500"
-                  }`}
+                  className={`text-[10px] font-bold ${isHovered ? "fill-[#F0186C] font-black" : "fill-slate-500"}`}
                 >
                   {d.month}
                 </text>
@@ -300,65 +223,15 @@ export function RevenueTrendChart({ financials }: RevenueTrendChartProps) {
           })}
         </svg>
 
-        {/* Dynamic Interactive Tooltip Card */}
-        {activePoint && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-pink-200 bg-gradient-to-r from-pink-50/70 via-white to-rose-50/50 p-3.5 shadow-xs">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#F0186C] text-white text-xs font-black">
-                {activePoint.month.slice(0, 3)}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black text-slate-900">{activePoint.month} Performance</span>
-                  {activePoint.isCurrent && (
-                    <span className="rounded-full bg-pink-100 px-2 py-0.5 text-[9px] font-extrabold text-[#D6135F]">
-                      Current Month
-                    </span>
-                  )}
-                  {activePoint.isProjected && (
-                    <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[9px] font-extrabold text-purple-700">
-                      Projected
-                    </span>
-                  )}
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  {activePoint.deals} Active enterprise client deliverables executed
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 text-xs font-mono">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-600 block">Actual</span>
-                <span className="font-black text-slate-900 text-sm">{activePoint.fullActual}</span>
-              </div>
-              <div className="h-6 w-px bg-pink-200" />
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-600 block">Target</span>
-                <span className="font-bold text-slate-700 text-sm">₹{activePoint.target}.0L</span>
-              </div>
-              <div className="h-6 w-px bg-pink-200" />
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-600 block">MoM Rate</span>
-                <span className="font-bold text-emerald-600 text-sm">+{activePoint.growth}%</span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Legend */}
-        <div className="mt-3 flex items-center justify-center gap-6 text-xs text-slate-600">
+        <div className="flex items-center justify-center gap-6 mt-3 text-xs text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-6 rounded-full bg-[#F0186C]" />
-            <span className="font-bold text-slate-700">Actual Revenue</span>
+            <span>Actual Revenue</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-0.5 w-6 border-b-2 border-dashed border-slate-400" />
-            <span className="font-semibold text-slate-500">Monthly Target</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full border-2 border-[#F0186C] bg-white" />
-            <span className="font-semibold text-slate-500">Milestone Node</span>
+            <span className="h-1 w-6 border-b-2 border-dashed border-slate-400" />
+            <span>Milestone Target</span>
           </div>
         </div>
       </div>

@@ -35,6 +35,8 @@ import {
   AttentionItem,
   SocialLead,
   ProspectItem,
+  PipelineDeal,
+  SubscriptionItem,
 } from "@/data/admin/types";
 import {
   RevenueTrendChart,
@@ -46,10 +48,12 @@ import {
 
 export function DashboardModule({
   financials,
-  projects,
-  attentionItems,
-  socialLeads,
-  prospects,
+  projects = [],
+  attentionItems = [],
+  socialLeads = [],
+  prospects = [],
+  deals = [],
+  subscriptions = [],
   onSelectTab,
   onResolveAttentionItem,
 }: {
@@ -58,10 +62,18 @@ export function DashboardModule({
   attentionItems: AttentionItem[];
   socialLeads: SocialLead[];
   prospects: ProspectItem[];
+  deals?: PipelineDeal[];
+  subscriptions?: SubscriptionItem[];
   onSelectTab: (tab: string) => void;
   onResolveAttentionItem: (id: string) => void;
 }) {
   const hotLeadsCount = socialLeads.filter((l) => l.qualificationScore >= 90).length;
+  const pipelineTotal = deals.reduce((sum, d) => sum + d.dealValue, 0) || financials.totalPipelineValue;
+
+  const displayRevenue = financials.monthlyRevenue > 0 ? `₹${financials.monthlyRevenue.toLocaleString("en-IN")}` : "₹0";
+  const displayTarget = financials.targetRevenue > 0 ? `Target: ₹${(financials.targetRevenue / 100000).toFixed(1)}L` : "Target: Baseline";
+  const displayReceivables = financials.overdueReceivables > 0 ? `₹${financials.overdueReceivables.toLocaleString("en-IN")}` : "₹0";
+  const displayPipeline = pipelineTotal > 0 ? `₹${pipelineTotal.toLocaleString("en-IN")}` : "₹0";
 
   return (
     <div className="space-y-6">
@@ -71,24 +83,26 @@ export function DashboardModule({
         <div className="group relative overflow-hidden rounded-3xl border border-pink-100 bg-white p-5 shadow-xs hover:border-pink-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D6135F] to-[#F0186C]" />
           <div className="flex items-center justify-between pb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Monthly Revenue (Sep)</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Monthly Revenue</span>
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-50 to-rose-100 text-[#D6135F] border border-pink-200/70 shadow-xs group-hover:scale-110 transition-transform">
               <DollarSign className="h-5 w-5" />
             </div>
           </div>
-          <div className="text-3xl font-black tracking-tight text-slate-900 font-mono mt-1">₹24,80,000</div>
+          <div className="text-3xl font-black tracking-tight text-slate-900 font-mono mt-1">{displayRevenue}</div>
           <div className="mt-1 flex items-center justify-between text-xs text-slate-600">
             <span className="flex items-center text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
               <TrendingUp className="mr-1 h-3.5 w-3.5" />
               +{financials.momGrowth}% MoM
             </span>
-            <span className="font-mono text-[11px] text-slate-500 font-medium">Target: ₹30.0L</span>
+            <span className="font-mono text-[11px] text-slate-500 font-medium">{displayTarget}</span>
           </div>
           {/* Progress bar */}
           <div className="mt-3.5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-gradient-to-r from-[#D6135F] via-[#F0186C] to-[#FF4D8D] transition-all duration-500"
-              style={{ width: `${(financials.monthlyRevenue / financials.targetRevenue) * 100}%` }}
+              style={{
+                width: `${financials.targetRevenue > 0 ? Math.min(100, (financials.monthlyRevenue / financials.targetRevenue) * 100) : 0}%`,
+              }}
             />
           </div>
         </div>
@@ -102,16 +116,18 @@ export function DashboardModule({
               <Layers className="h-5 w-5" />
             </div>
           </div>
-          <div className="text-3xl font-black tracking-tight text-slate-900 font-mono mt-1">12 Systems</div>
+          <div className="text-3xl font-black tracking-tight text-slate-900 font-mono mt-1">
+            {projects.length} {projects.length === 1 ? "System" : "Systems"}
+          </div>
           <div className="mt-1 flex items-center justify-between text-xs text-slate-600">
-            <span className="font-semibold text-slate-700">6 High-Impact Enterprise</span>
+            <span className="font-semibold text-slate-700">{projects.length} Active Deployments</span>
             <span className="inline-flex items-center rounded-lg bg-pink-50 px-2 py-0.5 text-[10px] font-bold text-[#D6135F] border border-pink-200">
-              91% On-Time
+              100% On-Time
             </span>
           </div>
           <div className="mt-3.5 flex items-center gap-1.5 text-[11px] text-slate-600 font-medium truncate">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Tata Steel · Krushi Odisha · OMSA</span>
+            <span>{projects.length > 0 ? projects.map((p) => p.client).slice(0, 3).join(" · ") : "Zero active client blockers"}</span>
           </div>
         </div>
 
@@ -124,20 +140,20 @@ export function DashboardModule({
               <AlertTriangle className="h-5 w-5" />
             </div>
           </div>
-          <div className="text-3xl font-black tracking-tight text-amber-700 font-mono mt-1">₹4,20,000</div>
+          <div className="text-3xl font-black tracking-tight text-amber-700 font-mono mt-1">{displayReceivables}</div>
           <div className="mt-1 flex items-center justify-between text-xs text-slate-600">
-            <span className="text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
-              1 Invoice &gt; 14 Days
+            <span className="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+              0 Overdue Invoices
             </span>
             <span className="font-mono text-[11px] text-slate-500">{financials.collectionVelocity}% Velocity</span>
           </div>
           <div className="mt-3.5 flex items-center justify-between text-[11px]">
-            <span className="text-slate-700 font-medium truncate">Tata Steel Kalinga Phase 2</span>
+            <span className="text-slate-700 font-medium truncate">All accounts cleared</span>
             <button
               onClick={() => onSelectTab("proof-vault")}
               className="text-[#D6135F] font-bold hover:underline inline-flex items-center gap-0.5"
             >
-              Track <ArrowRight className="h-3 w-3" />
+              Vault <ArrowRight className="h-3 w-3" />
             </button>
           </div>
         </div>
@@ -151,15 +167,15 @@ export function DashboardModule({
               <Sparkles className="h-5 w-5" />
             </div>
           </div>
-          <div className="text-3xl font-black tracking-tight text-slate-900 font-mono mt-1">₹68,50,000</div>
+          <div className="text-3xl font-black tracking-tight text-slate-900 font-mono mt-1">{displayPipeline}</div>
           <div className="mt-1 flex items-center justify-between text-xs text-slate-600">
             <span className="text-[#D6135F] font-bold bg-pink-50 px-2 py-0.5 rounded-lg border border-pink-200">
-              {hotLeadsCount} Hot Leads (&gt;90)
+              {hotLeadsCount} Inbound Leads
             </span>
-            <span className="font-mono text-[11px] text-slate-500 font-medium">6 Active Deals</span>
+            <span className="font-mono text-[11px] text-slate-500 font-medium">{deals.length} Active Deals</span>
           </div>
           <div className="mt-3.5 flex items-center justify-between text-[11px]">
-            <span className="text-slate-700 font-medium truncate">Dubai Logistics + Jaipur</span>
+            <span className="text-slate-700 font-medium truncate">{deals.length > 0 ? `${deals[0].company}` : "Ready for opportunities"}</span>
             <button
               onClick={() => onSelectTab("deals")}
               className="text-[#D6135F] font-bold hover:underline inline-flex items-center gap-0.5"
@@ -176,13 +192,13 @@ export function DashboardModule({
           <RevenueTrendChart financials={financials} />
         </div>
         <div className="lg:col-span-5">
-          <SectorPipelinePieChart onSelectSector={() => onSelectTab("deals")} />
+          <SectorPipelinePieChart deals={deals} onSelectSector={() => onSelectTab("deals")} />
         </div>
       </div>
 
       {/* Conversion Funnel & Inbound Channel Share Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PipelineFunnelChart />
+        <PipelineFunnelChart deals={deals} />
         <LeadSourcePieChart leads={socialLeads} />
       </div>
 
@@ -204,7 +220,7 @@ export function DashboardModule({
             </div>
           </div>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-[#D6135F] border border-rose-200">
-            <span className="h-2 w-2 rounded-full bg-[#F0186C] animate-ping" />
+            <span className="h-2 w-2 rounded-full bg-[#F0186C]" />
             {attentionItems.length} Urgent Items
           </span>
         </div>
@@ -280,7 +296,7 @@ export function DashboardModule({
 
           {attentionItems.length === 0 && (
             <div className="p-8 text-center text-xs font-semibold text-emerald-700 bg-emerald-50/50 rounded-2xl border border-emerald-200">
-              ✨ All critical items resolved. Operational health is at 100%.
+              ✨ All systems operational. Zero critical attention items.
             </div>
           )}
         </div>
@@ -305,71 +321,77 @@ export function DashboardModule({
           </Button>
         </div>
         <div className="pt-2 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-pink-100 bg-pink-50/30">
-                <TableHead className="text-slate-700 font-bold">Project &amp; Client</TableHead>
-                <TableHead className="text-slate-700 font-bold">Category</TableHead>
-                <TableHead className="text-slate-700 font-bold">Health Status</TableHead>
-                <TableHead className="text-slate-700 font-bold">Progress</TableHead>
-                <TableHead className="text-slate-700 font-bold">Deal Value</TableHead>
-                <TableHead className="text-slate-700 font-bold">Lead Engineer</TableHead>
-                <TableHead className="text-slate-700 font-bold">Next Milestone</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {projects.map((proj) => (
-                <TableRow key={proj.id} className="border-slate-100 hover:bg-pink-50/20 transition-colors">
-                  <TableCell>
-                    <div className="font-bold text-slate-900">{proj.name}</div>
-                    <div className="text-[11px] text-[#D6135F] font-semibold">{proj.client}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" size="xs">
-                      {proj.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        proj.status === "completed"
-                          ? "success"
-                          : proj.status === "on_track"
-                          ? "brand"
-                          : proj.status === "at_risk"
-                          ? "warning"
-                          : "destructive"
-                      }
-                      size="xs"
-                      className="uppercase font-mono font-bold"
-                    >
-                      {proj.status.replace("_", " ")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-20 overflow-hidden rounded-full bg-slate-100">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#D6135F] to-[#F0186C]"
-                          style={{ width: `${proj.progress}%` }}
-                        />
-                      </div>
-                      <span className="font-mono text-[11px] font-bold text-slate-700">{proj.progress}%</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-mono font-bold text-slate-900">{proj.dealValue}</TableCell>
-                  <TableCell className="text-xs text-slate-700 font-medium">{proj.leadEngineer}</TableCell>
-                  <TableCell>
-                    <div className="text-[11px] font-semibold text-slate-900">{proj.nextMilestone}</div>
-                    <div className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Clock className="h-3 w-3 text-[#D6135F]" />
-                      Due {proj.dueDate}
-                    </div>
-                  </TableCell>
+          {projects.length === 0 ? (
+            <div className="p-8 text-center text-xs text-slate-500 font-medium bg-pink-50/20 rounded-2xl border border-dashed border-pink-200">
+              No active project deployments logged yet. Convert deals to register new client deployments.
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-pink-100 bg-pink-50/30">
+                  <TableHead className="text-slate-700 font-bold">Project &amp; Client</TableHead>
+                  <TableHead className="text-slate-700 font-bold">Category</TableHead>
+                  <TableHead className="text-slate-700 font-bold">Health Status</TableHead>
+                  <TableHead className="text-slate-700 font-bold">Progress</TableHead>
+                  <TableHead className="text-slate-700 font-bold">Deal Value</TableHead>
+                  <TableHead className="text-slate-700 font-bold">Lead Engineer</TableHead>
+                  <TableHead className="text-slate-700 font-bold">Next Milestone</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {projects.map((proj) => (
+                  <TableRow key={proj.id} className="border-slate-100 hover:bg-pink-50/20 transition-colors">
+                    <TableCell>
+                      <div className="font-bold text-slate-900">{proj.name}</div>
+                      <div className="text-[11px] text-[#D6135F] font-semibold">{proj.client}</div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" size="xs">
+                        {proj.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          proj.status === "completed"
+                            ? "success"
+                            : proj.status === "on_track"
+                            ? "brand"
+                            : proj.status === "at_risk"
+                            ? "warning"
+                            : "destructive"
+                        }
+                        size="xs"
+                        className="uppercase font-mono font-bold"
+                      >
+                        {proj.status.replace("_", " ")}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-20 overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-[#D6135F] to-[#F0186C]"
+                            style={{ width: `${proj.progress}%` }}
+                          />
+                        </div>
+                        <span className="font-mono text-[11px] font-bold text-slate-700">{proj.progress}%</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono font-bold text-slate-900">{proj.dealValue}</TableCell>
+                    <TableCell className="text-xs text-slate-700 font-medium">{proj.leadEngineer}</TableCell>
+                    <TableCell>
+                      <div className="text-[11px] font-semibold text-slate-900">{proj.nextMilestone}</div>
+                      <div className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                        <Clock className="h-3 w-3 text-[#D6135F]" />
+                        Due {proj.dueDate}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
       </div>
     </div>

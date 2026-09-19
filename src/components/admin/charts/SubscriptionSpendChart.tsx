@@ -20,66 +20,51 @@ interface SpendCategory {
   seats: string;
 }
 
-const CATEGORY_SPEND: SpendCategory[] = [
-  {
-    category: "cloud_infra",
-    label: "Cloud & Server Infra",
-    monthlyCostUSD: 480,
-    percentage: 44.3,
-    color: "#F59E0B", // Amber
-    bgLight: "bg-amber-50",
-    borderLight: "border-amber-200",
-    tools: "AWS Chandaka EC2 & S3",
-    seats: "Dedicated VPC",
-  },
-  {
-    category: "ai_tool",
-    label: "Executive AI & Copilots",
-    monthlyCostUSD: 350,
-    percentage: 32.3,
-    color: "#F0186C", // Virtoy Pink
-    bgLight: "bg-pink-50",
-    borderLight: "border-pink-200",
-    tools: "Claude Pro Team + Antigravity Pro",
-    seats: "18 total seats",
-  },
-  {
-    category: "productivity",
-    label: "Google Workspace & Email",
-    monthlyCostUSD: 120,
-    percentage: 11.1,
-    color: "#3B82F6", // Blue
-    bgLight: "bg-blue-50",
-    borderLight: "border-blue-200",
-    tools: "vtindia.com Enterprise Mail",
-    seats: "20 users",
-  },
-  {
-    category: "dev_ops",
-    label: "DevOps & CI/CD",
-    monthlyCostUSD: 84,
-    percentage: 7.7,
-    color: "#10B981", // Emerald
-    bgLight: "bg-emerald-50",
-    borderLight: "border-emerald-200",
-    tools: "GitHub Enterprise Cloud",
-    seats: "12 developers",
-  },
-  {
-    category: "design_domain",
-    label: "Design & DNS Domains",
-    monthlyCostUSD: 50,
-    percentage: 4.6,
-    color: "#8B5CF6", // Purple
-    bgLight: "bg-purple-50",
-    borderLight: "border-purple-200",
-    tools: "Figma Org + Cloudflare DNS",
-    seats: "3 designers",
-  },
-];
+const CATEGORY_STYLES: Record<string, { label: string; color: string; bgLight: string; borderLight: string }> = {
+  cloud_infra: { label: "Cloud & Server Infra", color: "#F59E0B", bgLight: "bg-amber-50", borderLight: "border-amber-200" },
+  ai_tool: { label: "Executive AI & Copilots", color: "#F0186C", bgLight: "bg-pink-50", borderLight: "border-pink-200" },
+  productivity: { label: "Google Workspace & Email", color: "#3B82F6", bgLight: "bg-blue-50", borderLight: "border-blue-200" },
+  dev_ops: { label: "DevOps & CI/CD", color: "#10B981", bgLight: "bg-emerald-50", borderLight: "border-emerald-200" },
+  domain: { label: "Design & DNS Domains", color: "#8B5CF6", bgLight: "bg-purple-50", borderLight: "border-purple-200" },
+};
 
-export function SubscriptionSpendChart({ subscriptions }: SubscriptionSpendChartProps) {
+export function SubscriptionSpendChart({ subscriptions = [] }: SubscriptionSpendChartProps) {
   const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(0);
+
+  const categorySpend: SpendCategory[] = React.useMemo(() => {
+    if (!subscriptions || subscriptions.length === 0) return [];
+
+    const totalSpend = subscriptions.reduce((sum, s) => sum + s.costPerMonth, 0);
+    const map = new Map<string, { total: number; tools: string[]; seats: number }>();
+
+    subscriptions.forEach((s) => {
+      const cat = s.category || "productivity";
+      const existing = map.get(cat) || { total: 0, tools: [], seats: 0 };
+      existing.total += s.costPerMonth;
+      existing.tools.push(s.name);
+      existing.seats += s.seatCount;
+      map.set(cat, existing);
+    });
+
+    return Array.from(map.entries()).map(([cat, data]) => {
+      const style = CATEGORY_STYLES[cat] || { label: cat, color: "#F0186C", bgLight: "bg-pink-50", borderLight: "border-pink-200" };
+      const pct = totalSpend > 0 ? (data.total / totalSpend) * 100 : 0;
+      return {
+        category: cat,
+        label: style.label,
+        monthlyCostUSD: data.total,
+        percentage: parseFloat(pct.toFixed(1)),
+        color: style.color,
+        bgLight: style.bgLight,
+        borderLight: style.borderLight,
+        tools: data.tools.slice(0, 2).join(" + "),
+        seats: `${data.seats} total seats`,
+      };
+    });
+  }, [subscriptions]);
+
+  const totalMonthlyUSD = subscriptions.reduce((sum, s) => sum + s.costPerMonth, 0);
+  const totalMonthlyINR = Math.round(totalMonthlyUSD * 83);
 
   const size = 220;
   const center = size / 2;
@@ -88,7 +73,7 @@ export function SubscriptionSpendChart({ subscriptions }: SubscriptionSpendChart
 
   let accumulatedAngle = -90;
 
-  const slices = CATEGORY_SPEND.map((cat, index) => {
+  const slices = categorySpend.map((cat, index) => {
     const angle = (cat.percentage / 100) * 360;
     const startAngle = accumulatedAngle;
     const endAngle = accumulatedAngle + angle;
@@ -118,18 +103,13 @@ export function SubscriptionSpendChart({ subscriptions }: SubscriptionSpendChart
       `A ${activeRadius} ${activeRadius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
       `L ${x3} ${y3}`,
       `A ${activeInnerRadius} ${activeInnerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4}`,
-      `Z`,
+      "Z",
     ].join(" ");
 
-    return {
-      ...cat,
-      index,
-      pathData,
-      isHovered,
-    };
+    return { ...cat, pathData, isHovered };
   });
 
-  const activeCategory = hoveredIndex !== null ? CATEGORY_SPEND[hoveredIndex] : null;
+  const activeCat = hoveredIndex !== null && categorySpend[hoveredIndex] ? categorySpend[hoveredIndex] : categorySpend[0];
 
   return (
     <div className="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">
@@ -140,100 +120,88 @@ export function SubscriptionSpendChart({ subscriptions }: SubscriptionSpendChart
             <CreditCard className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900">SaaS &amp; AI Cloud Spend Distribution</h3>
-            <p className="text-xs text-slate-500">Breakdown of $1,084/mo (₹90,400/mo) operational subscriptions</p>
+            <h3 className="text-base font-bold text-slate-900">SaaS &amp; Cloud Subscription Spend</h3>
+            <p className="text-xs text-slate-500">Monthly breakdown across Cloud, AI &amp; Developer Tools</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
-          <PiggyBank className="h-3.5 w-3.5" />
-          ₹41,000 / mo AI Savings
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-pink-50 px-3 py-1 text-xs font-bold text-[#D6135F] border border-pink-200">
+            Total: ${totalMonthlyUSD}/mo (₹{(totalMonthlyINR / 1000).toFixed(1)}k)
+          </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center pt-4">
-        {/* SVG Donut */}
-        <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-          <svg viewBox={`0 0 ${size} ${size}`} className="w-48 h-48 sm:w-52 sm:h-52 overflow-visible select-none">
-            {slices.map((slice) => (
-              <path
-                key={slice.category}
-                d={slice.pathData}
-                fill={slice.color}
-                stroke="#FFFFFF"
-                strokeWidth="2"
-                className="cursor-pointer transition-all duration-300 hover:opacity-95"
-                onMouseEnter={() => setHoveredIndex(slice.index)}
-              />
-            ))}
-
-            <g className="pointer-events-none select-none">
-              <circle cx={center} cy={center} r={innerRadius - 4} fill="#FFFFFF" />
-              <text
-                x={center}
-                y={center - 8}
-                textAnchor="middle"
-                className="fill-slate-600 text-[9px] font-extrabold uppercase"
-              >
-                Monthly Total
-              </text>
-              <text
-                x={center}
-                y={center + 10}
-                textAnchor="middle"
-                className="fill-slate-900 text-sm font-black font-mono"
-              >
-                {activeCategory ? `$${activeCategory.monthlyCostUSD}` : "$1,084"}
-              </text>
-              <text
-                x={center}
-                y={center + 24}
-                textAnchor="middle"
-                className="fill-[#D6135F] text-[9px] font-bold"
-              >
-                {activeCategory ? `${activeCategory.percentage}%` : "₹90.4K/mo"}
-              </text>
-            </g>
-          </svg>
+      {categorySpend.length === 0 ? (
+        <div className="py-12 flex flex-col items-center justify-center text-center space-y-2">
+          <CreditCard className="h-10 w-10 text-pink-300 mx-auto" />
+          <h4 className="text-sm font-bold text-slate-800">No Subscriptions Tracked Yet</h4>
+          <p className="text-xs text-slate-500 max-w-sm">
+            Add recurring cloud infrastructure, developer seats, and AI tools to analyze monthly recurring expenses.
+          </p>
         </div>
-
-        {/* Categories list */}
-        <div className="md:col-span-7 space-y-2">
-          {CATEGORY_SPEND.map((item, idx) => {
-            const isHovered = hoveredIndex === idx;
-
-            return (
-              <div
-                key={item.category}
-                onMouseEnter={() => setHoveredIndex(idx)}
-                className={`flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer ${
-                  isHovered
-                    ? `${item.bgLight} ${item.borderLight} shadow-xs`
-                    : "bg-slate-50/50 border-slate-100 hover:bg-pink-50/30"
-                }`}
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span
-                    className="h-3 w-3 rounded-full shrink-0"
-                    style={{ backgroundColor: item.color }}
+      ) : (
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.4fr] items-center">
+          {/* SVG Donut Chart */}
+          <div className="relative flex flex-col items-center justify-center">
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+              <g>
+                {slices.map((slice, index) => (
+                  <path
+                    key={slice.category}
+                    d={slice.pathData}
+                    fill={slice.color}
+                    className="cursor-pointer transition-all duration-200"
+                    stroke="#FFFFFF"
+                    strokeWidth="2"
+                    onMouseEnter={() => setHoveredIndex(index)}
                   />
-                  <div className="min-w-0">
-                    <span className="text-xs font-bold text-slate-900 block truncate">{item.label}</span>
-                    <span className="text-[10px] text-slate-500 truncate">{item.tools}</span>
+                ))}
+              </g>
+
+              {/* Center Label */}
+              <g className="pointer-events-none">
+                <text x={center} y={center - 8} textAnchor="middle" className="fill-slate-400 text-[10px] font-bold uppercase">
+                  Monthly Total
+                </text>
+                <text x={center} y={center + 12} textAnchor="middle" className="fill-slate-900 text-sm font-black font-mono">
+                  ${totalMonthlyUSD}
+                </text>
+              </g>
+            </svg>
+          </div>
+
+          {/* Breakdown cards */}
+          <div className="space-y-2.5">
+            {categorySpend.map((cat, index) => {
+              const isHovered = hoveredIndex === index;
+              return (
+                <div
+                  key={cat.category}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  className={`flex items-center justify-between rounded-2xl border p-3 cursor-pointer transition-all ${
+                    isHovered
+                      ? "border-[#F0186C] bg-pink-50/40 shadow-xs"
+                      : "border-pink-100/70 bg-white hover:border-pink-200"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: cat.color }} />
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">{cat.label}</div>
+                      <div className="text-[10px] text-slate-500">{cat.tools}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="font-mono font-bold text-slate-700">${cat.monthlyCostUSD}</span>
+                    <span className="font-bold text-[#D6135F]">{cat.percentage}%</span>
                   </div>
                 </div>
-
-                <div className="text-right shrink-0">
-                  <span className="text-xs font-black text-slate-900 font-mono block">
-                    ${item.monthlyCostUSD} <span className="text-[10px] font-normal text-slate-500">/mo</span>
-                  </span>
-                  <span className="text-[10px] font-bold text-slate-500">{item.percentage}%</span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

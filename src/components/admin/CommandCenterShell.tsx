@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AdminSidebar } from "@/components/admin/layout/AdminSidebar";
 import { AdminTopBar } from "@/components/admin/layout/AdminTopBar";
+import { AdminSignIn } from "@/components/admin/auth/AdminSignIn";
 import { EmployeeSwitcherDialog } from "@/components/admin/EmployeeSwitcherDialog";
 import { DashboardModule } from "@/components/admin/modules/DashboardModule";
 import { ChiefOfStaffModule } from "@/components/admin/modules/ChiefOfStaffModule";
@@ -22,6 +23,7 @@ export function CommandCenterShell() {
 
   const {
     isHydrated,
+    isAuthenticated,
     currentEmployee,
     employees,
     financials,
@@ -37,6 +39,8 @@ export function CommandCenterShell() {
     activeTab,
     sidebarCollapsed,
     mobileDrawerOpen,
+    login,
+    logout,
     setActiveTab,
     setSidebarCollapsed,
     setMobileDrawerOpen,
@@ -67,9 +71,7 @@ export function CommandCenterShell() {
   }, [setSidebarCollapsed]);
 
   const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      window.location.href = "/";
-    }
+    logout();
   };
 
   // If not hydrated on client yet, show a clean loading screen
@@ -84,6 +86,11 @@ export function CommandCenterShell() {
         </div>
       </div>
     );
+  }
+
+  // If not authenticated, render the secure Sign In gate
+  if (!isAuthenticated) {
+    return <AdminSignIn employees={employees} onLogin={login} />;
   }
 
   return (

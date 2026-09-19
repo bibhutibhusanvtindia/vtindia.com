@@ -67,12 +67,12 @@ export function ChiefOfStaffModule({
     {
       id: "welcome-1",
       sender: "ai",
-      text: "Namaste Sir 🙏. I am your AI Chief of Staff with live telemetry across our ₹24.8L monthly revenue, 12 active client projects, overdue receivables, and incoming B2B pipeline. How can I assist leadership today?",
+      text: "Namaste Sir 🙏. I am your AI Chief of Staff with live telemetry across Virtoy enterprise operations, active client projects, receivables, and incoming B2B pipeline. How can I assist leadership today?",
       timestamp: "09:00 AM",
       aiData: {
-        answer: "Namaste Sir 🙏. I am your AI Chief of Staff with live telemetry across our ₹24.8L monthly revenue, 12 active client projects, overdue receivables, and incoming B2B pipeline. How can I assist leadership today?",
+        answer: "Namaste Sir 🙏. I am your AI Chief of Staff with live telemetry across Virtoy enterprise operations, active client projects, receivables, and incoming B2B pipeline. How can I assist leadership today?",
         suggestedActions: [
-          { label: "Check Overdue Receivables", actionId: "view_receivables", targetTab: "proof-vault" },
+          { label: "Check Operational Telemetry", actionId: "view_receivables", targetTab: "dashboard" },
           { label: "Prepare Management Agenda", actionId: "ask_agenda" },
           { label: "Review Deal Pipeline", actionId: "view_pipeline", targetTab: "deals" },
         ],
