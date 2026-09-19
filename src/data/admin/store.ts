@@ -182,6 +182,25 @@ export function useAdminStore() {
     []
   );
 
+  const addSocialLead = useCallback(
+    (lead: Omit<SocialLead, "id" | "timestamp">) => {
+      const newLead: SocialLead = {
+        ...lead,
+        id: `lead-${Date.now()}`,
+        timestamp: "Just now",
+      };
+      setSocialLeads((prev) => {
+        const updated = [newLead, ...prev];
+        try {
+          localStorage.setItem(STORAGE_KEYS.LEADS, JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+      addAuditLog("Captured Inbound Lead", "Social Lead Capture", `Captured new inquiry from ${newLead.senderName} (${newLead.platform})`);
+    },
+    [addAuditLog]
+  );
+
   const updateProspectStatus = useCallback(
     (prospectId: string, newStatus: ProspectItem["status"]) => {
       setProspects((prev) => {
@@ -336,6 +355,7 @@ export function useAdminStore() {
     setCurrentEmployee,
     updateLeadStatus,
     updateLeadSuggestedReply,
+    addSocialLead,
     updateProspectStatus,
     addProspect,
     addProofVaultItem,

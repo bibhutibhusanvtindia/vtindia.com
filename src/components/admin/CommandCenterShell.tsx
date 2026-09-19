@@ -43,6 +43,7 @@ export function CommandCenterShell() {
     setCurrentEmployee,
     updateLeadStatus,
     updateLeadSuggestedReply,
+    addSocialLead,
     updateProspectStatus,
     addProspect,
     addProofVaultItem,
@@ -60,14 +61,10 @@ export function CommandCenterShell() {
         e.preventDefault();
         setSidebarCollapsed((prev) => !prev);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setActiveTab("chief-of-staff");
-      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [setSidebarCollapsed, setActiveTab]);
+  }, [setSidebarCollapsed]);
 
   const handleLogout = () => {
     if (typeof window !== "undefined") {
@@ -75,12 +72,15 @@ export function CommandCenterShell() {
     }
   };
 
+  // If not hydrated on client yet, show a clean loading screen
   if (!isHydrated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] text-slate-600 text-xs">
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#F0186C] border-t-transparent" />
-          <span>Initializing Virtoy Executive Command Engine...</span>
+      <div className="flex min-h-screen items-center justify-center bg-[#FFF8FA]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-pink-200 border-t-[#F0186C]" />
+          <p className="text-xs font-mono font-bold text-[#D6135F] tracking-wide">
+            Initializing Virtoy Command Systems...
+          </p>
         </div>
       </div>
     );
@@ -162,6 +162,9 @@ export function CommandCenterShell() {
               leads={socialLeads}
               onUpdateStatus={updateLeadStatus}
               onUpdateReply={updateLeadSuggestedReply}
+              onAddLead={addSocialLead}
+              onAddDeal={addDeal}
+              onSelectTab={setActiveTab}
             />
           )}
 
@@ -170,6 +173,8 @@ export function CommandCenterShell() {
               prospects={prospects}
               onUpdateStatus={updateProspectStatus}
               onAddProspect={addProspect}
+              onAddDeal={addDeal}
+              onSelectTab={setActiveTab}
             />
           )}
 
