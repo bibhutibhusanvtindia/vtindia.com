@@ -279,6 +279,28 @@ export function useAdminStore() {
     [addAuditLog]
   );
 
+  const deleteProspect = useCallback(
+    (prospectId: string) => {
+      setProspects((prev) => {
+        const updated = prev.filter((p) => p.id !== prospectId);
+        try {
+          localStorage.setItem(STORAGE_KEYS.PROSPECTS, JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+      addAuditLog("Deleted Prospect Record", "B2B Maps Prospector", `Removed prospect #${prospectId}`);
+    },
+    [addAuditLog]
+  );
+
+  const clearProspects = useCallback(() => {
+    setProspects([]);
+    try {
+      localStorage.setItem(STORAGE_KEYS.PROSPECTS, JSON.stringify([]));
+    } catch {}
+    addAuditLog("Cleared All Prospect Records", "B2B Maps Prospector", "All discovered enterprise leads cleared.");
+  }, [addAuditLog]);
+
   const addProofVaultItem = useCallback(
     (item: Omit<ProofVaultItem, "id" | "timestamp" | "uploadedBy" | "uploadedByRole">) => {
       const newItem: ProofVaultItem = {
@@ -409,6 +431,8 @@ export function useAdminStore() {
     addSocialLead,
     updateProspectStatus,
     addProspect,
+    deleteProspect,
+    clearProspects,
     addProofVaultItem,
     updateSubscriptionSeats,
     resolveAttentionItem,

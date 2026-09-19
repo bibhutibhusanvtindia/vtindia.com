@@ -50,6 +50,8 @@ export function CommandCenterShell() {
     addSocialLead,
     updateProspectStatus,
     addProspect,
+    deleteProspect,
+    clearProspects,
     addProofVaultItem,
     updateSubscriptionSeats,
     resolveAttentionItem,
@@ -180,6 +182,8 @@ export function CommandCenterShell() {
               prospects={prospects}
               onUpdateStatus={updateProspectStatus}
               onAddProspect={addProspect}
+              onDeleteProspect={deleteProspect}
+              onClearProspects={clearProspects}
               onAddDeal={addDeal}
               onSelectTab={setActiveTab}
             />
