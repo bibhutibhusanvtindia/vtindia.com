@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Menu, Phone, X, Globe, Sparkles } from "lucide-react";
+import { ChevronDown, Menu, Phone, X, Globe, Sparkles, LogIn } from "lucide-react";
 import { clsx } from "clsx";
 import { companyLinks, productLinks, serviceLinks, topLevelLinks } from "@/data/nav";
 import { Logo } from "@/components/ui/Logo";
@@ -185,25 +185,16 @@ export function Header() {
 
             <CommandPalette />
             <SoundToggle />
-            <Link
-              href="/admin"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-muted transition hover:border-primary hover:text-primary hover:scale-105 shrink-0"
-              title="Open AI Executive Command Center"
-            >
-              <Sparkles className="h-4 w-4 text-indigo-500" />
-            </Link>
 
-            <a
-              href={`tel:+91${site.phones[0].number}`}
-              className="hidden 2xl:flex group shrink-0 whitespace-nowrap items-center gap-2 rounded-full border border-border/70 bg-surface/60 px-3 py-2 text-xs font-medium text-muted backdrop-blur-sm transition-all hover:border-primary/40 hover:text-foreground"
+            {/* Admin Sign In Button */}
+            <Link
+              href="/admin/login"
+              className="group flex shrink-0 items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3.5 py-1.5 text-xs font-bold text-primary transition-all duration-300 hover:border-primary hover:bg-primary hover:text-white shadow-2xs hover:shadow-md hover:shadow-primary/25"
+              title="Sign In to Virtoy Executive Command Center"
             >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-              </span>
-              <Phone className="h-3.5 w-3.5 text-primary" />
-              {site.phones[0].number}
-            </a>
+              <LogIn className="h-3.5 w-3.5 text-primary group-hover:text-white transition-colors" />
+              <span>Admin Sign In</span>
+            </Link>
 
             <Link
               href="/contact"
@@ -234,13 +225,17 @@ export function Header() {
 
             <CommandPalette />
             <SoundToggle />
+
+            {/* Mobile Admin Sign In Button */}
             <Link
-              href="/admin"
-              className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-border bg-surface text-muted"
-              title="Open AI Executive Command Center"
+              href="/admin/login"
+              className="flex items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-2.5 py-1.5 text-xs font-bold text-primary hover:bg-primary hover:text-white transition-colors"
+              title="Admin Sign In"
             >
-              <Sparkles className="h-4 w-4 text-indigo-500" />
+              <LogIn className="h-3.5 w-3.5" />
+              <span>Admin</span>
             </Link>
+
             <button
               className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground"
               onClick={() => setMobileOpen((v) => !v)}
@@ -317,7 +312,16 @@ export function Header() {
                 </div>
 
                 {/* Mobile Quick Action Buttons */}
-                <div className="mt-4 border-t border-border/80 pt-4 flex flex-col gap-3">
+                <div className="mt-4 border-t border-border/80 pt-4 flex flex-col gap-2.5">
+                  <Link
+                    href="/admin/login"
+                    className="flex items-center justify-center gap-2 rounded-full border-2 border-primary/40 bg-primary/5 py-2.5 text-xs font-bold text-primary hover:bg-primary hover:text-white transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span>Admin Sign In (Command Center)</span>
+                  </Link>
+
                   <a
                     href={`tel:+91${site.phones[0].number}`}
                     className="flex items-center justify-center gap-2 rounded-full border border-border/90 bg-surface py-2.5 text-xs font-semibold text-foreground"
