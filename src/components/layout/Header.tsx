@@ -89,16 +89,16 @@ export function Header() {
             : "border-transparent bg-background/70 backdrop-blur-md",
         )}
       >
-        <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-2 sm:gap-3 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-20 w-full max-w-[1440px] 2xl:max-w-[1600px] items-center justify-between gap-1.5 sm:gap-2 lg:gap-3 px-4 sm:px-6 lg:px-6 xl:px-8">
           {/* Brand Logo */}
           <div className="flex shrink-0 items-center">
             <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-              <Logo priority className="h-9 w-auto sm:h-11 transition-transform duration-300 hover:scale-[1.02]" />
+              <Logo priority className="h-8 w-auto sm:h-10 xl:h-11 transition-transform duration-300 hover:scale-[1.02]" />
             </Link>
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden items-center gap-0.5 xl:gap-1.5 lg:flex">
+          <nav className="hidden items-center gap-0.5 xl:gap-1.5 2xl:gap-2 lg:flex min-w-0">
             <NavLink href="/" label={t("nav_home")} active={pathname === "/"} />
             {dropdowns.map((dropdown) => (
               <div
@@ -107,7 +107,7 @@ export function Header() {
                 onMouseEnter={() => setOpenDropdown(dropdown.id)}
                 onMouseLeave={() => setOpenDropdown(null)}
               >
-                <button className="flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold text-foreground transition hover:text-primary xl:px-3 xl:text-sm">
+                <button className="flex items-center gap-1 rounded-full px-2 py-1.5 text-xs font-semibold text-foreground transition hover:text-primary xl:px-3 xl:text-sm whitespace-nowrap">
                   {dropdown.label}
                   <ChevronDown className="h-3.5 w-3.5 opacity-70" />
                 </button>
@@ -140,12 +140,12 @@ export function Header() {
           </nav>
 
           {/* Right Action Cluster */}
-          <div className="hidden shrink-0 items-center gap-2 xl:gap-2.5 lg:flex">
+          <div className="hidden shrink-0 items-center gap-1.5 xl:gap-2 2xl:gap-2.5 lg:flex">
             {/* Header Language Switcher Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setLangDropdownOpen((v) => !v)}
-                className="flex items-center gap-1.5 rounded-full border border-border/80 bg-surface/80 px-3 py-1.5 text-xs font-bold text-foreground transition hover:border-primary/50 hover:text-primary"
+                className="flex items-center gap-1.5 rounded-full border border-border/80 bg-surface/80 px-2.5 py-1.5 text-xs font-bold text-foreground transition hover:border-primary/50 hover:text-primary shrink-0"
                 title="Change Website Language"
               >
                 <span>{VOICE_LANGUAGES.find((l) => l.code === lang)?.flag || "🇬🇧"}</span>
@@ -187,7 +187,7 @@ export function Header() {
             <SoundToggle />
             <Link
               href="/admin"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-muted transition hover:border-primary hover:text-primary hover:scale-105"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-muted transition hover:border-primary hover:text-primary hover:scale-105 shrink-0"
               title="Open AI Executive Command Center"
             >
               <Sparkles className="h-4 w-4 text-indigo-500" />
@@ -207,7 +207,7 @@ export function Header() {
 
             <Link
               href="/contact"
-              className="group relative inline-flex shrink-0 whitespace-nowrap items-center gap-2 overflow-hidden rounded-full bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-strong hover:shadow-lg hover:shadow-primary/35 xl:px-5 xl:py-2.5 xl:text-sm"
+              className="group relative inline-flex shrink-0 whitespace-nowrap items-center gap-1.5 xl:gap-2 overflow-hidden rounded-full bg-primary px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-strong hover:shadow-lg hover:shadow-primary/35 xl:px-5 xl:py-2.5 xl:text-sm"
             >
               <span
                 aria-hidden="true"

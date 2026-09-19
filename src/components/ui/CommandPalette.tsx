@@ -202,11 +202,11 @@ export function CommandPalette() {
           setIsOpen(true);
           playHapticBeep(700, 0.05);
         }}
-        className="hidden items-center gap-2 rounded-full border border-border/80 bg-surface px-3 py-1.5 text-xs text-muted shadow-sm transition hover:border-primary hover:text-foreground md:flex"
-        title="Quick Search & Command Hub"
+        className="hidden items-center gap-1.5 2xl:gap-2 rounded-full border border-border/80 bg-surface px-2.5 py-1.5 2xl:px-3 text-xs text-muted shadow-sm transition hover:border-primary hover:text-foreground md:flex shrink-0"
+        title="Quick Search & Command Hub (Ctrl+K)"
       >
-        <Search className="h-3.5 w-3.5 text-primary" />
-        <span className="text-[11px] font-medium">Quick Command</span>
+        <Search className="h-3.5 w-3.5 text-primary shrink-0" />
+        <span className="text-[11px] font-medium hidden 2xl:inline">Quick Command</span>
         <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-[10px] font-bold text-muted">
           Ctrl K
         </kbd>
