@@ -18,6 +18,7 @@ import {
   Briefcase,
   AlertTriangle,
   LogOut,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/admin/ui/Button";
 import { Badge } from "@/components/admin/ui/Badge";
@@ -33,6 +34,7 @@ export function AdminTopBar({
   onSelectTab,
   onResolveAttentionItem,
   onResetData,
+  onExportData,
   onLogout,
 }: {
   onOpenMobileSidebar: () => void;
@@ -42,6 +44,7 @@ export function AdminTopBar({
   onSelectTab: (tabId: string) => void;
   onResolveAttentionItem: (id: string) => void;
   onResetData?: () => void;
+  onExportData?: () => void;
   onLogout?: () => void;
 }) {
   const [timeStr, setTimeStr] = React.useState<string>("");
@@ -114,6 +117,19 @@ export function AdminTopBar({
           <Sparkles className="h-3.5 w-3.5 text-rose-100" />
           <span>Ask AI</span>
         </Button>
+
+        {/* Export Full Workspace Backup (JSON) */}
+        {onExportData && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onExportData}
+            className="hidden sm:inline-flex h-9 w-9 p-0 text-slate-500 hover:bg-pink-50 hover:text-emerald-600 rounded-xl transition-colors"
+            title="Download Workspace JSON Backup"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        )}
 
         {/* Reset Store Data Button */}
         {onResetData && (

@@ -172,6 +172,32 @@ export function ProspectorModule({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleConvertToDeal = (prosp: ProspectItem) => {
+    if (!onAddDeal) return;
+    const rawMatch = prosp.estimatedDealValue.match(/\d+(\.\d+)?/);
+    const valLakhs = rawMatch ? parseFloat(rawMatch[0]) : 8.5;
+    const dealVal = valLakhs < 100 ? valLakhs * 100000 : valLakhs;
+
+    onAddDeal({
+      title: `${prosp.companyName} - Enterprise Tech Suite`,
+      company: prosp.companyName,
+      sector: prosp.category,
+      location: prosp.location,
+      stage: "discovery",
+      dealValue: Math.round(dealVal),
+      winProbability: 55,
+      leadRep: "Pritiranjan Sahu",
+      aiHealthScore: 88,
+      aiBottleneck: `Discovered enterprise lead in ${prosp.location}. Initial stakeholder outreach pending for ${prosp.contactPerson}.`,
+      aiNextBestAction: `Dispatch 1-Click WhatsApp pitch or schedule introductory technical discovery call.`,
+      expectedClose: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+    });
+
+    onUpdateStatus(prosp.id, "converted");
+    setConvertedDealId(prosp.id);
+    setTimeout(() => setConvertedDealId(null), 4000);
+  };
+
   /**
    * Real-Time Live Lead Discovery Action:
    * Calls the live `/api/lead-discovery` API to fetch real, active enterprises in real-time.
@@ -285,34 +311,6 @@ export function ProspectorModule({
       customPitch: "",
       coldCallScript: "",
     });
-  };
-
-  // Convert Prospect to Pipeline Deal
-  const handleConvertToDeal = (prospect: ProspectItem) => {
-    if (onAddDeal) {
-      const numMatch = prospect.estimatedDealValue.match(/\d+(\.\d+)?/);
-      const valLakhs = numMatch ? parseFloat(numMatch[0]) : 10.0;
-      const dealVal = valLakhs < 100 ? valLakhs * 100000 : valLakhs;
-
-      onAddDeal({
-        title: `${prospect.category} Enterprise Platform (${prospect.companyName})`,
-        company: prospect.companyName,
-        sector: prospect.category,
-        location: prospect.location,
-        stage: "discovery",
-        dealValue: Math.round(dealVal),
-        winProbability: 65,
-        leadRep: "Rakesh Panda",
-        aiHealthScore: 88,
-        aiBottleneck: `Enterprise lead discovered in ${prospect.location}. Value proposition prepared for ${prospect.contactPerson}.`,
-        aiNextBestAction: `Dispatch customized architecture pitch & schedule 15-min live demo.`,
-        expectedClose: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
-      });
-
-      onUpdateStatus(prospect.id, "converted");
-      setConvertedDealId(prospect.id);
-      setTimeout(() => setConvertedDealId(null), 4000);
-    }
   };
 
   // Export to CSV

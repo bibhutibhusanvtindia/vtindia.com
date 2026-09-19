@@ -15,6 +15,9 @@ import {
   Sparkles,
   ChevronRight,
   Filter,
+  Trash2,
+  Phone,
+  MessageSquare,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/admin/ui/Card";
 import { Button } from "@/components/admin/ui/Button";
@@ -37,12 +40,15 @@ export function PipelineDealMatrixModule({
   deals,
   onUpdateDealStage,
   onAddDeal,
+  onDeleteDeal,
 }: {
   deals: PipelineDeal[];
   onUpdateDealStage: (dealId: string, stage: DealStage) => void;
   onAddDeal: (deal: Omit<PipelineDeal, "id" | "lastActivity">) => void;
+  onDeleteDeal?: (dealId: string) => void;
 }) {
   const [sectorFilter, setSectorFilter] = React.useState<string>("all");
+  const [repFilter, setRepFilter] = React.useState<string>("all");
   const [selectedDeal, setSelectedDeal] = React.useState<PipelineDeal | null>(null);
   const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<"all" | "kanban" | "charts">("all");
@@ -57,9 +63,21 @@ export function PipelineDealMatrixModule({
   const [newRep, setNewRep] = React.useState("Ashwin Yadav");
   const [newBottleneck, setNewBottleneck] = React.useState("");
 
+  const availableReps = React.useMemo(() => {
+    const set = new Set<string>();
+    deals.forEach((d) => {
+      if (d.leadRep) set.add(d.leadRep);
+    });
+    return Array.from(set);
+  }, [deals]);
+
   const filteredDeals = React.useMemo(() => {
-    return deals.filter((d) => (sectorFilter === "all" ? true : d.sector === sectorFilter));
-  }, [deals, sectorFilter]);
+    return deals.filter((d) => {
+      const matchSector = sectorFilter === "all" || d.sector === sectorFilter;
+      const matchRep = repFilter === "all" || d.leadRep === repFilter;
+      return matchSector && matchRep;
+    });
+  }, [deals, sectorFilter, repFilter]);
 
   const totalPipeline = React.useMemo(() => {
     return deals.reduce((sum, d) => sum + (d.stage !== "lost" ? d.dealValue : 0), 0);
@@ -148,12 +166,25 @@ export function PipelineDealMatrixModule({
             <Select
               value={sectorFilter}
               onChange={(e) => setSectorFilter(e.target.value)}
-              className="w-48 text-xs bg-white border-2 border-pink-200 text-slate-800 rounded-xl"
+              className="w-44 text-xs bg-white border-2 border-pink-200 text-slate-800 rounded-xl"
             >
               <option value="all">🏢 All B2B Sectors</option>
               {availableSectors.map((s) => (
                 <option key={s} value={s}>
                   {s}
+                </option>
+              ))}
+            </Select>
+
+            <Select
+              value={repFilter}
+              onChange={(e) => setRepFilter(e.target.value)}
+              className="w-44 text-xs bg-white border-2 border-pink-200 text-slate-800 rounded-xl"
+            >
+              <option value="all">👤 All Deal Reps</option>
+              {availableReps.map((r) => (
+                <option key={r} value={r}>
+                  {r}
                 </option>
               ))}
             </Select>
@@ -524,13 +555,43 @@ export function PipelineDealMatrixModule({
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-pink-100 pt-3 text-xs">
-            <div className="flex items-center gap-2 text-slate-500 font-medium">
-              <Calendar className="h-4 w-4 text-[#D6135F]" />
-              <span>Target Close Date: <strong className="text-slate-800">{selectedDeal.expectedClose}</strong></span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                <Calendar className="h-4 w-4 text-[#D6135F]" />
+                <span>Target Close: <strong className="text-slate-800">{selectedDeal.expectedClose}</strong></span>
+              </div>
+
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Namaste from Virtoy Technologies! Following up on our enterprise discussion regarding ${selectedDeal.title} for ${selectedDeal.company}.`
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl hover:bg-emerald-100 transition-colors"
+              >
+                <MessageSquare className="h-3 w-3" />
+                <span>WhatsApp Client</span>
+              </a>
+
+              {onDeleteDeal && (
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to remove the deal "${selectedDeal.title}" from the active pipeline?`)) {
+                      onDeleteDeal(selectedDeal.id);
+                      setSelectedDeal(null);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-1 rounded-xl transition-colors"
+                  title="Delete Deal"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Delete Deal</span>
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-500 font-bold">Move to Stage:</span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[11px] text-slate-500 font-bold">Move Stage:</span>
               {STAGES.map((s) => (
                 <Button
                   key={s.id}
@@ -541,7 +602,7 @@ export function PipelineDealMatrixModule({
                     setSelectedDeal({ ...selectedDeal, stage: s.id });
                   }}
                   className={`text-[10px] rounded-xl font-bold ${
-                    selectedDeal.stage === s.id ? "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white shadow-xs" : "border-slate-200 text-slate-700"
+                    selectedDeal.stage === s.id ? "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white shadow-xs" : "border-slate-200 text-slate-700 hover:bg-pink-50"
                   }`}
                 >
                   {s.label.split(". ")[1]}

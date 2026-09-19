@@ -57,6 +57,8 @@ export function CommandCenterShell() {
     resolveAttentionItem,
     updateDealStage,
     addDeal,
+    deleteDeal,
+    exportDataSnapshot,
     resetToDefaultData,
   } = useAdminStore();
 
@@ -126,6 +128,7 @@ export function CommandCenterShell() {
           onSelectTab={setActiveTab}
           onResolveAttentionItem={resolveAttentionItem}
           onResetData={resetToDefaultData}
+          onExportData={exportDataSnapshot}
           onLogout={handleLogout}
         />
 
@@ -194,11 +197,15 @@ export function CommandCenterShell() {
               deals={pipelineDeals}
               onUpdateDealStage={updateDealStage}
               onAddDeal={addDeal}
+              onDeleteDeal={deleteDeal}
             />
           )}
 
           {activeTab === "cold-outreach" && (
-            <ColdOutreachStudioModule templates={outreachTemplates} />
+            <ColdOutreachStudioModule
+              templates={outreachTemplates}
+              prospects={prospects}
+            />
           )}
 
           {activeTab === "proof-vault" && (

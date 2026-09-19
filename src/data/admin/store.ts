@@ -383,6 +383,63 @@ export function useAdminStore() {
     [addAuditLog]
   );
 
+  const deleteDeal = useCallback(
+    (dealId: string) => {
+      setPipelineDeals((prev) => {
+        const target = prev.find((d) => d.id === dealId);
+        const updated = prev.filter((d) => d.id !== dealId);
+        try {
+          localStorage.setItem(STORAGE_KEYS.DEALS, JSON.stringify(updated));
+        } catch {}
+        if (target) {
+          addAuditLog("Deleted Pipeline Deal", "Deal Matrix", `Removed deal ${target.title} (${target.company})`);
+        }
+        return updated;
+      });
+    },
+    [addAuditLog]
+  );
+
+  const exportDataSnapshot = useCallback(() => {
+    const snapshot = {
+      timestamp: new Date().toISOString(),
+      version: "6.0",
+      company: "Virtoy Technologies Private Limited",
+      financials,
+      projects,
+      attentionItems,
+      socialLeads,
+      prospects,
+      proofVault,
+      subscriptions,
+      auditLogs,
+      pipelineDeals,
+      outreachTemplates,
+    };
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `virtoy-command-backup-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    addAuditLog("Exported Enterprise Backup", "System Administration", "Full workspace JSON backup snapshot downloaded.");
+  }, [
+    financials,
+    projects,
+    attentionItems,
+    socialLeads,
+    prospects,
+    proofVault,
+    subscriptions,
+    auditLogs,
+    pipelineDeals,
+    outreachTemplates,
+    addAuditLog,
+  ]);
+
   const resetToDefaultData = useCallback(() => {
     try {
       localStorage.clear();
@@ -438,6 +495,8 @@ export function useAdminStore() {
     resolveAttentionItem,
     updateDealStage,
     addDeal,
+    deleteDeal,
+    exportDataSnapshot,
     addAuditLog,
     resetToDefaultData,
   };

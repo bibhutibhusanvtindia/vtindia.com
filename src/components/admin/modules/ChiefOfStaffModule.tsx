@@ -83,11 +83,24 @@ export function ChiefOfStaffModule({
   const [inputVal, setInputVal] = useState("");
   const [isThinking, setIsThinking] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || inputVal;
     if (!textToSend.trim() || isThinking) return;
+
+    // Check voice navigation shortcuts
+    const lower = textToSend.toLowerCase();
+    if (lower.includes("go to deal") || lower.includes("open deal") || lower.includes("show deal")) {
+      onSelectTab("deals");
+    } else if (lower.includes("go to lead") || lower.includes("open lead") || lower.includes("show lead")) {
+      onSelectTab("social-leads");
+    } else if (lower.includes("go to prospect") || lower.includes("open prospect") || lower.includes("scout")) {
+      onSelectTab("prospector");
+    } else if (lower.includes("go to briefing") || lower.includes("generate report")) {
+      onSelectTab("briefing");
+    }
 
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -121,6 +134,55 @@ export function ChiefOfStaffModule({
       setMessages((prev) => [...prev, aiMsg]);
       setIsThinking(false);
     }, 450);
+  };
+
+  const handleVoiceListenToggle = () => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognition =
+      (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition ||
+      (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice speech recognition is supported in Google Chrome and Microsoft Edge. Please use Chrome/Edge or type your query.");
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-IN";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results?.[0]?.[0]?.transcript;
+        if (transcript) {
+          setInputVal(transcript);
+          handleSend(transcript);
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
   };
 
   const handleSpeechToggle = (textToRead: string) => {
@@ -309,6 +371,25 @@ export function ChiefOfStaffModule({
 
         {/* Input Bar */}
         <div className="border-t border-pink-100 bg-gradient-to-r from-pink-50/40 via-white to-pink-50/40 p-4">
+          {isListening && (
+            <div className="mb-2.5 flex items-center justify-between rounded-2xl border-2 border-[#F0186C] bg-pink-50/90 px-4 py-2 text-xs font-bold text-[#D6135F] animate-pulse">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F0186C] opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-[#F0186C]" />
+                </span>
+                <span>🎙️ Listening to voice query... Speak naturally</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleVoiceListenToggle}
+                className="text-[11px] underline hover:text-rose-800"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -316,6 +397,19 @@ export function ChiefOfStaffModule({
             }}
             className="flex items-center gap-2.5"
           >
+            <button
+              type="button"
+              onClick={handleVoiceListenToggle}
+              className={`p-2.5 rounded-xl border transition-all ${
+                isListening
+                  ? "bg-rose-500 text-white border-rose-600 animate-pulse ring-4 ring-rose-300/50 shadow-md"
+                  : "bg-white border-2 border-pink-200 text-[#D6135F] hover:bg-pink-50"
+              }`}
+              title={isListening ? "Listening... click to stop" : "Voice Input (Speech-to-Text)"}
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+
             <Input
               type="text"
               placeholder="Ask your AI Chief of Staff (e.g. 'Prepare our Monday agenda', 'What deals need attention?')..."

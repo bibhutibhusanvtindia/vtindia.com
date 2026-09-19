@@ -22,18 +22,23 @@ import { Badge } from "@/components/admin/ui/Badge";
 import { Input } from "@/components/admin/ui/Input";
 import { Textarea } from "@/components/admin/ui/Textarea";
 import { Select } from "@/components/admin/ui/Select";
-import { OutreachTemplate, OutreachChannel } from "@/data/admin/types";
+import { OutreachTemplate, OutreachChannel, ProspectItem } from "@/data/admin/types";
 import { WhatsAppIcon, LinkedinIcon } from "@/lib/social-icons";
 
 export function ColdOutreachStudioModule({
   templates,
+  prospects = [],
 }: {
   templates: OutreachTemplate[];
+  prospects?: ProspectItem[];
 }) {
   const [selectedChannel, setSelectedChannel] = React.useState<OutreachChannel>("whatsapp");
   const [selectedSector, setSelectedSector] = React.useState<string>("Healthcare");
+  const [selectedProspectId, setSelectedProspectId] = React.useState<string>("");
   const [clientName, setClientName] = React.useState<string>("Apollo Care Hospital");
   const [contactPerson, setContactPerson] = React.useState<string>("Dr. Mishra");
+  const [targetPhone, setTargetPhone] = React.useState<string>("+91 9437012345");
+  const [targetEmail, setTargetEmail] = React.useState<string>("contact@apollo.org");
   const [tone, setTone] = React.useState<string>("roi_driven");
   const [copied, setCopied] = React.useState(false);
 
@@ -43,6 +48,40 @@ export function ColdOutreachStudioModule({
   const [generatedCta, setGeneratedCta] = React.useState<string>("");
   const [isGenerating, setIsGenerating] = React.useState(false);
 
+  const handleSelectProspect = (prospId: string) => {
+    setSelectedProspectId(prospId);
+    const found = prospects.find((p) => p.id === prospId);
+    if (found) {
+      setClientName(found.companyName);
+      setContactPerson(found.contactPerson);
+      setTargetPhone(found.phone || "");
+      setTargetEmail(found.email || "");
+
+      // Auto map category to sector
+      const cat = found.category.toLowerCase();
+      if (cat.includes("hotel") || cat.includes("hospitality")) {
+        setSelectedSector("Hotels & Hospitality");
+      } else if (cat.includes("hospital") || cat.includes("health")) {
+        setSelectedSector("Healthcare");
+      } else if (cat.includes("steel") || cat.includes("industry") || cat.includes("mining")) {
+        setSelectedSector("Manufacturing & Heavy Steel");
+      } else if (cat.includes("college") || cat.includes("education")) {
+        setSelectedSector("Higher Education");
+      } else {
+        setSelectedSector("Real Estate & Architecture");
+      }
+
+      // If prospect already has a custom pitch, populate it
+      if (found.customPitch) {
+        setGeneratedHook(`Tailored Enterprise Platform for ${found.companyName} (${found.location.split(",")[0]})`);
+        setGeneratedBody(found.customPitch);
+        setGeneratedCta(
+          `Let's schedule an executive 10-minute technical preview this week. Reach out via WhatsApp or visit https://vtindia.com`
+        );
+      }
+    }
+  };
+
   const matchedTemplate = React.useMemo(() => {
     return (
       templates.find((t) => t.sector.toLowerCase().includes(selectedSector.toLowerCase())) ||
@@ -51,7 +90,7 @@ export function ColdOutreachStudioModule({
   }, [templates, selectedSector]);
 
   React.useEffect(() => {
-    if (matchedTemplate) {
+    if (matchedTemplate && !selectedProspectId) {
       setGeneratedHook(matchedTemplate.hook);
       setGeneratedBody(
         matchedTemplate.body
@@ -61,7 +100,7 @@ export function ColdOutreachStudioModule({
       );
       setGeneratedCta(matchedTemplate.callToAction);
     }
-  }, [matchedTemplate, clientName, contactPerson]);
+  }, [matchedTemplate, clientName, contactPerson, selectedProspectId]);
 
   const handleGenerateAI = () => {
     setIsGenerating(true);
@@ -109,7 +148,18 @@ export function ColdOutreachStudioModule({
 
   const handleWhatsAppSend = () => {
     const encoded = encodeURIComponent(fullPitchText);
-    window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    const cleanPhone = targetPhone ? targetPhone.replace(/[^0-9]/g, "") : "";
+    if (cleanPhone) {
+      window.open(`https://wa.me/${cleanPhone}?text=${encoded}`, "_blank");
+    } else {
+      window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    }
+  };
+
+  const handleEmailSend = () => {
+    const subject = encodeURIComponent(`Virtoy Technologies Enterprise Solution for ${clientName}`);
+    const body = encodeURIComponent(fullPitchText);
+    window.location.href = `mailto:${targetEmail || "contact@client.com"}?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -221,6 +271,28 @@ export function ColdOutreachStudioModule({
               </div>
             </div>
 
+            {/* Discovered Prospect Quick Selector */}
+            {prospects && prospects.length > 0 && (
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                  <span>Target Scouted Prospect (Auto-Fill)</span>
+                  <span className="text-[10px] text-[#D6135F] font-bold">{prospects.length} Scouted</span>
+                </label>
+                <Select
+                  value={selectedProspectId}
+                  onChange={(e) => handleSelectProspect(e.target.value)}
+                  className="mt-1 bg-white border-2 border-pink-200 text-slate-800 text-xs rounded-xl focus:border-[#F0186C]"
+                >
+                  <option value="">-- Or Select Discovered Enterprise --</option>
+                  {prospects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.companyName} ({p.location.split(",")[0]}) · {p.category}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            )}
+
             {/* Target Sector */}
             <div>
               <label className="text-[11px] font-bold text-slate-700">Target Industry / Sector</label>
@@ -254,6 +326,28 @@ export function ColdOutreachStudioModule({
                   value={contactPerson}
                   onChange={(e) => setContactPerson(e.target.value)}
                   placeholder="e.g. Dr. Mishra / Mr. Singh"
+                  className="mt-1 text-xs bg-white border-2 border-pink-100 rounded-xl focus:border-[#F0186C]"
+                />
+              </div>
+            </div>
+
+            {/* Phone & Email */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[11px] font-bold text-slate-700">Target Phone (WhatsApp)</label>
+                <Input
+                  value={targetPhone}
+                  onChange={(e) => setTargetPhone(e.target.value)}
+                  placeholder="+91 9437012345"
+                  className="mt-1 text-xs bg-white border-2 border-pink-100 rounded-xl focus:border-[#F0186C]"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] font-bold text-slate-700">Target Email</label>
+                <Input
+                  value={targetEmail}
+                  onChange={(e) => setTargetEmail(e.target.value)}
+                  placeholder="contact@company.com"
                   className="mt-1 text-xs bg-white border-2 border-pink-100 rounded-xl focus:border-[#F0186C]"
                 />
               </div>
@@ -299,15 +393,15 @@ export function ColdOutreachStudioModule({
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button
                   size="xs"
                   variant="outline"
                   onClick={handleCopy}
                   className="gap-1 text-xs border-pink-200 text-slate-700 hover:bg-pink-50 rounded-xl"
                 >
-                  {copied ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
-                  {copied ? "Copied!" : "Copy Full Pitch"}
+                  {copied ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3 text-[#D6135F]" />}
+                  {copied ? "Copied!" : "Copy Pitch"}
                 </Button>
 
                 {selectedChannel === "whatsapp" && (
@@ -318,6 +412,17 @@ export function ColdOutreachStudioModule({
                   >
                     <WhatsAppIcon className="h-3 w-3" />
                     Open WhatsApp Web
+                  </Button>
+                )}
+
+                {selectedChannel === "email" && (
+                  <Button
+                    size="xs"
+                    onClick={handleEmailSend}
+                    className="gap-1 text-xs bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white shadow-sm rounded-xl font-bold"
+                  >
+                    <Mail className="h-3 w-3" />
+                    Open Email Client
                   </Button>
                 )}
               </div>
