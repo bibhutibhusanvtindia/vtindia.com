@@ -99,6 +99,24 @@ export function PipelineDealMatrixModule({
     return null;
   };
 
+  const availableSectors = React.useMemo(() => {
+    const set = new Set<string>();
+    deals.forEach((d) => {
+      if (d.sector) set.add(d.sector);
+    });
+    if (set.size === 0) {
+      [
+        "Hotels & Hospitality",
+        "Heavy Steel & Mining",
+        "Logistics & Supply Chain",
+        "Hospitals & Healthcare",
+        "Higher Education",
+        "Real Estate & Architecture",
+      ].forEach((s) => set.add(s));
+    }
+    return Array.from(set);
+  }, [deals]);
+
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
@@ -130,15 +148,14 @@ export function PipelineDealMatrixModule({
             <Select
               value={sectorFilter}
               onChange={(e) => setSectorFilter(e.target.value)}
-              className="w-44 text-xs bg-white border-2 border-pink-200 text-slate-800 rounded-xl"
+              className="w-48 text-xs bg-white border-2 border-pink-200 text-slate-800 rounded-xl"
             >
-              <option value="all">All B2B Sectors</option>
-              <option value="Logistics & Supply Chain">Logistics & Supply Chain</option>
-              <option value="Hospitals & Healthcare">Hospitals & Healthcare</option>
-              <option value="Higher Education">Higher Education</option>
-              <option value="Hotels & Hospitality">Hotels & Hospitality</option>
-              <option value="Heavy Steel & Mining">Heavy Steel & Mining</option>
-              <option value="Real Estate & Architecture">Real Estate & Architecture</option>
+              <option value="all">🏢 All B2B Sectors</option>
+              {availableSectors.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
             </Select>
 
             <Dialog open={isNewDialogOpen} onOpenChange={setIsNewDialogOpen}>
@@ -157,7 +174,7 @@ export function PipelineDealMatrixModule({
                 </DialogHeader>
                 <div className="space-y-3 py-2 text-xs">
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700">Project / Scope Title</label>
+                    <label className="text-[11px] font-bold text-slate-700">Project / Scope Title *</label>
                     <Input
                       placeholder="e.g. 6-DoF VR Crane Hazard Training Suite"
                       value={newTitle}
@@ -166,9 +183,9 @@ export function PipelineDealMatrixModule({
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700">Target Enterprise / Client</label>
+                    <label className="text-[11px] font-bold text-slate-700">Target Enterprise / Client *</label>
                     <Input
-                      placeholder="e.g. JSW Steel / Kalinga Port"
+                      placeholder="e.g. JSW Steel / Kalinga Port / Mayfair"
                       value={newCompany}
                       onChange={(e) => setNewCompany(e.target.value)}
                       className="mt-1 bg-white border-slate-200 rounded-xl"
@@ -176,15 +193,13 @@ export function PipelineDealMatrixModule({
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[11px] font-bold text-slate-700">Sector</label>
-                      <Select value={newSector} onChange={(e) => setNewSector(e.target.value)} className="mt-1 bg-white border-slate-200 rounded-xl">
-                        <option value="Heavy Steel & Mining">Heavy Steel & Mining</option>
-                        <option value="Logistics & Supply Chain">Logistics & Supply Chain</option>
-                        <option value="Hospitals & Healthcare">Hospitals & Healthcare</option>
-                        <option value="Higher Education">Higher Education</option>
-                        <option value="Hotels & Hospitality">Hotels & Hospitality</option>
-                        <option value="Real Estate & Architecture">Real Estate & Architecture</option>
-                      </Select>
+                      <label className="text-[11px] font-bold text-slate-700">Sector / Category</label>
+                      <Input
+                        placeholder="e.g. Heavy Industry / Hotels"
+                        value={newSector}
+                        onChange={(e) => setNewSector(e.target.value)}
+                        className="mt-1 bg-white border-slate-200 rounded-xl"
+                      />
                     </div>
                     <div>
                       <label className="text-[11px] font-bold text-slate-700">Estimated Value (₹ INR)</label>
@@ -199,12 +214,11 @@ export function PipelineDealMatrixModule({
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[11px] font-bold text-slate-700">Win Probability (%)</label>
+                      <label className="text-[11px] font-bold text-slate-700">Location / City</label>
                       <Input
-                        type="number"
-                        placeholder="65"
-                        value={newProb}
-                        onChange={(e) => setNewProb(e.target.value)}
+                        placeholder="e.g. Bhubaneswar, Odisha / Dubai"
+                        value={newLocation}
+                        onChange={(e) => setNewLocation(e.target.value)}
                         className="mt-1 bg-white border-slate-200 rounded-xl"
                       />
                     </div>
@@ -218,14 +232,26 @@ export function PipelineDealMatrixModule({
                       </Select>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700">Current Key Bottleneck / Question</label>
-                    <Input
-                      placeholder="e.g. Awaiting board budget approval on Phase 1"
-                      value={newBottleneck}
-                      onChange={(e) => setNewBottleneck(e.target.value)}
-                      className="mt-1 bg-white border-slate-200 rounded-xl"
-                    />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700">Win Probability (%)</label>
+                      <Input
+                        type="number"
+                        placeholder="65"
+                        value={newProb}
+                        onChange={(e) => setNewProb(e.target.value)}
+                        className="mt-1 bg-white border-slate-200 rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700">Current Key Bottleneck</label>
+                      <Input
+                        placeholder="e.g. Budget approval pending"
+                        value={newBottleneck}
+                        onChange={(e) => setNewBottleneck(e.target.value)}
+                        className="mt-1 bg-white border-slate-200 rounded-xl"
+                      />
+                    </div>
                   </div>
                 </div>
                 <DialogFooter>

@@ -285,66 +285,93 @@ export function SocialLeadsModule({
               Showing <strong className="text-slate-900 font-bold">{filteredLeads.length}</strong> incoming inquiries
             </span>
             <span className="text-[11px] font-mono text-emerald-700 font-bold">
-              Total Inbound Pipeline: ₹47.3L
+              {leads.length > 0
+                ? `Total Inbound Pipeline: ₹${leads
+                    .reduce((acc, l) => {
+                      const m = l.estimatedDealValue.match(/\d+(\.\d+)?/);
+                      return acc + (m ? parseFloat(m[0]) : 0);
+                    }, 0)
+                    .toFixed(1)}L`
+                : "Total Inbound Pipeline: ₹0.0L"}
             </span>
           </div>
 
           <div className="space-y-3 max-h-[660px] overflow-y-auto pr-1">
-            {filteredLeads.map((lead) => {
-              const isSelected = activeLead?.id === lead.id;
-              const platConfig = platformIcons[lead.platform];
-              const IconComponent = platConfig.icon;
+            {filteredLeads.length === 0 ? (
+              <div className="rounded-3xl border-2 border-dashed border-pink-200 bg-white p-8 text-center space-y-3">
+                <MessageCircle className="h-8 w-8 text-[#D6135F] mx-auto opacity-50" />
+                <p className="text-sm font-bold text-slate-800">No inbound inquiries yet</p>
+                <p className="text-xs text-slate-500">Inbound messages from WhatsApp, Instagram, and web forms will appear here automatically.</p>
+                {onAddLead && (
+                  <Button
+                    size="sm"
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white font-bold rounded-xl text-xs gap-1.5"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Simulate Inbound Lead</span>
+                  </Button>
+                )}
+              </div>
+            ) : (
+              filteredLeads.map((lead) => {
+                const isSelected = activeLead?.id === lead.id;
+                const platConfig = platformIcons[lead.platform];
+                const IconComponent = platConfig.icon;
 
-              return (
-                <div
-                  key={lead.id}
-                  onClick={() => setActiveLeadId(lead.id)}
-                  className={`group relative flex flex-col gap-3 rounded-3xl border p-4.5 cursor-pointer transition-all shadow-xs ${
-                    isSelected
-                      ? "border-[#F0186C] bg-gradient-to-br from-[#FFF8FA] to-pink-50/50 ring-2 ring-[#F0186C]/40 shadow-sm"
-                      : "border-pink-100 bg-white hover:border-pink-300 hover:bg-pink-50/30 hover:-translate-y-0.5"
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${platConfig.color}`}>
-                        <IconComponent className="h-4 w-4" />
-                      </span>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#D6135F] transition-colors">
-                          {lead.senderName}
-                        </h4>
-                        <span className="text-[11px] text-slate-500 font-medium">{lead.senderHandle}</span>
+                return (
+                  <div
+                    key={lead.id}
+                    onClick={() => setActiveLeadId(lead.id)}
+                    className={`group relative flex flex-col gap-3 rounded-3xl border p-4.5 cursor-pointer transition-all shadow-xs ${
+                      isSelected
+                        ? "border-[#F0186C] bg-gradient-to-br from-[#FFF8FA] to-pink-50/50 ring-2 ring-[#F0186C]/40 shadow-sm"
+                        : "border-pink-100 bg-white hover:border-pink-300 hover:bg-pink-50/30 hover:-translate-y-0.5"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${platConfig.color}`}>
+                          <IconComponent className="h-4 w-4" />
+                        </span>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#D6135F] transition-colors">
+                            {lead.senderName}
+                          </h4>
+                          <span className="text-[11px] text-slate-500 font-medium">{lead.senderHandle}</span>
+                        </div>
+                      </div>
+
+                      {/* AI Score Badge */}
+                      <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-black text-emerald-700 border border-emerald-200">
+                        <Flame className="h-3.5 w-3.5 text-emerald-600 fill-emerald-600" />
+                        <span>{lead.qualificationScore}% Score</span>
                       </div>
                     </div>
 
-                    {/* AI Score Badge */}
-                    <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-black text-emerald-700 border border-emerald-200">
-                      <Flame className="h-3.5 w-3.5 text-emerald-600 fill-emerald-600" />
-                      <span>{lead.qualificationScore}% Score</span>
+                    {/* Message Preview */}
+                    <p className="text-xs text-slate-700 line-clamp-2 leading-relaxed bg-pink-50/30 p-2.5 rounded-2xl border border-pink-100/60">
+                      &ldquo;{lead.message}&rdquo;
+                    </p>
+
+                    {/* Bottom Metadata */}
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 border-t border-pink-100/70 pt-2 font-medium">
+                      <span className="font-mono text-emerald-700 font-bold">{lead.estimatedDealValue}</span>
+                      <span className="text-[10px] text-slate-400">{lead.timestamp}</span>
+                      <span
+                        className={`capitalize font-bold text-[10px] rounded-lg px-2 py-0.5 ${
+                          lead.status === "won"
+                            ? "bg-emerald-100 text-emerald-800 font-black border border-emerald-300"
+                            : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {lead.status === "won" ? "🎉 Won Deal" : lead.status.replace("_", " ")}
+                      </span>
                     </div>
                   </div>
-
-                  {/* Message Preview */}
-                  <p className="text-xs text-slate-700 line-clamp-2 leading-relaxed bg-pink-50/30 p-2.5 rounded-2xl border border-pink-100/60">
-                    &ldquo;{lead.message}&rdquo;
-                  </p>
-
-                  {/* Bottom Metadata */}
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 border-t border-pink-100/70 pt-2 font-medium">
-                    <span className="font-mono text-emerald-700 font-bold">{lead.estimatedDealValue}</span>
-                    <span className="text-[10px] text-slate-400">{lead.timestamp}</span>
-                    <span className={`capitalize font-bold text-[10px] rounded-lg px-2 py-0.5 ${
-                      lead.status === "won"
-                        ? "bg-emerald-100 text-emerald-800 font-black border border-emerald-300"
-                        : "bg-slate-100 text-slate-700"
-                    }`}>
-                      {lead.status === "won" ? "🎉 Won Deal" : lead.status.replace("_", " ")}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 

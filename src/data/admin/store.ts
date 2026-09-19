@@ -30,19 +30,19 @@ import {
 } from "./initialData";
 
 const STORAGE_KEYS = {
-  AUTH_SESSION: "vt_admin_auth_session_v5",
-  CURRENT_USER: "vt_admin_current_user_v5",
-  FINANCIALS: "vt_admin_financials_v5",
-  PROJECTS: "vt_admin_projects_v5",
-  ATTENTION: "vt_admin_attention_v5",
-  LEADS: "vt_admin_leads_v5",
-  PROSPECTS: "vt_admin_prospects_v5",
-  VAULT: "vt_admin_vault_v5",
-  SUBSCRIPTIONS: "vt_admin_subscriptions_v5",
-  AUDIT_LOGS: "vt_admin_audit_logs_v5",
-  DEALS: "vt_admin_deals_v5",
-  ACTIVE_TAB: "vt_admin_active_tab_v5",
-  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v5",
+  AUTH_SESSION: "vt_admin_auth_session_v6",
+  CURRENT_USER: "vt_admin_current_user_v6",
+  FINANCIALS: "vt_admin_financials_v6",
+  PROJECTS: "vt_admin_projects_v6",
+  ATTENTION: "vt_admin_attention_v6",
+  LEADS: "vt_admin_leads_v6",
+  PROSPECTS: "vt_admin_prospects_v6",
+  VAULT: "vt_admin_vault_v6",
+  SUBSCRIPTIONS: "vt_admin_subscriptions_v6",
+  AUDIT_LOGS: "vt_admin_audit_logs_v6",
+  DEALS: "vt_admin_deals_v6",
+  ACTIVE_TAB: "vt_admin_active_tab_v6",
+  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v6",
 };
 
 export function useAdminStore() {
