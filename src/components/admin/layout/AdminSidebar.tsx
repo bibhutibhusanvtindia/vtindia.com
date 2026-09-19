@@ -112,22 +112,12 @@ export function AdminSidebar({
       >
         {/* Brand Header */}
         <div className="flex h-16 items-center justify-between border-b border-pink-100 px-4 bg-white">
-          <Link href="/admin" className="flex items-center gap-3 overflow-hidden">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-pink-50/80 border border-pink-200/80 shadow-xs">
-              <Logo variant="primary" className="h-6 w-auto" />
-            </div>
+          <Link href="/admin" className="flex items-center gap-2 overflow-hidden" title="Virtoy Command Center">
+            <Logo variant="primary" className={cn("w-auto transition-all", collapsed ? "h-7" : "h-8 sm:h-9")} />
             {!collapsed && (
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-black tracking-tight text-slate-900">VIRTOY</span>
-                  <span className="rounded-md bg-gradient-to-r from-[#D6135F] to-[#F0186C] px-1.5 py-0.5 text-[9px] font-extrabold text-white font-mono shadow-xs">
-                    COMMAND
-                  </span>
-                </div>
-                <span className="text-[10px] text-[#D6135F] font-bold leading-none mt-0.5">
-                  AI B2B Growth Platform
-                </span>
-              </div>
+              <span className="rounded-md bg-gradient-to-r from-[#D6135F] to-[#F0186C] px-1.5 py-0.5 text-[9px] font-extrabold text-white font-mono shadow-xs shrink-0">
+                COMMAND
+              </span>
             )}
           </Link>
 

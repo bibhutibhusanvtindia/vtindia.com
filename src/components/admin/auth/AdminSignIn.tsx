@@ -77,10 +77,12 @@ export function AdminSignIn({
       <div className="w-full max-w-md relative z-10 space-y-6">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center space-y-3">
-          <Link href="/" className="inline-flex items-center gap-3 p-2 group transition-transform hover:scale-105">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white border-2 border-pink-200 shadow-md shadow-pink-500/10">
-              <Logo variant="primary" className="h-8 w-auto" />
-            </div>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center p-1 transition-transform hover:scale-[1.03]"
+            title="Virtoy Technologies"
+          >
+            <Logo priority className="h-12 sm:h-14 w-auto drop-shadow-xs" />
           </Link>
 
           <div className="space-y-1">
