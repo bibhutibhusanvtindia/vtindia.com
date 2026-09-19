@@ -17,6 +17,7 @@ import {
   Clock,
   Briefcase,
   AlertTriangle,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/admin/ui/Button";
 import { Badge } from "@/components/admin/ui/Badge";
@@ -31,6 +32,8 @@ export function AdminTopBar({
   attentionItems,
   onSelectTab,
   onResolveAttentionItem,
+  onResetData,
+  onLogout,
 }: {
   onOpenMobileSidebar: () => void;
   currentEmployee: Employee;
@@ -38,6 +41,8 @@ export function AdminTopBar({
   attentionItems: AttentionItem[];
   onSelectTab: (tabId: string) => void;
   onResolveAttentionItem: (id: string) => void;
+  onResetData?: () => void;
+  onLogout?: () => void;
 }) {
   const [timeStr, setTimeStr] = React.useState<string>("");
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
@@ -109,6 +114,23 @@ export function AdminTopBar({
           <Sparkles className="h-3.5 w-3.5 text-rose-100" />
           <span>Ask AI</span>
         </Button>
+
+        {/* Reset Store Data Button */}
+        {onResetData && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (window.confirm("Are you sure you want to reset all mock data to fresh initial seed records?")) {
+                onResetData();
+              }
+            }}
+            className="hidden sm:inline-flex h-9 w-9 p-0 text-slate-500 hover:bg-pink-50 hover:text-[#D6135F] rounded-xl transition-colors"
+            title="Reset Mock Data"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        )}
 
         {/* Attention Notifications Dropover */}
         <div className="relative">
@@ -210,6 +232,19 @@ export function AdminTopBar({
             </span>
           </div>
         </button>
+
+        {/* Quick Logout Button */}
+        {onLogout && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onLogout}
+            className="h-9 w-9 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+            title="Log out to public website"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </header>
   );

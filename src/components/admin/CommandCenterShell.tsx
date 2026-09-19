@@ -69,6 +69,12 @@ export function CommandCenterShell() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [setSidebarCollapsed, setActiveTab]);
 
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
+    }
+  };
+
   if (!isHydrated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] text-slate-600 text-xs">
@@ -92,6 +98,7 @@ export function CommandCenterShell() {
         onOpenEmployeeSwitcher={() => setIsEmployeeSwitcherOpen(true)}
         mobileOpen={mobileDrawerOpen}
         onCloseMobile={() => setMobileDrawerOpen(false)}
+        onLogout={handleLogout}
       />
 
       {/* 2. Main Content Container */}
@@ -109,6 +116,8 @@ export function CommandCenterShell() {
           attentionItems={attentionItems}
           onSelectTab={setActiveTab}
           onResolveAttentionItem={resolveAttentionItem}
+          onResetData={resetToDefaultData}
+          onLogout={handleLogout}
         />
 
         {/* Dynamic Module Viewport */}

@@ -21,6 +21,7 @@ import {
   Users,
   Sparkles,
   X,
+  LogOut,
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Badge } from "@/components/admin/ui/Badge";
@@ -79,6 +80,7 @@ export function AdminSidebar({
   onOpenEmployeeSwitcher,
   mobileOpen,
   onCloseMobile,
+  onLogout,
 }: {
   activeTab: string;
   onSelectTab: (tabId: string) => void;
@@ -88,6 +90,7 @@ export function AdminSidebar({
   onOpenEmployeeSwitcher: () => void;
   mobileOpen: boolean;
   onCloseMobile: () => void;
+  onLogout?: () => void;
 }) {
   return (
     <>
@@ -149,25 +152,6 @@ export function AdminSidebar({
             <X className="h-4 w-4" />
           </Button>
         </div>
-
-        {/* Live System Telemetry Pill (when expanded) */}
-        {!collapsed && (
-          <div className="mx-3 mt-3 rounded-2xl border border-pink-200/80 bg-gradient-to-br from-pink-50/70 via-rose-50/40 to-white p-3 shadow-2xs">
-            <div className="flex items-center justify-between text-[11px]">
-              <div className="flex items-center gap-1.5">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F0186C] opacity-75" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#F0186C]" />
-                </span>
-                <span className="font-bold text-slate-900">AI Engines Live</span>
-              </div>
-              <span className="font-mono text-[10px] font-black text-[#D6135F]">99.9% Telemetry</span>
-            </div>
-            <p className="mt-1 text-[10px] text-slate-500 font-medium leading-tight">
-              Claude 3.7 + Antigravity B2B Scout Synced
-            </p>
-          </div>
-        )}
 
         {/* Navigation Item Groups */}
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5">
@@ -252,7 +236,7 @@ export function AdminSidebar({
                 </Badge>
               </div>
 
-              <div className="flex items-center justify-between px-1 text-[11px]">
+              <div className="flex items-center justify-between px-1 text-[11px] pt-1">
                 <button
                   onClick={onOpenEmployeeSwitcher}
                   className="flex items-center gap-1 font-bold text-slate-600 hover:text-[#D6135F] transition-colors"
@@ -261,14 +245,26 @@ export function AdminSidebar({
                   <span>Switch Role</span>
                 </button>
 
-                <Link
-                  href="/"
-                  target="_blank"
-                  className="flex items-center gap-1 font-semibold text-slate-500 hover:text-[#D6135F] transition-colors"
-                >
-                  <span>Public Site</span>
-                  <ExternalLink className="h-3 w-3" />
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/"
+                    target="_blank"
+                    className="flex items-center gap-1 font-semibold text-slate-500 hover:text-[#D6135F] transition-colors"
+                  >
+                    <span>Site</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
+                  {onLogout && (
+                    <button
+                      onClick={onLogout}
+                      title="Log out to public site"
+                      className="flex items-center gap-0.5 font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-1.5 py-0.5 rounded-md transition-colors"
+                    >
+                      <LogOut className="h-3 w-3" />
+                      <span>Exit</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
@@ -285,10 +281,19 @@ export function AdminSidebar({
                 href="/"
                 target="_blank"
                 title="Public Site"
-                className="text-slate-400 hover:text-[#D6135F] p-1"
+                className="text-slate-400 hover:text-[#D6135F] p-1 rounded-lg"
               >
                 <ExternalLink className="h-4 w-4" />
               </Link>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  title="Logout / Exit Command Center"
+                  className="text-slate-400 hover:text-rose-600 p-1 rounded-lg transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              )}
             </div>
           )}
         </div>

@@ -36,6 +36,13 @@ import {
   SocialLead,
   ProspectItem,
 } from "@/data/admin/types";
+import {
+  RevenueTrendChart,
+  SectorPipelinePieChart,
+  PipelineFunnelChart,
+  LeadSourcePieChart,
+  OperationalHealthGauges,
+} from "@/components/admin/charts";
 
 export function DashboardModule({
   financials,
@@ -58,72 +65,6 @@ export function DashboardModule({
 
   return (
     <div className="space-y-6">
-      {/* Top Banner: Virtoy Executive Hero & Quick Actions */}
-      <div className="relative overflow-hidden rounded-3xl border-2 border-pink-200/90 bg-gradient-to-br from-white via-[#FFF5F8] to-[#FCE7F3]/70 p-6 sm:p-8 shadow-sm">
-        {/* Ambient Decorative Pink Glow Orbs */}
-        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-[#F0186C]/15 to-[#FF4D8D]/5 blur-3xl" />
-        <div className="pointer-events-none absolute right-1/3 -bottom-20 h-48 w-48 rounded-full bg-[#D6135F]/10 blur-2xl" />
-
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F0186C] px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase text-white shadow-sm shadow-[#F0186C]/30">
-                <Sparkles className="h-3 w-3" />
-                EXECUTIVE AI ENGINE
-              </span>
-              <span className="text-xs font-bold text-[#D6135F]">Virtoy Executive Command Center</span>
-            </div>
-            <h2 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-              AI Executive Command Center &amp;{" "}
-              <span className="bg-gradient-to-r from-[#D6135F] via-[#F0186C] to-[#FF2E7E] bg-clip-text text-transparent">
-                B2B Growth Platform
-              </span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
-              Single-screen executive visibility: Real-time revenue telemetry, AI chief of staff assistant, B2B deal matrix, and omnichannel pipeline prospecting.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <Button
-              size="sm"
-              onClick={() => onSelectTab("chief-of-staff")}
-              className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] hover:from-[#B00D4D] hover:to-[#D6135F] text-white gap-2 shadow-md shadow-[#F0186C]/30 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs font-bold px-4 py-2.5 rounded-xl"
-            >
-              <Bot className="h-4 w-4" />
-              Ask AI Chief of Staff
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onSelectTab("deals")}
-              className="border-2 border-pink-200 bg-white text-slate-800 hover:border-[#F0186C] hover:bg-pink-50/60 hover:text-[#D6135F] text-xs font-bold gap-1.5 px-3.5 py-2.5 rounded-xl shadow-xs transition-all"
-            >
-              <Briefcase className="h-4 w-4 text-[#D6135F]" />
-              Deal Matrix
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onSelectTab("cold-outreach")}
-              className="border-2 border-pink-200 bg-white text-slate-800 hover:border-[#F0186C] hover:bg-pink-50/60 hover:text-[#D6135F] text-xs font-bold gap-1.5 px-3.5 py-2.5 rounded-xl shadow-xs transition-all"
-            >
-              <Zap className="h-4 w-4 text-[#F0186C]" />
-              AI Outreach
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onSelectTab("briefing")}
-              className="border-2 border-pink-200 bg-white text-slate-800 hover:border-[#F0186C] hover:bg-pink-50/60 hover:text-[#D6135F] text-xs font-bold gap-1.5 px-3.5 py-2.5 rounded-xl shadow-xs transition-all"
-            >
-              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
-              1-Click Briefing
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* 4 Core Financial & Operations Metric Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Monthly Revenue */}
@@ -228,6 +169,25 @@ export function DashboardModule({
           </div>
         </div>
       </div>
+
+      {/* Executive Visual Analytics & Telemetry Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7">
+          <RevenueTrendChart financials={financials} />
+        </div>
+        <div className="lg:col-span-5">
+          <SectorPipelinePieChart onSelectSector={() => onSelectTab("deals")} />
+        </div>
+      </div>
+
+      {/* Conversion Funnel & Inbound Channel Share Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PipelineFunnelChart />
+        <LeadSourcePieChart leads={socialLeads} />
+      </div>
+
+      {/* Operational Velocity & Health Radial Gauges */}
+      <OperationalHealthGauges />
 
       {/* Real-Time AI Attention Matrix */}
       <div className="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">

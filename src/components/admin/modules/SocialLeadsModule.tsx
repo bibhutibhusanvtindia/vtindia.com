@@ -26,6 +26,7 @@ import { Badge } from "@/components/admin/ui/Badge";
 import { Select } from "@/components/admin/ui/Select";
 import { Textarea } from "@/components/admin/ui/Textarea";
 import { SocialLead, SocialPlatform } from "@/data/admin/types";
+import { LeadSourcePieChart } from "@/components/admin/charts";
 
 export function SocialLeadsModule({
   leads,
@@ -118,6 +119,9 @@ export function SocialLeadsModule({
           </div>
         </div>
       </div>
+
+      {/* Omnichannel Channel Share Pie Chart */}
+      <LeadSourcePieChart leads={leads} />
 
       {/* Main 2-Column Interface */}
       <div className="grid gap-6 lg:grid-cols-[1.3fr_1.7fr] lg:items-start">

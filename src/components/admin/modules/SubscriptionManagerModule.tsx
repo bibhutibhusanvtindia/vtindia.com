@@ -21,6 +21,7 @@ import { Button } from "@/components/admin/ui/Button";
 import { Badge } from "@/components/admin/ui/Badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/Table";
 import { SubscriptionItem } from "@/data/admin/types";
+import { SubscriptionSpendChart } from "@/components/admin/charts";
 
 export function SubscriptionManagerModule({
   subscriptions,
@@ -110,6 +111,9 @@ export function SubscriptionManagerModule({
           </p>
         </div>
       </div>
+
+      {/* SaaS & AI Cloud Spend Distribution Chart */}
+      <SubscriptionSpendChart subscriptions={subscriptions} />
 
       {/* Subscriptions Table with Smart Countdown & AI Optimizer */}
       <div className="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">

@@ -23,6 +23,7 @@ import { Input } from "@/components/admin/ui/Input";
 import { Select } from "@/components/admin/ui/Select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/admin/ui/Dialog";
 import { PipelineDeal, DealStage } from "@/data/admin/types";
+import { SectorPipelinePieChart, PipelineFunnelChart } from "@/components/admin/charts";
 
 const STAGES: { id: DealStage; label: string; color: string; bg: string }[] = [
   { id: "discovery", label: "1. Discovery & Qualify", color: "text-blue-700", bg: "border-blue-200 bg-blue-50/40" },
@@ -44,6 +45,7 @@ export function PipelineDealMatrixModule({
   const [sectorFilter, setSectorFilter] = React.useState<string>("all");
   const [selectedDeal, setSelectedDeal] = React.useState<PipelineDeal | null>(null);
   const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<"all" | "kanban" | "charts">("all");
 
   // New Deal Form State
   const [newTitle, setNewTitle] = React.useState("");
@@ -283,8 +285,67 @@ export function PipelineDealMatrixModule({
         </div>
       </div>
 
-      {/* Visual Kanban Columns */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+      {/* Visual Analytics View Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-3 rounded-2xl border border-pink-100 shadow-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-700">Display Layout:</span>
+          <div className="flex items-center gap-1 rounded-xl bg-pink-50/60 p-1 border border-pink-200/70">
+            <button
+              onClick={() => setViewMode("all")}
+              className={`rounded-lg px-3 py-1 text-xs font-bold transition-all ${
+                viewMode === "all"
+                  ? "bg-[#F0186C] text-white shadow-xs"
+                  : "text-slate-600 hover:text-[#D6135F]"
+              }`}
+            >
+              Full Overview
+            </button>
+            <button
+              onClick={() => setViewMode("charts")}
+              className={`rounded-lg px-3 py-1 text-xs font-bold transition-all ${
+                viewMode === "charts"
+                  ? "bg-[#F0186C] text-white shadow-xs"
+                  : "text-slate-600 hover:text-[#D6135F]"
+              }`}
+            >
+              Sector &amp; Funnel Charts
+            </button>
+            <button
+              onClick={() => setViewMode("kanban")}
+              className={`rounded-lg px-3 py-1 text-xs font-bold transition-all ${
+                viewMode === "kanban"
+                  ? "bg-[#F0186C] text-white shadow-xs"
+                  : "text-slate-600 hover:text-[#D6135F]"
+              }`}
+            >
+              Kanban Stages
+            </button>
+          </div>
+        </div>
+
+        <span className="text-xs text-slate-500 font-medium">
+          Showing <strong>{filteredDeals.length}</strong> deals • Total: <strong>₹{(totalPipeline / 100000).toFixed(1)}L</strong>
+        </span>
+      </div>
+
+      {/* Charts Grid (Visible in 'all' and 'charts' mode) */}
+      {(viewMode === "all" || viewMode === "charts") && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-7">
+            <PipelineFunnelChart deals={deals} />
+          </div>
+          <div className="lg:col-span-5">
+            <SectorPipelinePieChart
+              deals={deals}
+              onSelectSector={(sec) => setSectorFilter(sec)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Visual Kanban Columns (Visible in 'all' and 'kanban' mode) */}
+      {(viewMode === "all" || viewMode === "kanban") && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         {STAGES.map((stage) => {
           const stageDeals = filteredDeals.filter((d) => d.stage === stage.id);
           const stageValue = stageDeals.reduce((sum, d) => sum + d.dealValue, 0);
@@ -383,6 +444,7 @@ export function PipelineDealMatrixModule({
           );
         })}
       </div>
+      )}
 
       {/* Deal Detail Inspection Drawer / Modal */}
       {selectedDeal && (
