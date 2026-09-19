@@ -43,34 +43,6 @@ interface NavGroup {
   items: NavItem[];
 }
 
-const NAV_GROUPS: NavGroup[] = [
-  {
-    groupTitle: "Executive Core",
-    items: [
-      { id: "dashboard", label: "Executive Command", icon: LayoutDashboard, badge: "4 Alert", badgeVariant: "destructive" },
-      { id: "chief-of-staff", label: "AI Chief of Staff", icon: Bot, badge: "Voice AI", badgeVariant: "brand" },
-      { id: "briefing", label: "1-Click Briefings", icon: FileSpreadsheet },
-    ],
-  },
-  {
-    groupTitle: "B2B Growth & Revenue",
-    items: [
-      { id: "social-leads", label: "Omnichannel Leads", icon: Inbox, badge: "5 New", badgeVariant: "emerald" },
-      { id: "prospector", label: "B2B Maps Prospector", icon: Compass },
-      { id: "deals", label: "Deal Pipeline Matrix", icon: Briefcase, badge: "₹68.5L", badgeVariant: "brand" },
-      { id: "cold-outreach", label: "AI Outreach Studio", icon: Zap },
-    ],
-  },
-  {
-    groupTitle: "Operations & Assets",
-    items: [
-      { id: "proof-vault", label: "Proof & Discussion Vault", icon: FolderGit2, badge: "3 Proofs", badgeVariant: "secondary" },
-      { id: "subscriptions", label: "AI & Subscriptions", icon: CreditCard, badge: "Save ₹1.53L", badgeVariant: "emerald" },
-      { id: "audit-trail", label: "Multi-Rep Audit Trail", icon: History },
-    ],
-  },
-];
-
 export function AdminSidebar({
   activeTab,
   onSelectTab,
@@ -81,6 +53,11 @@ export function AdminSidebar({
   mobileOpen,
   onCloseMobile,
   onLogout,
+  attentionCount = 0,
+  leadsCount = 0,
+  dealsCount = 0,
+  dealsTotal = 0,
+  vaultCount = 0,
 }: {
   activeTab: string;
   onSelectTab: (tabId: string) => void;
@@ -91,7 +68,63 @@ export function AdminSidebar({
   mobileOpen: boolean;
   onCloseMobile: () => void;
   onLogout?: () => void;
+  attentionCount?: number;
+  leadsCount?: number;
+  dealsCount?: number;
+  dealsTotal?: number;
+  vaultCount?: number;
 }) {
+  const navGroups: NavGroup[] = [
+    {
+      groupTitle: "Executive Core",
+      items: [
+        {
+          id: "dashboard",
+          label: "Executive Command",
+          icon: LayoutDashboard,
+          badge: attentionCount > 0 ? `${attentionCount} Alert` : undefined,
+          badgeVariant: "destructive",
+        },
+        { id: "chief-of-staff", label: "AI Chief of Staff", icon: Bot, badge: "Voice AI", badgeVariant: "brand" },
+        { id: "briefing", label: "1-Click Briefings", icon: FileSpreadsheet },
+      ],
+    },
+    {
+      groupTitle: "B2B Growth & Revenue",
+      items: [
+        {
+          id: "social-leads",
+          label: "Omnichannel Leads",
+          icon: Inbox,
+          badge: leadsCount > 0 ? `${leadsCount} New` : undefined,
+          badgeVariant: "emerald",
+        },
+        { id: "prospector", label: "B2B Maps Prospector", icon: Compass },
+        {
+          id: "deals",
+          label: "Deal Pipeline Matrix",
+          icon: Briefcase,
+          badge: dealsTotal > 0 ? `₹${(dealsTotal / 100000).toFixed(1)}L` : (dealsCount > 0 ? `${dealsCount}` : undefined),
+          badgeVariant: "brand",
+        },
+        { id: "cold-outreach", label: "AI Outreach Studio", icon: Zap },
+      ],
+    },
+    {
+      groupTitle: "Operations & Assets",
+      items: [
+        {
+          id: "proof-vault",
+          label: "Proof & Discussion Vault",
+          icon: FolderGit2,
+          badge: vaultCount > 0 ? `${vaultCount} Proofs` : undefined,
+          badgeVariant: "secondary",
+        },
+        { id: "subscriptions", label: "AI & Subscriptions", icon: CreditCard },
+        { id: "audit-trail", label: "Multi-Rep Audit Trail", icon: History },
+      ],
+    },
+  ];
   return (
     <>
       {/* Mobile Backdrop */}
@@ -145,7 +178,7 @@ export function AdminSidebar({
 
         {/* Navigation Item Groups */}
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5">
-          {NAV_GROUPS.map((group) => (
+          {navGroups.map((group) => (
             <div key={group.groupTitle} className="space-y-1">
               {!collapsed && (
                 <span className="px-2 text-[10px] font-black uppercase tracking-wider text-[#D6135F]">

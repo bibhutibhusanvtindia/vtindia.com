@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Bot,
   Check,
@@ -28,6 +28,7 @@ import {
   SocialLead,
   ProspectItem,
   SubscriptionItem,
+  PipelineDeal,
 } from "@/data/admin/types";
 
 interface ChatMessage {
@@ -53,6 +54,7 @@ export function ChiefOfStaffModule({
   socialLeads,
   prospects,
   subscriptions,
+  deals = [],
   onSelectTab,
 }: {
   financials: FinancialMetrics;
@@ -61,6 +63,7 @@ export function ChiefOfStaffModule({
   socialLeads: SocialLead[];
   prospects: ProspectItem[];
   subscriptions: SubscriptionItem[];
+  deals?: PipelineDeal[];
   onSelectTab: (tab: string) => void;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -73,8 +76,8 @@ export function ChiefOfStaffModule({
         answer: "Namaste Sir 🙏. I am your AI Chief of Staff with live telemetry across Virtoy enterprise operations, active client projects, receivables, and incoming B2B pipeline. How can I assist leadership today?",
         suggestedActions: [
           { label: "Check Operational Telemetry", actionId: "view_receivables", targetTab: "dashboard" },
-          { label: "Prepare Management Agenda", actionId: "ask_agenda" },
-          { label: "Review Deal Pipeline", actionId: "view_pipeline", targetTab: "deals" },
+          { label: "Explore Deal Matrix", actionId: "view_deals", targetTab: "deals" },
+          { label: "Scout B2B Radar", actionId: "scout_radar", targetTab: "prospector" },
         ],
       },
     },
@@ -84,7 +87,9 @@ export function ChiefOfStaffModule({
   const [isThinking, setIsThinking] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || inputVal;
@@ -121,6 +126,7 @@ export function ChiefOfStaffModule({
         socialLeads,
         prospects,
         subscriptions,
+        deals,
       });
 
       const aiMsg: ChatMessage = {

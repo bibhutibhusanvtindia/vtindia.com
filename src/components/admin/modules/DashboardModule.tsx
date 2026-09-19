@@ -142,13 +142,21 @@ export function DashboardModule({
           </div>
           <div className="text-3xl font-black tracking-tight text-amber-700 font-mono mt-1">{displayReceivables}</div>
           <div className="mt-1 flex items-center justify-between text-xs text-slate-600">
-            <span className="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-              0 Overdue Invoices
+            <span
+              className={
+                financials.overdueReceivables > 0
+                  ? "text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200"
+                  : "text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200"
+              }
+            >
+              {financials.overdueReceivables > 0 ? "In Recovery" : "0 Overdue Invoices"}
             </span>
             <span className="font-mono text-[11px] text-slate-500">{financials.collectionVelocity}% Velocity</span>
           </div>
           <div className="mt-3.5 flex items-center justify-between text-[11px]">
-            <span className="text-slate-700 font-medium truncate">All accounts cleared</span>
+            <span className="text-slate-700 font-medium truncate">
+              {financials.overdueReceivables > 0 ? "Outstanding balance pending" : "All accounts cleared"}
+            </span>
             <button
               onClick={() => onSelectTab("proof-vault")}
               className="text-[#D6135F] font-bold hover:underline inline-flex items-center gap-0.5"
@@ -203,7 +211,12 @@ export function DashboardModule({
       </div>
 
       {/* Operational Velocity & Health Radial Gauges */}
-      <OperationalHealthGauges />
+      <OperationalHealthGauges
+        financials={financials}
+        projects={projects}
+        socialLeads={socialLeads}
+        attentionItems={attentionItems}
+      />
 
       {/* Real-Time AI Attention Matrix */}
       <div className="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">

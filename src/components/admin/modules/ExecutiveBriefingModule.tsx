@@ -25,7 +25,9 @@ import {
   SocialLead,
   ProspectItem,
   SubscriptionItem,
+  PipelineDeal,
 } from "@/data/admin/types";
+import { useMemo } from "react";
 
 export function ExecutiveBriefingModule({
   financials,
@@ -34,6 +36,7 @@ export function ExecutiveBriefingModule({
   socialLeads,
   prospects,
   subscriptions,
+  deals = [],
 }: {
   financials: FinancialMetrics;
   projects: ProjectHealth[];
@@ -41,16 +44,20 @@ export function ExecutiveBriefingModule({
   socialLeads: SocialLead[];
   prospects: ProspectItem[];
   subscriptions: SubscriptionItem[];
+  deals?: PipelineDeal[];
 }) {
-  const [briefingData] = useState(() =>
-    generateExecutiveBriefingData({
-      financials,
-      projects,
-      attentionItems,
-      socialLeads,
-      prospects,
-      subscriptions,
-    })
+  const briefingData = useMemo(
+    () =>
+      generateExecutiveBriefingData({
+        financials,
+        projects,
+        attentionItems,
+        socialLeads,
+        prospects,
+        subscriptions,
+        deals,
+      }),
+    [financials, projects, attentionItems, socialLeads, prospects, subscriptions, deals]
   );
 
   const handlePrint = () => {

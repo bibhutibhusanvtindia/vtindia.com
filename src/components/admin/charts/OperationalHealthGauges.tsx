@@ -3,6 +3,8 @@
 import * as React from "react";
 import { Activity, ShieldCheck, Zap, TrendingUp, CheckCircle2 } from "lucide-react";
 
+import { FinancialMetrics, ProjectHealth, AttentionItem, SocialLead } from "@/data/admin/types";
+
 interface GaugeItem {
   id: string;
   label: string;
@@ -14,51 +16,69 @@ interface GaugeItem {
   status: string;
 }
 
-const GAUGES: GaugeItem[] = [
-  {
-    id: "collection",
-    label: "Cash Collection Velocity",
-    sublabel: "Invoice recovery within 30 days",
-    value: 94.2,
-    displayValue: "94.2%",
-    color: "#10B981", // Emerald
-    target: "Target: >90%",
-    status: "Healthy",
-  },
-  {
-    id: "delivery",
-    label: "Milestone Delivery Rate",
-    sublabel: "Active client sprints on schedule",
-    value: 91.0,
-    displayValue: "91.0%",
-    color: "#F0186C", // Virtoy Pink
-    target: "Target: >88%",
-    status: "High Speed",
-  },
-  {
-    id: "leads",
-    label: "Lead AI Qualification Rate",
-    sublabel: "Inbound scoring >85 intent",
-    value: 92.4,
-    displayValue: "92.4%",
-    color: "#3B82F6", // Blue
-    target: "Target: >85%",
-    status: "Optimized",
-  },
-  {
-    id: "uptime",
-    label: "AI Agents & Telemetry Sync",
-    sublabel: "Claude 3.7 + Antigravity live stream",
-    value: 99.9,
-    displayValue: "99.9%",
-    color: "#8B5CF6", // Purple
-    target: "Target: 99.9%",
-    status: "Real-time",
-  },
-];
-
-export function OperationalHealthGauges() {
+export function OperationalHealthGauges({
+  financials,
+  projects = [],
+  socialLeads = [],
+  attentionItems = [],
+}: {
+  financials?: FinancialMetrics;
+  projects?: ProjectHealth[];
+  socialLeads?: SocialLead[];
+  attentionItems?: AttentionItem[];
+}) {
   const [hoveredGauge, setHoveredGauge] = React.useState<string | null>(null);
+
+  const collectionVal = financials?.collectionVelocity ?? 100;
+  const onScheduleCount = projects.filter((p) => p.status === "completed" || p.status === "on_track").length;
+  const deliveryVal = projects.length > 0 ? Math.round((onScheduleCount / projects.length) * 100) : 100;
+  const highIntentCount = socialLeads.filter((l) => l.qualificationScore >= 80).length;
+  const leadVal = socialLeads.length > 0 ? Math.round((highIntentCount / socialLeads.length) * 100) : 100;
+  const critBlockers = attentionItems.filter((a) => a.severity === "critical").length;
+  const syncVal = critBlockers === 0 ? 100 : Math.max(80, 100 - critBlockers * 5);
+
+  const gauges: GaugeItem[] = [
+    {
+      id: "collection",
+      label: "Cash Collection Velocity",
+      sublabel: "Invoice recovery & settlement index",
+      value: collectionVal,
+      displayValue: `${collectionVal}%`,
+      color: "#10B981", // Emerald
+      target: "Target: >90%",
+      status: (financials?.overdueReceivables ?? 0) === 0 ? "100% Cleared" : "In Recovery",
+    },
+    {
+      id: "delivery",
+      label: "Milestone Delivery Rate",
+      sublabel: "Active client software sprints on schedule",
+      value: deliveryVal,
+      displayValue: `${deliveryVal}%`,
+      color: "#F0186C", // Virtoy Pink
+      target: "Target: >88%",
+      status: projects.length > 0 ? `${projects.length} Active` : "On Schedule",
+    },
+    {
+      id: "leads",
+      label: "Lead AI Qualification Rate",
+      sublabel: "Inbound scoring >80 intent",
+      value: leadVal,
+      displayValue: `${leadVal}%`,
+      color: "#3B82F6", // Blue
+      target: "Target: >85%",
+      status: socialLeads.length > 0 ? `${socialLeads.length} Captured` : "Active Radar",
+    },
+    {
+      id: "uptime",
+      label: "AI Agents & Telemetry Sync",
+      sublabel: "Claude + Antigravity live stream",
+      value: syncVal,
+      displayValue: `${syncVal}%`,
+      color: "#8B5CF6", // Purple
+      target: "Target: 99.9%",
+      status: critBlockers === 0 ? "Real-time" : `${critBlockers} Urgent`,
+    },
+  ];
 
   return (
     <div className="rounded-3xl border border-pink-100 bg-white p-6 shadow-sm">
@@ -80,7 +100,7 @@ export function OperationalHealthGauges() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-5">
-        {GAUGES.map((g) => {
+        {gauges.map((g) => {
           const isHovered = hoveredGauge === g.id;
           const strokeDashoffset = 100 - g.value;
 

@@ -110,6 +110,11 @@ export function CommandCenterShell() {
         mobileOpen={mobileDrawerOpen}
         onCloseMobile={() => setMobileDrawerOpen(false)}
         onLogout={handleLogout}
+        attentionCount={attentionItems.length}
+        leadsCount={socialLeads.length}
+        dealsCount={pipelineDeals.length}
+        dealsTotal={pipelineDeals.reduce((sum, d) => sum + d.dealValue, 0)}
+        vaultCount={proofVault.length}
       />
 
       {/* 2. Main Content Container */}
@@ -141,6 +146,8 @@ export function CommandCenterShell() {
               attentionItems={attentionItems}
               socialLeads={socialLeads}
               prospects={prospects}
+              deals={pipelineDeals}
+              subscriptions={subscriptions}
               onSelectTab={setActiveTab}
               onResolveAttentionItem={resolveAttentionItem}
             />
@@ -154,6 +161,7 @@ export function CommandCenterShell() {
               socialLeads={socialLeads}
               prospects={prospects}
               subscriptions={subscriptions}
+              deals={pipelineDeals}
               onSelectTab={setActiveTab}
             />
           )}
@@ -166,6 +174,7 @@ export function CommandCenterShell() {
               socialLeads={socialLeads}
               prospects={prospects}
               subscriptions={subscriptions}
+              deals={pipelineDeals}
             />
           )}
 

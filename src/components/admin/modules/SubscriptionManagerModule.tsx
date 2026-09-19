@@ -35,10 +35,26 @@ export function SubscriptionManagerModule({
   const totalMonthlySpend = subscriptions.reduce((sum, s) => sum + s.costPerMonth, 0);
   const expiringSoonCount = subscriptions.filter((s) => s.daysUntilRenewal <= 7).length;
 
-  const handleOptimizeClaude = (subId: string) => {
+  // Dynamic cost savings calculation based on inactive seats and cloud reserved capacity
+  const totalInactiveSeats = subscriptions.reduce((sum, s) => sum + Math.max(0, s.seatCount - s.activeSeats), 0);
+  const monthlySeatWasteUSD = subscriptions.reduce((sum, s) => {
+    const inactive = Math.max(0, s.seatCount - s.activeSeats);
+    const perSeat = s.seatCount > 0 ? s.costPerMonth / s.seatCount : 0;
+    return sum + inactive * perSeat;
+  }, 0);
+  const annualSavingsUSD = Math.round((monthlySeatWasteUSD + totalMonthlySpend * 0.15) * 12);
+  const annualSavingsINR = Math.round(annualSavingsUSD * 83);
+
+  // Dynamic closest upcoming renewal
+  const sortedByRenewal = [...subscriptions].sort((a, b) => a.daysUntilRenewal - b.daysUntilRenewal);
+  const closestRenewal = sortedByRenewal[0];
+
+  const handleOptimizeSubscription = (subId: string) => {
     setOptimizingSubId(subId);
+    const targetSub = subscriptions.find((s) => s.id === subId);
+    if (!targetSub) return;
     setTimeout(() => {
-      onUpdateSeats(subId, 6, 6);
+      onUpdateSeats(subId, targetSub.activeSeats, targetSub.activeSeats);
       setOptimizingSubId(null);
     }, 600);
   };
@@ -66,7 +82,7 @@ export function SubscriptionManagerModule({
               </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">
-              Track Claude Pro, Antigravity Pro, AWS Cloud, GitHub, and Google Workspace with AI seat rationalization &amp; cost savings.
+              Track developer seats, cloud servers, AI copilots, and domains with live seat rationalization &amp; renewal telemetry.
             </p>
           </div>
 
@@ -85,7 +101,9 @@ export function SubscriptionManagerModule({
           <div className="text-3xl font-black tracking-tight text-slate-900 font-mono mt-1">
             ${totalMonthlySpend} <span className="text-xs font-bold text-slate-500">/ mo (₹{Math.round(totalMonthlySpend * 83).toLocaleString("en-IN")})</span>
           </div>
-          <p className="mt-1 text-xs text-slate-500 font-medium">Across 7 mission-critical developer &amp; AI tools</p>
+          <p className="mt-1 text-xs text-slate-500 font-medium">
+            Across {subscriptions.length} tracked developer &amp; AI subscriptions
+          </p>
         </div>
 
         <div className="rounded-3xl border border-pink-100 bg-white p-5 shadow-xs hover:border-pink-300 hover:shadow-md transition-all">
@@ -94,20 +112,24 @@ export function SubscriptionManagerModule({
             <PiggyBank className="h-5 w-5 text-emerald-600" />
           </div>
           <div className="text-3xl font-black tracking-tight text-emerald-700 font-mono mt-1">
-            ₹1,53,600 <span className="text-xs font-bold text-slate-500">/ year</span>
+            ₹{annualSavingsINR.toLocaleString("en-IN")} <span className="text-xs font-bold text-slate-500">/ year</span>
           </div>
           <p className="mt-1 text-xs text-emerald-700 font-bold">
-            Via Claude seat rationalization &amp; AWS Reserved Nodes
+            {totalInactiveSeats > 0
+              ? `Via ${totalInactiveSeats} unused seat rationalizations & reserve plans`
+              : "All active seats currently 100% utilized"}
           </p>
         </div>
 
         <div className="rounded-3xl border border-pink-100 bg-white p-5 shadow-xs hover:border-pink-300 hover:shadow-md transition-all">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Urgent Renewal Countdown</span>
           <div className="text-3xl font-black tracking-tight text-amber-700 font-mono mt-1">
-            3 Days Left
+            {closestRenewal ? `${closestRenewal.daysUntilRenewal} Days Left` : "0 Pending"}
           </div>
           <p className="mt-1 text-xs text-slate-500 truncate font-medium">
-            Claude Pro Team Plan ($200/mo) renews Sep 21
+            {closestRenewal
+              ? `${closestRenewal.name} ($${closestRenewal.costPerMonth}/mo) renews ${closestRenewal.nextRenewalDate}`
+              : "No upcoming auto-renewals in schedule"}
           </p>
         </div>
       </div>
@@ -137,79 +159,87 @@ export function SubscriptionManagerModule({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {subscriptions.map((sub) => {
-                const isClaude = sub.name.includes("Claude");
-                const hasInactiveSeats = sub.seatCount > sub.activeSeats;
+              {subscriptions.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-xs text-slate-500 font-medium">
+                    No active software subscriptions tracked in workspace. Subscriptions added will reflect live renewal countdowns.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                subscriptions.map((sub) => {
+                  const hasInactiveSeats = sub.seatCount > sub.activeSeats;
+                  const inactiveSeatsCount = sub.seatCount - sub.activeSeats;
 
-                return (
-                  <TableRow key={sub.id} className="border-slate-100 hover:bg-pink-50/20 transition-colors">
-                    <TableCell>
-                      <div className="font-bold text-slate-900">{sub.name}</div>
-                      <div className="text-[11px] text-[#D6135F] font-semibold">{sub.provider}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" size="xs" className="uppercase font-bold">
-                        {sub.category.replace("_", " ")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-mono font-black text-slate-900">
-                      ${sub.costPerMonth} <span className="text-[10px] text-slate-500 font-normal">/mo</span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5">
-                        <Badge
-                          variant={
-                            sub.daysUntilRenewal <= 3
-                              ? "destructive"
-                              : sub.daysUntilRenewal <= 7
-                              ? "warning"
-                              : "brand"
-                          }
-                          size="xs"
-                          className="font-mono flex items-center gap-1 font-bold"
-                        >
-                          <Clock className="h-2.5 w-2.5" />
-                          {sub.daysUntilRenewal}d left
+                  return (
+                    <TableRow key={sub.id} className="border-slate-100 hover:bg-pink-50/20 transition-colors">
+                      <TableCell>
+                        <div className="font-bold text-slate-900">{sub.name}</div>
+                        <div className="text-[11px] text-[#D6135F] font-semibold">{sub.provider}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" size="xs" className="uppercase font-bold">
+                          {sub.category.replace("_", " ")}
                         </Badge>
-                      </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5 font-medium">{sub.nextRenewalDate}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1 text-xs">
-                        <span className="font-mono font-black text-slate-900">{sub.activeSeats}</span>
-                        <span className="text-slate-400">/</span>
-                        <span className="font-mono text-slate-500 font-semibold">{sub.seatCount} seats</span>
-                      </div>
-                      {hasInactiveSeats && (
-                        <div className="text-[10px] font-bold text-amber-700">
-                          {sub.seatCount - sub.activeSeats} inactive seat(s)
+                      </TableCell>
+                      <TableCell className="font-mono font-black text-slate-900">
+                        ${sub.costPerMonth} <span className="text-[10px] text-slate-500 font-normal">/mo</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5">
+                          <Badge
+                            variant={
+                              sub.daysUntilRenewal <= 3
+                                ? "destructive"
+                                : sub.daysUntilRenewal <= 7
+                                ? "warning"
+                                : "brand"
+                            }
+                            size="xs"
+                            className="font-mono flex items-center gap-1 font-bold"
+                          >
+                            <Clock className="h-2.5 w-2.5" />
+                            {sub.daysUntilRenewal}d left
+                          </Badge>
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="max-w-xs">
-                      <p className="text-[11px] text-slate-700 leading-relaxed font-medium">{sub.optimizationTip}</p>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {isClaude && hasInactiveSeats ? (
-                        <Button
-                          variant="emerald"
-                          size="xs"
-                          onClick={() => handleOptimizeClaude(sub.id)}
-                          disabled={optimizingSubId === sub.id}
-                          className="rounded-xl font-bold shadow-xs"
-                        >
-                          <Sparkles className="h-3 w-3" />
-                          <span>{optimizingSubId === sub.id ? "Optimizing..." : "Save $50/mo"}</span>
-                        </Button>
-                      ) : (
-                        <span className="inline-block text-[10px] font-bold text-emerald-700 border border-emerald-300 bg-emerald-50 px-2.5 py-1 rounded-lg">
-                          ✓ Optimized
-                        </span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                        <div className="text-[10px] text-slate-500 mt-0.5 font-medium">{sub.nextRenewalDate}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-xs">
+                          <span className="font-mono font-black text-slate-900">{sub.activeSeats}</span>
+                          <span className="text-slate-400">/</span>
+                          <span className="font-mono text-slate-500 font-semibold">{sub.seatCount} seats</span>
+                        </div>
+                        {hasInactiveSeats && (
+                          <div className="text-[10px] font-bold text-amber-700">
+                            {inactiveSeatsCount} inactive seat(s)
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="max-w-xs">
+                        <p className="text-[11px] text-slate-700 leading-relaxed font-medium">{sub.optimizationTip}</p>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {hasInactiveSeats ? (
+                          <Button
+                            variant="emerald"
+                            size="xs"
+                            onClick={() => handleOptimizeSubscription(sub.id)}
+                            disabled={optimizingSubId === sub.id}
+                            className="rounded-xl font-bold shadow-xs"
+                          >
+                            <Sparkles className="h-3 w-3" />
+                            <span>{optimizingSubId === sub.id ? "Rationalizing..." : `Trim ${inactiveSeatsCount} Seats`}</span>
+                          </Button>
+                        ) : (
+                          <span className="inline-block text-[10px] font-bold text-emerald-700 border border-emerald-300 bg-emerald-50 px-2.5 py-1 rounded-lg">
+                            ✓ Optimized
+                          </span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </div>

@@ -30,19 +30,19 @@ import {
 } from "./initialData";
 
 const STORAGE_KEYS = {
-  AUTH_SESSION: "vt_admin_auth_session_v6",
-  CURRENT_USER: "vt_admin_current_user_v6",
-  FINANCIALS: "vt_admin_financials_v6",
-  PROJECTS: "vt_admin_projects_v6",
-  ATTENTION: "vt_admin_attention_v6",
-  LEADS: "vt_admin_leads_v6",
-  PROSPECTS: "vt_admin_prospects_v6",
-  VAULT: "vt_admin_vault_v6",
-  SUBSCRIPTIONS: "vt_admin_subscriptions_v6",
-  AUDIT_LOGS: "vt_admin_audit_logs_v6",
-  DEALS: "vt_admin_deals_v6",
-  ACTIVE_TAB: "vt_admin_active_tab_v6",
-  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v6",
+  AUTH_SESSION: "vt_admin_auth_session_v8_dynamic",
+  CURRENT_USER: "vt_admin_current_user_v8_dynamic",
+  FINANCIALS: "vt_admin_financials_v8_dynamic",
+  PROJECTS: "vt_admin_projects_v8_dynamic",
+  ATTENTION: "vt_admin_attention_v8_dynamic",
+  LEADS: "vt_admin_leads_v8_dynamic",
+  PROSPECTS: "vt_admin_prospects_v8_dynamic",
+  VAULT: "vt_admin_vault_v8_dynamic",
+  SUBSCRIPTIONS: "vt_admin_subscriptions_v8_dynamic",
+  AUDIT_LOGS: "vt_admin_audit_logs_v8_dynamic",
+  DEALS: "vt_admin_deals_v8_dynamic",
+  ACTIVE_TAB: "vt_admin_active_tab_v8_dynamic",
+  SIDEBAR_COLLAPSED: "vt_admin_sidebar_collapsed_v8_dynamic",
 };
 
 export function useAdminStore() {

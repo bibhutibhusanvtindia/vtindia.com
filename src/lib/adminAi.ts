@@ -4,9 +4,8 @@ import {
   AttentionItem,
   SocialLead,
   ProspectItem,
-  ProofVaultItem,
   SubscriptionItem,
-  AuditLog,
+  PipelineDeal,
   ExecutiveBriefingData,
 } from "@/data/admin/types";
 
@@ -26,9 +25,20 @@ export function generateChiefOfStaffResponse(
     socialLeads: SocialLead[];
     prospects: ProspectItem[];
     subscriptions: SubscriptionItem[];
+    deals?: PipelineDeal[];
   }
 ): AIResponse {
   const q = query.toLowerCase();
+  const deals = context.deals || [];
+  const pipelineTotal = deals.reduce((sum, d) => sum + d.dealValue, 0) || context.financials.totalPipelineValue || 0;
+  const revLakhs = context.financials.monthlyRevenue > 0 ? (context.financials.monthlyRevenue / 100000).toFixed(1) : "0";
+  const pipelineLakhs = pipelineTotal > 0 ? (pipelineTotal / 100000).toFixed(1) : "0";
+  const overdueLakhs = context.financials.overdueReceivables > 0 ? (context.financials.overdueReceivables / 100000).toFixed(1) : "0";
+  const activeProjectsCount = context.projects.length;
+  const attentionCount = context.attentionItems.length;
+  const leadsCount = context.socialLeads.length;
+  const prospectsCount = context.prospects.length;
+  const dealsCount = deals.length;
 
   // Query: How is the company doing today? / Company health / Overview
   if (
@@ -38,26 +48,43 @@ export function generateChiefOfStaffResponse(
     q.includes("status") ||
     q.includes("today")
   ) {
+    const dealsText =
+      dealsCount > 0
+        ? `We are currently tracking **${dealsCount} active pipeline deals** worth **₹${pipelineLakhs}L**.`
+        : `Deal pipeline is clean with **0 active deals** registered.`;
+
+    const projectsText =
+      activeProjectsCount > 0
+        ? `There are **${activeProjectsCount} active project deployments** underway.`
+        : `No active deployment blockers logged.`;
+
+    const attentionText =
+      attentionCount > 0
+        ? `**${attentionCount} items** require leadership review.`
+        : `Zero critical blockers or overdue invoices flagged today.`;
+
     return {
-      answer: `Good day, Sir. Virtoy Technologies is operating at high momentum today. Monthly revenue stands at ₹24.8L (82.7% of the ₹30.0L monthly target) with an 18.4% MoM growth rate. 
+      answer: `Namaste Sir 🙏. Here is today's real-time executive telemetry for Virtoy Technologies:
 
-We have 12 active production deployments with our key heavy-industry project (SafeAct for Tata Steel) at 88% completion and Krushi Odisha 2025 Spatial VR Expo at 94%.
-
-However, 2 critical items require executive oversight today: ₹4.20L in overdue receivables from Tata Steel Kalinga Phase 2, and 3 high-intent B2B social inquiries from Dubai and Jaipur waiting for technical proposals.`,
+- **Monthly Collections**: ₹${revLakhs}L recorded for this cycle (${context.financials.momGrowth}% MoM velocity).
+- **Deal Pipeline**: ${dealsText}
+- **Engineering Deliveries**: ${projectsText}
+- **Executive Attention**: ${attentionText}
+- **Discovery Radar**: ${prospectsCount} scouted commercial enterprises and ${leadsCount} qualified inbound leads in your workspace.`,
       insights: [
-        "Monthly Revenue: ₹24.8L (+18.4% MoM) — On track to reach target with 2 pending enterprise closes.",
-        "Total Active Pipeline: ₹68.5L across heavy industry, higher education, and UAE logistics.",
-        "Team Engineering Velocity: 91% on-time milestone delivery index.",
+        `Active Enterprise Pipeline: ₹${pipelineLakhs}L across ${dealsCount} registered opportunities.`,
+        `Commercial Discovery: ${prospectsCount} target enterprises in radar.`,
+        `Operational Health: ${attentionCount === 0 ? "100% on-track, zero blockers" : `${attentionCount} items requiring action`}.`,
       ],
       highlightMetrics: [
-        { label: "Monthly Revenue", value: "₹24.8L", trend: "+18.4% MoM" },
-        { label: "Receivables Pending", value: "₹4.20L", trend: "14 days overdue" },
-        { label: "Active Pipeline", value: "₹68.5L", trend: "6 enterprise deals" },
+        { label: "Active Pipeline", value: `₹${pipelineLakhs}L`, trend: `${dealsCount} deals` },
+        { label: "Inbound Leads", value: `${leadsCount}`, trend: "Live capture" },
+        { label: "Overdue Invoices", value: `₹${overdueLakhs}L`, trend: `${context.financials.collectionVelocity}% velocity` },
       ],
       suggestedActions: [
-        { label: "Review Overdue Invoices", actionId: "view_vault", targetTab: "vault" },
-        { label: "Inspect High-Intent Leads", actionId: "view_leads", targetTab: "social_leads" },
-        { label: "Generate Executive Briefing", actionId: "gen_briefing", targetTab: "briefing" },
+        { label: "View Deal Pipeline Matrix", actionId: "view_deals", targetTab: "deals" },
+        { label: "Live Scout B2B Leads", actionId: "view_prospects", targetTab: "prospector" },
+        { label: "Export Executive Briefing", actionId: "view_briefing", targetTab: "briefing" },
       ],
     };
   }
@@ -70,22 +97,41 @@ However, 2 critical items require executive oversight today: ₹4.20L in overdue
     q.includes("critical") ||
     q.includes("what needs")
   ) {
-    return {
-      answer: `Sir, here are the top 3 items requiring your immediate executive intervention:
+    if (context.attentionItems.length === 0) {
+      return {
+        answer: `Sir, all systems are operating cleanly. There are currently **0 critical attention items** or payment blockers in your workspace.
 
-1. **Tata Steel Kalinga Overdue Invoice (₹4.20L)**: The SAP workflow clearance has stalled for 14 days following Phase 1 acceptance. Recommendation: Have COO Piyali Sahu send the formal escalation letter to Asit Mishra.
-2. **Claude Pro Team Subscription Renewal (3 Days Left)**: AI seat audit found 2 inactive developer seats. Downgrading before Sep 21 saves ₹41,000 annually.
-3. **High-Value UAE Logistics Lead (₹22.0L)**: Al-Futtaim Logistics in JAFZA Dubai requested a 6-DoF forklift VR demo after watching our SafeAct simulation.`,
+All client invoices, developer tools, and pipeline leads are in healthy status. You can use the **B2B Maps Prospector** to scout new commercial opportunities or review the **Deal Matrix**.`,
+        insights: [
+          "Zero overdue invoice escalations pending.",
+          "All active software subscriptions operational.",
+          "Workspace synchronized with live database.",
+        ],
+        suggestedActions: [
+          { label: "Open B2B Maps Prospector", actionId: "open_prospector", targetTab: "prospector" },
+          { label: "Check Deal Pipeline", actionId: "open_deals", targetTab: "deals" },
+        ],
+      };
+    }
+
+    const itemsSummary = context.attentionItems
+      .slice(0, 3)
+      .map((item, idx) => `${idx + 1}. **${item.title}** (${item.severity.toUpperCase()}): ${item.description}`)
+      .join("\n");
+
+    return {
+      answer: `Sir, here are the top items requiring your executive intervention:
+
+${itemsSummary}`,
       insights: [
-        "Receivables risk: 1 enterprise invoice > 14 days overdue.",
-        "SaaS cost saving opportunity: ₹41,000/yr ready for 1-click execution.",
-        "High-conversion window: UAE lead inquiry is under 1 hour old.",
+        `Total active attention items: ${context.attentionItems.length}`,
+        `Highest severity: ${context.attentionItems[0]?.severity || "normal"}`,
       ],
-      suggestedActions: [
-        { label: "Send Invoice Reminder", actionId: "send_invoice", targetTab: "vault" },
-        { label: "Optimize AI Seats", actionId: "opt_seats", targetTab: "subscriptions" },
-        { label: "Draft UAE VR Proposal", actionId: "reply_lead", targetTab: "social_leads" },
-      ],
+      suggestedActions: context.attentionItems.slice(0, 2).map((item) => ({
+        label: item.actionLabel || "Review Item",
+        actionId: `act_${item.id}`,
+        targetTab: item.actionModule || "dashboard",
+      })),
     };
   }
 
@@ -97,32 +143,37 @@ However, 2 critical items require executive oversight today: ₹4.20L in overdue
     q.includes("review") ||
     q.includes("monday")
   ) {
+    const dealsList =
+      deals.length > 0
+        ? deals.slice(0, 3).map((d) => `${d.company} (₹${(d.dealValue / 100000).toFixed(1)}L - ${d.stage})`).join(", ")
+        : "Review new B2B prospect discovery pipeline";
+
     return {
-      answer: `Here is the structured **Leadership & Operations Review Agenda** prepared for your upcoming executive session:
+      answer: `Here is the structured **Leadership & Operations Review Agenda** synthesized from your live workspace data:
 
 ### 📋 Virtoy Technologies Executive Review Agenda
-**1. Financial & Cashflow Velocity (15 Mins)** — Lead: Mrs. Piyali Sahu (COO)
-- Review Q3 revenue run-rate (₹24.8L current vs ₹30.0L target).
-- Escalation plan for Tata Steel Kalinga Phase 2 milestone invoice (₹4.20L).
+**1. Financial Health & Pipeline Run-Rate (15 Mins)** — Lead: Mrs. Piyali Sahu (COO)
+- Review active pipeline value (₹${pipelineLakhs}L across ${dealsCount} deals).
+- Collections status: ₹${revLakhs}L collected, ₹${overdueLakhs}L overdue.
 
-**2. Engineering & Delivery Milestones (20 Mins)** — Lead: Niranjan Sahu & Ashwin Yadav
-- Krushi Odisha 2025 Spatial Expo load test results (40K concurrent capacity).
-- SafeAct Quest 3 multilingual (Odia/Hindi) voice module staging.
-- Banki Autonomous College semester grade engine sign-off.
+**2. Engineering Deliveries & Milestones (20 Mins)** — Lead: Niranjan Sahu & Ashwin Yadav
+- Status of active deployments (${activeProjectsCount} active systems).
+- Architecture benchmarks and client QA verification.
 
-**3. B2B Growth & Omnichannel Pipeline (15 Mins)** — Lead: Rakesh Panda
-- Evaluation of 5 new high-intent social leads (Dubai Logistics, Jaipur Heritage Hotels).
-- B2B Maps Prospector outreach campaign for Kolkata hospitals & Jajpur steel plants.
+**3. Commercial Growth & Prospecting (15 Mins)** — Lead: Rakesh Panda
+- Key opportunities in focus: ${dealsList}.
+- Inbound inquiries: ${leadsCount} leads captured via social & WhatsApp channels.
+- Geo-Radar campaign: ${prospectsCount} scouted enterprises.
 
-**4. AI Tooling & Infrastructure Optimization (10 Mins)** — Lead: Mr. Anup Patnaik
-- Cloudflare strict SSL audit and Claude Pro seat rationalization.`,
+**4. Operations & Infrastructure (10 Mins)** — Lead: Mr. Anup Patnaik (Co-Founder)
+- SaaS subscriptions & developer infrastructure review (${context.subscriptions.length} active tools).`,
       insights: [
-        "Agenda optimized for 60-minute crisp executive decision-making.",
-        "Covers revenue recovery, engineering quality, pipeline expansion, and infrastructure cost controls.",
+        "Agenda dynamically customized based on current active pipeline and active projects.",
+        "60-minute executive session format designed for fast decision-making.",
       ],
       suggestedActions: [
         { label: "Export Full Briefing PDF", actionId: "export_pdf", targetTab: "briefing" },
-        { label: "View Team Audit Trail", actionId: "audit_trail", targetTab: "audit" },
+        { label: "View Multi-Rep Audit Trail", actionId: "audit_trail", targetTab: "audit-trail" },
       ],
     };
   }
@@ -130,39 +181,42 @@ However, 2 critical items require executive oversight today: ₹4.20L in overdue
   // Query: Revenue / Financials / Targets
   if (q.includes("revenue") || q.includes("financial") || q.includes("target") || q.includes("money") || q.includes("cashflow")) {
     return {
-      answer: `Monthly financial breakdown:
-- **Current Revenue**: ₹24,80,000 (82.7% of target).
-- **Target Revenue**: ₹30,00,000 (₹5.20L gap remaining for the month).
-- **Overdue Collections**: ₹4,20,000 (Tata Steel Kalinga).
-- **Active Pipeline Potential**: ₹68,50,000 across 6 high-probability enterprise proposals.
-- **Collection Velocity**: 94.2% on-time settlement over the past 90 days.
-
-Closing the Grand Kalinga PMS expansion (₹4.5L) and Jaipur Heritage Hotel deal (₹7.5L) will comfortably push total monthly collections beyond ₹36.0L.`,
+      answer: `Live Financial Telemetry breakdown:
+- **Monthly Collections**: ₹${context.financials.monthlyRevenue.toLocaleString("en-IN")}.
+- **Target Revenue**: ₹${context.financials.targetRevenue.toLocaleString("en-IN")}.
+- **Overdue Invoices**: ₹${context.financials.overdueReceivables.toLocaleString("en-IN")}.
+- **Total Pipeline Volume**: ₹${pipelineTotal.toLocaleString("en-IN")} across ${dealsCount} active opportunities.
+- **Settlement Velocity**: ${context.financials.collectionVelocity}% on-time collection index.`,
       highlightMetrics: [
-        { label: "Achieved Revenue", value: "₹24.8L", trend: "82.7% Target" },
-        { label: "Monthly Target", value: "₹30.0L", trend: "₹5.2L to go" },
-        { label: "Pipeline Value", value: "₹68.5L", trend: "High probability" },
+        { label: "Collections", value: `₹${revLakhs}L`, trend: `${context.financials.momGrowth}% MoM` },
+        { label: "Active Deals", value: `${dealsCount}`, trend: `₹${pipelineLakhs}L volume` },
+        { label: "Overdue", value: `₹${overdueLakhs}L`, trend: "Receivables" },
       ],
       suggestedActions: [
         { label: "View Financial Graphs", actionId: "view_dash", targetTab: "dashboard" },
+        { label: "Inspect Deal Pipeline", actionId: "view_deals", targetTab: "deals" },
       ],
     };
   }
 
-  // Default fallback response with smart contextual recommendations
+  // Default fallback response
   return {
-    answer: `Sir, I am monitoring all operations across Virtoy Technologies. 
+    answer: `Sir, I am monitoring live operations across Virtoy Technologies.
 
-Currently tracking **12 active projects**, **₹24.8L in monthly revenue**, **7 active software subscriptions**, and **5 qualified omnichannel leads**.
+Currently tracking:
+- **${dealsCount} active pipeline deals** (₹${pipelineLakhs}L total volume)
+- **${activeProjectsCount} project deployments**
+- **${leadsCount} inbound leads** & **${prospectsCount} scouted commercial enterprises**
+- **${attentionCount} active attention items**
 
 You can ask me to:
-- Generate leadership review agendas
-- Analyze revenue targets & collection bottlenecks
-- Draft tailored B2B client pitches
-- Summarize developer activity & discussion proofs`,
+1. *"How is the company doing today?"*
+2. *"Prepare our Monday management review agenda"*
+3. *"What needs my immediate attention?"*
+4. *"Analyze revenue and active pipeline"*`,
     insights: [
-      "All systems operating within normal parameters.",
-      "Dual Innovation Hubs (Kolkata HQ & Bhubaneswar O-HUB) connected with zero reported downtime.",
+      `Workspace synchronized with ${dealsCount} deals and ${leadsCount} inbound leads.`,
+      "All AI telemetry nodes operational.",
     ],
     suggestedActions: [
       { label: "What needs my attention?", actionId: "ask_attention" },
@@ -179,7 +233,26 @@ export function generateExecutiveBriefingData(context: {
   socialLeads: SocialLead[];
   prospects: ProspectItem[];
   subscriptions: SubscriptionItem[];
+  deals?: PipelineDeal[];
 }): ExecutiveBriefingData {
+  const deals = context.deals || [];
+  const pipelineTotal = deals.reduce((sum, d) => sum + d.dealValue, 0) || context.financials.totalPipelineValue || 0;
+  const pipelineStr = pipelineTotal > 0 ? `₹${(pipelineTotal / 100000).toFixed(1)}L` : "₹0";
+  const revStr = context.financials.monthlyRevenue > 0 ? `₹${(context.financials.monthlyRevenue / 100000).toFixed(1)}L` : "₹0";
+
+  const topDeals = deals.map((d) => ({
+    client: d.company,
+    deal: d.title,
+    value: `₹${(d.dealValue / 100000).toFixed(1)} Lakh`,
+    rep: d.leadRep,
+  }));
+
+  const blockers = context.attentionItems.map((a) => ({
+    item: a.title,
+    owner: "Executive Leadership",
+    impact: a.description,
+  }));
+
   return {
     generatedAt: new Date().toLocaleDateString("en-IN", {
       day: "numeric",
@@ -189,52 +262,44 @@ export function generateExecutiveBriefingData(context: {
       minute: "2-digit",
     }),
     preparedFor: "Mr. Pritiranjan Sahu (CEO) & Executive Leadership",
-    executiveSummary:
-      "Virtoy Technologies Pvt. Ltd. maintained strong commercial velocity this cycle, recording ₹24.8L in monthly revenue (+18.4% MoM) and expanding total enterprise pipeline to ₹68.5L. Primary engineering operations remain healthy with SafeAct Industrial VR and Krushi Odisha Spatial WebXR on track for timely delivery. Executive focus this week centers on recovering ₹4.20L in overdue receivables and converting 3 high-intent overseas & domestic enterprise leads.",
+    executiveSummary: `Virtoy Technologies Pvt. Ltd. operations telemetry report. Active pipeline volume is currently tracking at ${pipelineStr} across ${deals.length} enterprise opportunities. Total active deployments stand at ${context.projects.length} systems with ${context.socialLeads.length} inbound leads captured and ${context.prospects.length} commercial prospects in the discovery radar. ${
+      context.attentionItems.length > 0
+        ? `${context.attentionItems.length} operational attention items are flagged for leadership review.`
+        : "All active systems and collections are operating within standard parameters with zero critical blockers."
+    }`,
     kpiSnapshot: {
-      monthlyRevenue: "₹24,80,000",
-      momGrowth: "+18.4%",
-      pipelineVolume: "₹68,50,000",
-      collectionEfficiency: "94.2%",
-      activeDeployments: 12,
+      monthlyRevenue: revStr,
+      momGrowth: `+${context.financials.momGrowth}%`,
+      pipelineVolume: pipelineStr,
+      collectionEfficiency: `${context.financials.collectionVelocity}%`,
+      activeDeployments: context.projects.length,
     },
-    criticalBlockers: [
-      {
-        item: "Tata Steel Kalinga Phase 2 milestone invoice (₹4.20L) pending SAP release for 14 days.",
-        owner: "Mrs. Piyali Sahu (COO)",
-        impact: "Receivable cashflow delay; Phase 3 scheduling pending.",
-      },
-      {
-        item: "Claude Pro annual subscription auto-renewal with 2 inactive developer seats ($50/mo waste).",
-        owner: "Mr. Anup Patnaik (Co-Founder)",
-        impact: "Avoidable SaaS overhead (₹41,000/yr).",
-      },
-    ],
-    topWins: [
-      {
-        client: "Odisha Medical Services Association (OMSA)",
-        deal: "State-wide Digital Voting & Identity Registry Portal",
-        value: "₹5,20,000",
-        rep: "Niranjan Sahu",
-      },
-      {
-        client: "Grand Kalinga Hotels & Suites",
-        deal: "Cloud PMS & WhatsApp Automated Guest Room Service",
-        value: "₹4,50,000",
-        rep: "Rakesh Panda",
-      },
-      {
-        client: "Banki Autonomous College",
-        deal: "IQAC & NAAC SSR Document Automation ERP",
-        value: "₹6,80,000",
-        rep: "Mr. Kailash Patnaik",
-      },
-    ],
+    criticalBlockers:
+      blockers.length > 0
+        ? blockers
+        : [
+            {
+              item: "Zero critical blockers currently flagged across engineering or collections.",
+              owner: "Executive Operations",
+              impact: "Standard commercial velocity maintained.",
+            },
+          ],
+    topWins:
+      topDeals.length > 0
+        ? topDeals
+        : [
+            {
+              client: "Enterprise Pipeline",
+              deal: "Ready to register closed opportunities",
+              value: "₹0",
+              rep: "Sales & Leadership",
+            },
+          ],
     weeklyFocus: [
-      "Secure payment clearance for Tata Steel Kalinga Phase 2 invoice.",
-      "Conduct 40K concurrent virtual user load test on AWS Chandaka node for Krushi Odisha Expo.",
-      "Deliver live VR telemetry demonstrations to Al-Futtaim Heavy Logistics Dubai and Royal Heritage Jaipur.",
-      "Execute Claude Pro team seat rationalization and AWS savings plan.",
+      `Review and advance ${deals.length} active deals in the Pipeline Matrix.`,
+      `Follow up on ${context.socialLeads.length} qualified inbound inquiries across WhatsApp and web channels.`,
+      `Scout target commercial enterprises in Odisha, India, and UAE using B2B Maps Prospector.`,
+      `Maintain 100% on-time milestone delivery across ${context.projects.length} client software projects.`,
     ],
   };
 }
