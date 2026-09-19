@@ -150,43 +150,52 @@ export function ChiefOfStaffModule({
   return (
     <div className="space-y-6">
       {/* Module Header Card */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-rose-200/70 bg-gradient-to-r from-rose-50/90 via-pink-50/50 to-rose-100/50 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-100 text-[#D6135F] shadow-sm">
-              <Bot className="h-4 w-4" />
-            </span>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900">AI Chief of Staff</h2>
-            <Badge variant="brand" size="sm">
-              Strategic Copilot
-            </Badge>
+      <div className="relative overflow-hidden rounded-3xl border-2 border-pink-200/90 bg-gradient-to-br from-white via-[#FFF5F8] to-[#FCE7F3]/70 p-6 sm:p-7 shadow-sm">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-[#F0186C]/15 to-[#FF4D8D]/5 blur-3xl" />
+        
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 text-white shadow-sm shadow-[#F0186C]/25">
+                <Bot className="h-5 w-5" />
+              </span>
+              <h2 className="text-2xl font-black tracking-tight text-slate-900">
+                AI Chief of Staff{" "}
+                <span className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] bg-clip-text text-transparent">
+                  Copilot
+                </span>
+              </h2>
+              <span className="rounded-full bg-pink-50 px-3 py-1 text-xs font-bold text-[#D6135F] border border-pink-200">
+                Strategic AI
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">
+              Natural language executive queries grounded in live revenue telemetry, engineering deliveries, and CRM pipeline.
+            </p>
           </div>
-          <p className="text-xs text-slate-600">
-            Natural language executive queries grounded in live revenue telemetry, engineering deliveries, and CRM pipeline.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleSend("Prepare our Monday management review agenda")}
-            className="border-slate-200 bg-white text-slate-700 hover:bg-rose-50 hover:border-rose-300 text-xs gap-1.5 shadow-sm"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-[#D6135F]" />
-            Generate Board Agenda
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSend("Prepare our Monday management review agenda")}
+              className="border-2 border-pink-200 bg-white text-[#D6135F] hover:bg-pink-50 hover:border-[#F0186C] font-bold text-xs gap-1.5 px-3.5 py-2 rounded-xl shadow-xs"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-[#F0186C]" />
+              Generate Board Agenda
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Quick Prompt Suggestions */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-        <span className="text-[11px] font-bold text-slate-500 shrink-0 uppercase tracking-wider">Quick Prompts:</span>
+        <span className="text-[11px] font-black text-[#D6135F] shrink-0 uppercase tracking-wider">Quick Prompts:</span>
         {PROMPT_SUGGESTIONS.map((prompt) => (
           <button
             key={prompt}
             onClick={() => handleSend(prompt)}
-            className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 hover:border-rose-300 hover:bg-rose-50/60 transition-colors shadow-sm"
+            className="shrink-0 rounded-2xl border border-pink-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-[#F0186C] hover:bg-pink-50 hover:text-[#D6135F] transition-all shadow-2xs"
           >
             {prompt}
           </button>
@@ -194,7 +203,7 @@ export function ChiefOfStaffModule({
       </div>
 
       {/* Chat Conversation Card */}
-      <Card className="flex flex-col h-[580px] border-slate-200/80 bg-white shadow-sm">
+      <div className="flex flex-col h-[600px] rounded-3xl border border-pink-100 bg-white shadow-sm overflow-hidden">
         {/* Messages Scroll Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {messages.map((msg) => {
@@ -205,34 +214,34 @@ export function ChiefOfStaffModule({
                 className={`flex gap-3 ${isAi ? "items-start" : "items-end justify-end"}`}
               >
                 {isAi && (
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#D6135F] to-[#F0186C] text-white shadow-sm shadow-[#F0186C]/25">
-                    <Bot className="h-4 w-4" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D6135F] to-[#F0186C] text-white shadow-sm shadow-[#F0186C]/25">
+                    <Bot className="h-5 w-5" />
                   </div>
                 )}
 
                 <div
-                  className={`max-w-2xl rounded-2xl p-4 text-xs leading-relaxed shadow-sm ${
+                  className={`max-w-2xl rounded-3xl p-4 sm:p-5 text-xs sm:text-sm leading-relaxed shadow-xs ${
                     isAi
-                      ? "border border-rose-100 bg-rose-50/40 text-slate-800"
-                      : "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white rounded-br-none"
+                      ? "border border-pink-100 bg-gradient-to-br from-[#FFF9FA] via-pink-50/30 to-white text-slate-800"
+                      : "bg-gradient-to-r from-[#D6135F] via-[#E01563] to-[#F0186C] text-white rounded-br-none shadow-md shadow-[#F0186C]/20"
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-4 mb-1 text-[10px] opacity-80">
-                    <span className="font-bold">{isAi ? "AI Chief of Staff" : "Executive"}</span>
-                    <span>{msg.timestamp}</span>
+                  <div className="flex items-center justify-between gap-4 mb-1.5 text-[11px] font-bold opacity-80">
+                    <span className={isAi ? "text-[#D6135F]" : "text-white"}>{isAi ? "AI Chief of Staff" : "Executive"}</span>
+                    <span className="font-mono text-[10px]">{msg.timestamp}</span>
                   </div>
 
                   {/* Body Content */}
-                  <div className="whitespace-pre-wrap space-y-2 font-sans">{msg.text}</div>
+                  <div className="whitespace-pre-wrap space-y-2 font-sans font-normal">{msg.text}</div>
 
                   {/* AI Metrics Highlights if present */}
                   {msg.aiData?.highlightMetrics && msg.aiData.highlightMetrics.length > 0 && (
-                    <div className="mt-3 grid grid-cols-3 gap-2 border-t border-rose-200/60 pt-3">
+                    <div className="mt-3.5 grid grid-cols-3 gap-2.5 border-t border-pink-100 pt-3">
                       {msg.aiData.highlightMetrics.map((m) => (
-                        <div key={m.label} className="rounded-xl bg-white p-2 text-center border border-slate-200 shadow-sm">
-                          <div className="text-[10px] text-slate-500">{m.label}</div>
-                          <div className="font-bold text-slate-900 font-mono">{m.value}</div>
-                          {m.trend && <div className="text-[9px] text-[#D6135F] font-semibold">{m.trend}</div>}
+                        <div key={m.label} className="rounded-2xl bg-white p-2.5 text-center border border-pink-100 shadow-2xs">
+                          <div className="text-[10px] font-semibold text-slate-500">{m.label}</div>
+                          <div className="font-black text-slate-900 font-mono text-sm mt-0.5">{m.value}</div>
+                          {m.trend && <div className="text-[10px] text-[#D6135F] font-bold">{m.trend}</div>}
                         </div>
                       ))}
                     </div>
@@ -240,7 +249,7 @@ export function ChiefOfStaffModule({
 
                   {/* AI Suggested Action Buttons if present */}
                   {msg.aiData?.suggestedActions && msg.aiData.suggestedActions.length > 0 && (
-                    <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-rose-200/60 pt-3">
+                    <div className="mt-3.5 flex flex-wrap items-center gap-2 border-t border-pink-100 pt-3">
                       {msg.aiData.suggestedActions.map((act) => (
                         <Button
                           key={act.label}
@@ -250,9 +259,9 @@ export function ChiefOfStaffModule({
                             if (act.targetTab) onSelectTab(act.targetTab);
                             else if (act.actionId.startsWith("ask_")) handleSend(act.label);
                           }}
-                          className="border-slate-200 bg-white text-slate-700 hover:border-rose-300 hover:text-[#D6135F] shadow-sm"
+                          className="border border-pink-200 bg-white text-[#D6135F] hover:bg-[#F0186C] hover:text-white font-bold text-xs gap-1 rounded-xl shadow-2xs transition-all"
                         >
-                          <Sparkles className="h-3 w-3 text-[#D6135F]" />
+                          <Sparkles className="h-3 w-3" />
                           {act.label}
                         </Button>
                       ))}
@@ -261,21 +270,21 @@ export function ChiefOfStaffModule({
 
                   {/* Bottom AI utility buttons */}
                   {isAi && (
-                    <div className="mt-3 flex items-center justify-end gap-3 text-[10px] text-slate-500 border-t border-rose-200/60 pt-2">
+                    <div className="mt-3.5 flex items-center justify-end gap-3.5 text-[11px] text-slate-500 border-t border-pink-100/70 pt-2 font-medium">
                       <button
                         onClick={() => handleSpeechToggle(msg.text)}
                         className="flex items-center gap-1 hover:text-[#D6135F] transition-colors"
                         title="Listen to response"
                       >
-                        {isSpeaking ? <VolumeX className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
-                        <span>{isSpeaking ? "Mute" : "Listen"}</span>
+                        {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                        <span>{isSpeaking ? "Mute" : "Listen Voice"}</span>
                       </button>
                       <button
                         onClick={() => handleCopy(msg.text, msg.id)}
                         className="flex items-center gap-1 hover:text-[#D6135F] transition-colors"
                         title="Copy text"
                       >
-                        {copiedId === msg.id ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+                        {copiedId === msg.id ? <Check className="h-3.5 w-3.5 text-emerald-600 font-bold" /> : <Copy className="h-3.5 w-3.5" />}
                         <span>{copiedId === msg.id ? "Copied" : "Copy"}</span>
                       </button>
                     </div>
@@ -286,45 +295,45 @@ export function ChiefOfStaffModule({
           })}
 
           {isThinking && (
-            <div className="flex gap-3 items-center text-xs text-slate-500">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-100 text-[#D6135F] animate-pulse">
-                <Bot className="h-4 w-4" />
+            <div className="flex gap-3 items-center text-xs text-slate-600 font-medium">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-pink-100 text-[#D6135F] animate-pulse">
+                <Bot className="h-5 w-5" />
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-[#D6135F]" />
-                <span>AI Chief of Staff is analyzing Virtoy company telemetry...</span>
+              <div className="flex items-center gap-2.5 rounded-2xl border border-pink-200 bg-pink-50/50 p-3.5 shadow-2xs">
+                <Loader2 className="h-4 w-4 animate-spin text-[#F0186C]" />
+                <span>AI Chief of Staff is analyzing Virtoy telemetry &amp; project registries...</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Input Bar */}
-        <div className="border-t border-slate-100 bg-slate-50/70 p-4">
+        <div className="border-t border-pink-100 bg-gradient-to-r from-pink-50/40 via-white to-pink-50/40 p-4">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSend();
             }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2.5"
           >
             <Input
               type="text"
               placeholder="Ask your AI Chief of Staff (e.g. 'Prepare our Monday agenda', 'What deals need attention?')..."
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
-              className="flex-1 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
+              className="flex-1 bg-white border-2 border-pink-200/90 text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-[#F0186C] text-xs sm:text-sm py-2"
             />
             <Button
               type="submit"
               disabled={!inputVal.trim() || isThinking}
-              className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white font-bold shadow-sm shadow-[#F0186C]/25"
+              className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] hover:from-[#B00D4D] hover:to-[#D6135F] text-white font-bold shadow-md shadow-[#F0186C]/25 rounded-xl px-4 py-2"
             >
-              <Send className="h-3.5 w-3.5" />
+              <Send className="h-4 w-4" />
               <span>Ask Assistant</span>
             </Button>
           </form>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

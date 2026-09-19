@@ -115,56 +115,65 @@ export function ColdOutreachStudioModule({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-rose-200/70 bg-gradient-to-r from-rose-50/90 via-pink-50/50 to-rose-100/50 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-100 text-[#D6135F] shadow-sm">
-              <Zap className="h-4 w-4" />
-            </span>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900">AI B2B Cold Outreach Studio</h2>
-            <Badge variant="brand" size="sm">
-              Multi-Channel AI Pitch Engine
-            </Badge>
-          </div>
-          <p className="text-xs text-slate-600">
-            Generate high-converting, tailored executive cold pitches for WhatsApp, LinkedIn, Email, and Phone calls in 1 click.
-          </p>
-        </div>
+      <div className="relative overflow-hidden rounded-3xl border-2 border-pink-200/90 bg-gradient-to-br from-white via-[#FFF5F8] to-[#FCE7F3]/70 p-6 sm:p-7 shadow-sm">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-[#F0186C]/15 to-[#FF4D8D]/5 blur-3xl" />
 
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={handleGenerateAI}
-            disabled={isGenerating}
-            size="sm"
-            className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white gap-1.5 shadow-sm shadow-[#F0186C]/25 font-bold"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            {isGenerating ? "Synthesizing AI Pitch..." : "Generate AI Pitch"}
-          </Button>
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 text-white shadow-sm shadow-[#F0186C]/25">
+                <Zap className="h-5 w-5" />
+              </span>
+              <h2 className="text-2xl font-black tracking-tight text-slate-900">
+                AI B2B Cold Outreach{" "}
+                <span className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] bg-clip-text text-transparent">
+                  Studio
+                </span>
+              </h2>
+              <span className="rounded-full bg-pink-50 px-3 py-1 text-xs font-bold text-[#D6135F] border border-pink-200">
+                Multi-Channel AI
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">
+              Generate high-converting, tailored executive cold pitches for WhatsApp, LinkedIn, Email, and Phone calls in 1 click.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleGenerateAI}
+              disabled={isGenerating}
+              size="sm"
+              className="bg-gradient-to-r from-[#D6135F] to-[#F0186C] hover:from-[#B00D4D] hover:to-[#D6135F] text-white gap-2 shadow-md shadow-[#F0186C]/25 font-bold rounded-xl px-4 py-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              {isGenerating ? "Synthesizing AI Pitch..." : "Generate AI Pitch"}
+            </Button>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Left Column: Configuration Controls */}
         <div className="space-y-4 lg:col-span-5">
-          <Card className="border-slate-200/80 bg-white p-4 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+          <div className="rounded-3xl border border-pink-100 bg-white p-5 space-y-4 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-pink-100 pb-3">
               <Sliders className="h-4 w-4 text-[#D6135F]" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">Outreach Parameters</h3>
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Outreach Parameters</h3>
             </div>
 
             {/* Target Channel */}
             <div>
-              <label className="text-[11px] font-semibold text-slate-700">Target Channel</label>
+              <label className="text-[11px] font-bold text-slate-700">Target Channel</label>
               <div className="mt-1.5 grid grid-cols-2 gap-2">
                 <Button
                   size="sm"
                   variant={selectedChannel === "whatsapp" ? "brand" : "outline"}
                   onClick={() => setSelectedChannel("whatsapp")}
-                  className={`text-xs gap-1.5 justify-start ${
+                  className={`text-xs gap-1.5 justify-start rounded-xl font-bold ${
                     selectedChannel === "whatsapp"
                       ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm"
-                      : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50"
+                      : "border-2 border-pink-100 text-slate-700 bg-white hover:bg-pink-50/50 hover:border-pink-300"
                   }`}
                 >
                   <WhatsAppIcon className="h-3.5 w-3.5" />
@@ -174,10 +183,10 @@ export function ColdOutreachStudioModule({
                   size="sm"
                   variant={selectedChannel === "linkedin" ? "brand" : "outline"}
                   onClick={() => setSelectedChannel("linkedin")}
-                  className={`text-xs gap-1.5 justify-start ${
+                  className={`text-xs gap-1.5 justify-start rounded-xl font-bold ${
                     selectedChannel === "linkedin"
                       ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm"
-                      : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50"
+                      : "border-2 border-pink-100 text-slate-700 bg-white hover:bg-pink-50/50 hover:border-pink-300"
                   }`}
                 >
                   <LinkedinIcon className="h-3.5 w-3.5" />
@@ -187,10 +196,10 @@ export function ColdOutreachStudioModule({
                   size="sm"
                   variant={selectedChannel === "email" ? "brand" : "outline"}
                   onClick={() => setSelectedChannel("email")}
-                  className={`text-xs gap-1.5 justify-start ${
+                  className={`text-xs gap-1.5 justify-start rounded-xl font-bold ${
                     selectedChannel === "email"
                       ? "bg-gradient-to-r from-[#D6135F] to-[#F0186C] text-white shadow-sm"
-                      : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50"
+                      : "border-2 border-pink-100 text-slate-700 bg-white hover:bg-pink-50/50 hover:border-pink-300"
                   }`}
                 >
                   <Mail className="h-3.5 w-3.5" />
@@ -200,10 +209,10 @@ export function ColdOutreachStudioModule({
                   size="sm"
                   variant={selectedChannel === "cold_call" ? "brand" : "outline"}
                   onClick={() => setSelectedChannel("cold_call")}
-                  className={`text-xs gap-1.5 justify-start ${
+                  className={`text-xs gap-1.5 justify-start rounded-xl font-bold ${
                     selectedChannel === "cold_call"
                       ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-sm"
-                      : "border-slate-200 text-slate-700 bg-white hover:bg-slate-50"
+                      : "border-2 border-pink-100 text-slate-700 bg-white hover:bg-pink-50/50 hover:border-pink-300"
                   }`}
                 >
                   <PhoneCall className="h-3.5 w-3.5" />
@@ -214,11 +223,11 @@ export function ColdOutreachStudioModule({
 
             {/* Target Sector */}
             <div>
-              <label className="text-[11px] font-semibold text-slate-700">Target Industry / Sector</label>
+              <label className="text-[11px] font-bold text-slate-700">Target Industry / Sector</label>
               <Select
                 value={selectedSector}
                 onChange={(e) => setSelectedSector(e.target.value)}
-                className="mt-1 bg-white border-slate-200 text-slate-800 text-xs"
+                className="mt-1 bg-white border-2 border-pink-100 text-slate-800 text-xs rounded-xl focus:border-[#F0186C]"
               >
                 <option value="Healthcare">Hospitals & Healthcare (HMS / OMSA Registry)</option>
                 <option value="Hotels & Hospitality">Hotels & Luxury Resorts (Hotel-PMS)</option>
@@ -231,32 +240,32 @@ export function ColdOutreachStudioModule({
             {/* Client & Contact Person */}
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">Company Name</label>
+                <label className="text-[11px] font-bold text-slate-700">Company Name</label>
                 <Input
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
                   placeholder="e.g. Royal Heritage"
-                  className="mt-1 text-xs bg-white border-slate-200"
+                  className="mt-1 text-xs bg-white border-2 border-pink-100 rounded-xl focus:border-[#F0186C]"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-semibold text-slate-700">Contact Person</label>
+                <label className="text-[11px] font-bold text-slate-700">Contact Person</label>
                 <Input
                   value={contactPerson}
                   onChange={(e) => setContactPerson(e.target.value)}
                   placeholder="e.g. Dr. Mishra / Mr. Singh"
-                  className="mt-1 text-xs bg-white border-slate-200"
+                  className="mt-1 text-xs bg-white border-2 border-pink-100 rounded-xl focus:border-[#F0186C]"
                 />
               </div>
             </div>
 
             {/* Strategic Tone */}
             <div>
-              <label className="text-[11px] font-semibold text-slate-700">Value Pitch Strategy & Tone</label>
+              <label className="text-[11px] font-bold text-slate-700">Value Pitch Strategy & Tone</label>
               <Select
                 value={tone}
                 onChange={(e) => setTone(e.target.value)}
-                className="mt-1 bg-white border-slate-200 text-slate-800 text-xs"
+                className="mt-1 bg-white border-2 border-pink-100 text-slate-800 text-xs rounded-xl focus:border-[#F0186C]"
               >
                 <option value="roi_driven">ROI & Cost Savings Focus (Direct Financial Impact)</option>
                 <option value="social_proof">Client Social Proof (Tata Steel / OMSA / Govt Credentials)</option>
@@ -264,15 +273,15 @@ export function ColdOutreachStudioModule({
                 <option value="consultative">Executive Advisory & NAAC Consultancy Tone</option>
               </Select>
             </div>
-          </Card>
+          </div>
 
           {/* Quick Tips */}
-          <div className="rounded-2xl border border-rose-200/60 bg-rose-50/50 p-4 text-xs space-y-2">
+          <div className="rounded-3xl border border-pink-200/80 bg-gradient-to-br from-pink-50/70 to-rose-50/40 p-4 text-xs space-y-2 shadow-2xs">
             <div className="flex items-center gap-1.5 font-bold text-[#D6135F]">
-              <Lightbulb className="h-3.5 w-3.5" />
+              <Lightbulb className="h-4 w-4" />
               Virtoy Growth Playbook Tip
             </div>
-            <p className="text-slate-600 text-[11px] leading-relaxed">
+            <p className="text-slate-600 text-[11px] leading-relaxed font-medium">
               Leading with our verified client credentials (Tata Steel SafeAct, OMSA Health Registry, 18+ NAAC Colleges) triples reply rates compared to generic software pitches.
             </p>
           </div>
@@ -280,14 +289,14 @@ export function ColdOutreachStudioModule({
 
         {/* Right Column: Interactive Pitch Workspace */}
         <div className="space-y-4 lg:col-span-7">
-          <Card className="border-slate-200/80 bg-white p-5 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="rounded-3xl border border-pink-100 bg-white p-6 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-pink-100 pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-[#D6135F]" />
                 <h3 className="text-sm font-bold text-slate-900">Synthesized Pitch Preview</h3>
-                <Badge variant="brand" size="xs">
+                <span className="rounded-full bg-pink-50 px-2.5 py-0.5 text-[10px] font-bold text-[#D6135F] border border-pink-200">
                   {selectedChannel.toUpperCase()}
-                </Badge>
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -295,7 +304,7 @@ export function ColdOutreachStudioModule({
                   size="xs"
                   variant="outline"
                   onClick={handleCopy}
-                  className="gap-1 text-xs border-slate-200 text-slate-700 hover:bg-slate-50"
+                  className="gap-1 text-xs border-pink-200 text-slate-700 hover:bg-pink-50 rounded-xl"
                 >
                   {copied ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
                   {copied ? "Copied!" : "Copy Full Pitch"}
@@ -305,7 +314,7 @@ export function ColdOutreachStudioModule({
                   <Button
                     size="xs"
                     onClick={handleWhatsAppSend}
-                    className="gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                    className="gap-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm rounded-xl font-bold"
                   >
                     <WhatsAppIcon className="h-3 w-3" />
                     Open WhatsApp Web
@@ -316,50 +325,50 @@ export function ColdOutreachStudioModule({
 
             {/* Hook Headline */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#D6135F]">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#D6135F]">
                 1. Attention Hook (Opening Line)
               </span>
               <Input
                 value={generatedHook}
                 onChange={(e) => setGeneratedHook(e.target.value)}
-                className="font-semibold text-slate-900 bg-white border-slate-200 text-xs"
+                className="font-bold text-slate-900 bg-white border-2 border-pink-100 text-xs rounded-xl focus:border-[#F0186C]"
               />
             </div>
 
             {/* Pitch Body */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">
                 2. Value Proposition & Credibility Anchor
               </span>
               <Textarea
                 value={generatedBody}
                 onChange={(e) => setGeneratedBody(e.target.value)}
-                className="min-h-[140px] text-xs text-slate-800 leading-relaxed bg-white border-slate-200 font-sans"
+                className="min-h-[140px] text-xs text-slate-800 leading-relaxed bg-white border-2 border-pink-100 font-sans rounded-xl focus:border-[#F0186C]"
               />
             </div>
 
             {/* Call to Action */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700">
                 3. Low-Friction Call-To-Action (CTA)
               </span>
               <Input
                 value={generatedCta}
                 onChange={(e) => setGeneratedCta(e.target.value)}
-                className="text-slate-900 bg-white border-slate-200 text-xs"
+                className="text-slate-900 bg-white border-2 border-pink-100 text-xs rounded-xl focus:border-[#F0186C]"
               />
             </div>
 
             {/* Full Formatted Preview Box */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            <div className="rounded-2xl border border-pink-200/80 bg-gradient-to-br from-pink-50/40 to-rose-50/20 p-4 text-xs">
+              <span className="text-[10px] font-black text-[#D6135F] uppercase tracking-wider">
                 Full Message Output:
               </span>
-              <p className="mt-2 whitespace-pre-wrap font-sans text-slate-800 text-xs leading-relaxed">
+              <p className="mt-2 whitespace-pre-wrap font-sans text-slate-800 text-xs leading-relaxed font-normal">
                 {fullPitchText}
               </p>
             </div>
-          </Card>
+          </div>
         </div>
       </div>
     </div>

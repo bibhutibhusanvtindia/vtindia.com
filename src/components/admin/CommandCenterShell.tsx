@@ -81,7 +81,7 @@ export function CommandCenterShell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 selection:bg-[#F0186C] selection:text-white flex antialiased">
+    <div className="min-h-screen bg-[#FCF9FA] bg-[radial-gradient(ellipse_100%_60%_at_50%_0%,rgba(240,24,108,0.05),rgba(255,255,255,0))] text-slate-900 selection:bg-[#F0186C] selection:text-white flex antialiased">
       {/* 1. Left Sidebar Navigation */}
       <AdminSidebar
         activeTab={activeTab}
